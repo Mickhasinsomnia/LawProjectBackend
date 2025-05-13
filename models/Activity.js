@@ -21,7 +21,7 @@ const ActivitySchema=new mongoose.Schema({
     },
   status: {
       type: String,
-      enum: ['available', 'booked'],
+      enum: ['confirmed','rescheduled','cancelled'],
       default: 'available'
   },
   detail: {
