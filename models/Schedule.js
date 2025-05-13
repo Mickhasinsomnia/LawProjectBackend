@@ -1,6 +1,4 @@
-const mongoose=require('mongoose')
-
-const ScheduleSchema=new mongoose.Schema({
+const ScheduleSchema = new mongoose.Schema({
   lawyerId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
@@ -13,14 +11,14 @@ const ScheduleSchema=new mongoose.Schema({
   },
 
   status: {
-      type: String,
-      enum: ['available', 'booked'],
-      default: 'available'
+    type: String,
+    enum: ['available', 'booked'],
+    default: 'available'
   },
-  detail: {
-      type: String,
-      default: ""
-  }
-})
 
-module.exports = mongoose.model('Schedule', ScheduleSchema);
+  detail: {
+    type: String,
+    default: ""
+  }
+
+}, { timestamps: true });

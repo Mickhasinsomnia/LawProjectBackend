@@ -6,29 +6,24 @@ const ActivitySchema=new mongoose.Schema({
     ref: 'User',
     required: true,
   },
-
   lawyerId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
     required: true,
   },
-
   timeStamp: {
     type: Date,
     required: true
   },
-
   location: {
       type: String,
       required: true,
     },
-
   status: {
       type: String,
       enum: ['available', 'booked'],
       default: 'available'
   },
-
   detail: {
       type: String,
       default: ""
