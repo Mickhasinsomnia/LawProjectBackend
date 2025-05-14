@@ -9,7 +9,6 @@ const auth = require('./routes/auth')
 dotenv.config({ path: "./config/config.env" });
 connectDB();
 
-
 const PORT = process.env.PORT || 5050;
 
 const app = express();
