@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const ScheduleSchema = new mongoose.Schema({
   lawyerId: {
     type: mongoose.Schema.Types.ObjectId,

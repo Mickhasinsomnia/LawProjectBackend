@@ -10,7 +10,6 @@ const LawyerSchema=new mongoose.Schema({
     type: String,
     required: true
   },
-
   // lawyerVerificationStatus: {
   //     type: String,
   //     enum: ['real', 'fake', 'pending'],
@@ -22,7 +21,6 @@ const LawyerSchema=new mongoose.Schema({
   //       enum: ['real', 'fake', 'pending'],
   //       default: 'pending'
   //     },
-
   experience:{
     type:Number,
     require:true,
@@ -33,11 +31,18 @@ const LawyerSchema=new mongoose.Schema({
     require:true,
     min:0
   },
-
-
-
-
-
+  avgRating: {
+      type: Number,
+      default: 0,
+      min: 0,
+      max: 5,
+      set: val => Math.round(val * 100) / 100,
+    },
+    reviewCount: {
+      type: Number,
+      default: 0,
+      min: 0,
+    }
 }, {
   _id: false,
 });
