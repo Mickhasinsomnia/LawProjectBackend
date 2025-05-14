@@ -15,3 +15,7 @@ exports.addSchedule = async (req, res, next) => {
     });
   }
 };
+
+exports.updateSchedule = async (req, res, next) => {
+
+};

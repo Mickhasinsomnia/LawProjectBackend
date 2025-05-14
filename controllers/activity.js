@@ -47,3 +47,21 @@ exports.updateActivity = async (req,res,next) =>{
   })
 
 }
+
+exports.deleteActivity = async(req,res,next) =>{
+  const activity = await Activity.findById(req.params.id);
+
+  if(!activity){
+    return res.status(404).json({
+      message:"No activity found"
+    })
+  }
+
+  await Activity.deleteOne({ _id: req.params.id });
+
+  return res.status(200).json({
+    success:true,
+    message: {}
+  })
+
+}
