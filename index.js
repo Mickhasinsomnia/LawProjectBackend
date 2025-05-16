@@ -1,8 +1,7 @@
 const express = require("express");
 const dotenv = require("dotenv");
 const connectDB = require("./config/db");
-const schedule= require('./routes/schedule')
-const activity= require('./routes/activity')
+const appointment= require('./routes/appointment')
 const auth = require('./routes/auth')
 
 
@@ -19,8 +18,7 @@ const server = app.listen(
 
 app.use(express.json());
 
-app.use('/api/v1/schedule', schedule);
-app.use('/api/v1/activity', activity);
+app.use('/api/v1/appointment', appointment);
 app.use('/api/v1/auth', auth);
 
 

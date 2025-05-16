@@ -1,4 +1,4 @@
-const {createActivity,updateActivity,deleteActivity} = require('../controllers/activity')
+const {createActivity,updateActivity,deleteActivity} = require('../controllers/appointment')
 
 const express = require('express');
 

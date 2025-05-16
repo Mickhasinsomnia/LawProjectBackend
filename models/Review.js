@@ -36,26 +36,6 @@ const LawyerReviewSchema = new mongoose.Schema({
     required: true,
     maxlenght: 1000
   },
-  status: {
-    reported: {
-      type: Boolean,
-      default: false,
-    },
-  },
-  report: {
-    reason: {
-      type: String,
-      enum: ['spam', 'inappropriate', 'fake', 'other', 'offensive Language'],
-    },
-    otherReasonText: {
-      type: String,
-      maxlength: 200,
-      required: function () {
-        return this.report?.reason === 'other';
-      },
-    },
-  },
-}, {
   timestamps: true,
 });
 

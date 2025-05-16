@@ -1,4 +1,4 @@
-const Activity = require('../models/Activity')
+const Activity = require('../models/Appointment')
 
 exports.createActivity = async (req, res, next) => {
 
