@@ -1,67 +1,83 @@
-const Activity = require('../models/Appointment')
+const Appointment = require("../models/Appointment");
 
-exports.createActivity = async (req, res, next) => {
-
-  const newActivity = await Activity.create(req.body);
+exports.createAppointment = async (req, res, next) => {
   try {
-    res.status(201).json({
+    const newAppointment = await Appointment.create(req.body);
+
+    return res.status(201).json({
       success: true,
-      data: newActivity,
+      data: newAppointment,
     });
   } catch (err) {
     console.error(err);
-    res.status(400).json({
+    return res.status(400).json({
       success: false,
-      message: "Failed to create camp",
+      message: "Failed to create appointment",
+      error: err.message,
+    });
+  }
+};
+
+exports.updateAppointment = async (req, res, next) => {
+  try {
+    let activity = await Appointment.findById(req.params.id);  // Use await here
+
+    if (!activity) {
+      return res.status(404).json({
+        success: false,
+        message: `No appointment found with the id of ${req.params.id}`,
+      });
+    }
+
+    // if(req.user.role != 'admin' && activity.lawyerId != req.user.id){
+    //   return res.status(403).json({
+    //     success: false,
+    //     message: `User ${req.user.id} is not authorized to update this appointment`,
+    //   });
+    // }
+
+    activity = await Appointment.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+      runValidators: true,
     });
 
-  }
-}
-
-exports.updateActivity = async (req,res,next) =>{
-
-  let activity = Activity.findById(req.params.id);
-
-  if(!activity){
-    return res.status(404).json({
+    return res.status(200).json({
+      success: true,
+      data: activity,
+    });
+  } catch (err) {
+    console.error(err);
+    return res.status(400).json({
       success: false,
-      message: `No activity with the id of ${req.params.id}`
-    })
+      message: "Failed to update appointment",
+      error: err.message,
+    });
   }
+};
 
-  // if(req.user.role!='admin' && activity.lawyerId!=req.user.id){
-  //   return res.status(403).json({
-  //     success: false,
-  //     message: `User ${req.user.id} is not authorized to update this activity`
-  //   })
-  // }
+exports.deleteAppointment = async (req, res, next) => {
+  try {
+    const activity = await Appointment.findById(req.params.id);
 
-  activity = await Activity.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
-      runValidators:true
-  });
+    if (!activity) {
+      return res.status(404).json({
+        success: false,
+        message: "No appointment found with the given id",
+      });
+    }
 
-  return res.status(201).json({
-    success:true,
-    data:activity
-  })
+    await Appointment.deleteOne({ _id: req.params.id });
 
-}
-
-exports.deleteActivity = async(req,res,next) =>{
-  const activity = await Activity.findById(req.params.id);
-
-  if(!activity){
-    return res.status(404).json({
-      message:"No activity found"
-    })
+    return res.status(200).json({
+      success: true,
+      message: "Appointment deleted successfully",
+    });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({
+      success: false,
+      message: "Failed to delete appointment",
+      error: err.message,
+    });
   }
-
-  await Activity.deleteOne({ _id: req.params.id });
-
-  return res.status(200).json({
-    success:true,
-    message: {}
-  })
-
-}
+};
