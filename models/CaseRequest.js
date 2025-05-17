@@ -22,7 +22,7 @@ const CaseRequestSchema = new mongoose.Schema({
   status: {
       type: String,
       enum: ['open', 'assigned', 'cancelled'],
-      default: 'pending'
+      default: 'open'
   },
 })
 

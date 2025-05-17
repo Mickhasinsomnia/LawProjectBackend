@@ -1,9 +1,8 @@
 const Hiring = require('../models/Hiring');
-const CaseRequest = require('../models/CaseRequest')
+const CaseRequest = require('../models/CaseRequest');
 
 exports.addHiring = async (req, res, next) => {
   try {
-
     const acceptedCase = await CaseRequest.findById(req.params.id);
 
     if (!acceptedCase) {
@@ -19,7 +18,6 @@ exports.addHiring = async (req, res, next) => {
     const newHire = await Hiring.create(req.body);
 
     acceptedCase.status = "assigned";
-
     await acceptedCase.save();
 
     return res.status(201).json({
@@ -30,15 +28,15 @@ exports.addHiring = async (req, res, next) => {
     console.error(err);
     return res.status(400).json({
       success: false,
-      message: "Failed to create case request",
-      error: err.message
+      message: "Failed to create hiring",
+      error: err.message,
     });
   }
 };
 
 exports.updateHiring = async (req, res, next) => {
   try {
-    let hiring = await Hiring.findById(req.params.id);
+    const hiring = await Hiring.findById(req.params.id);
 
     if (!hiring) {
       return res.status(404).json({
@@ -47,18 +45,17 @@ exports.updateHiring = async (req, res, next) => {
       });
     }
 
-    if(req.user.role!='admin' && req.user.id != hiring.lawyer_id){
+    if (req.user.role !== 'admin' && req.user.id !== hiring.lawyer_id.toString()) {
       return res.status(403).json({
-        success:false,
-        message:`User ${req.user.id} is not authorized to update this case request`,
-      })
+        success: false,
+        message: `User ${req.user.id} is not authorized to update this hiring`,
+      });
     }
 
     if (req.body.task) hiring.task = req.body.task;
     if (req.body.note) hiring.note = req.body.note;
     if (req.body.start_date) hiring.start_date = req.body.start_date;
     if (req.body.end_date) hiring.end_date = req.body.end_date;
-
 
     await hiring.save();
 
@@ -86,29 +83,32 @@ exports.cancelHiring = async (req, res, next) => {
       });
     }
 
-    if(req.user.role!='admin' && req.user.id != hiring.lawyer_id){
+    if (req.user.role !== 'admin' && req.user.id !== hiring.lawyer_id.toString()) {
       return res.status(403).json({
-        success:false,
-        message:`User ${req.user.id} is not authorized to cancel this hiring`,
-      })
+        success: false,
+        message: `User ${req.user.id} is not authorized to cancel this hiring`,
+      });
     }
 
     hiring.status.status = 'cancelled';
     await hiring.save();
 
     const caseRequest = await CaseRequest.findById(hiring.case_id);
-    caseRequest.status = 'open';
+    if (caseRequest) {
+      caseRequest.status = 'open';
+      await caseRequest.save();
+    }
 
     return res.status(200).json({
       success: true,
-      message: "Hiring canceled successfully",
+      message: "Hiring cancelled successfully",
     });
   } catch (err) {
     console.error(err);
     return res.status(500).json({
       success: false,
       message: "Failed to cancel hiring",
-      error: err.message
+      error: err.message,
     });
   }
 };

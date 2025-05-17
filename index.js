@@ -3,6 +3,9 @@ const dotenv = require("dotenv");
 const connectDB = require("./config/db");
 const appointment= require('./routes/appointment')
 const auth = require('./routes/auth')
+const caseRequest = require('./routes/caseRequest')
+const clientCase = require ('./routes/clientCase')
+const hiring = require ('./routes/hiring')
 
 
 dotenv.config({ path: "./config/config.env" });
@@ -20,6 +23,9 @@ app.use(express.json());
 
 app.use('/api/v1/appointment', appointment);
 app.use('/api/v1/auth', auth);
+app.use('/api/v1/caseRequest', caseRequest);
+app.use('/api/v1/clientCase', clientCase);
+app.use('/api/v1/hiring', hiring);
 
 
 process.on("unhandledRejection", (err, promise) => {
