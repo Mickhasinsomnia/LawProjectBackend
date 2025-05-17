@@ -9,7 +9,6 @@ const HiringSchema = new mongoose.Schema({
   lawyer_id:{
     type:mongoose.Schema.Types.ObjectId,
     ref:'Lawyer',
-    require:true
   },
   approved_at:{
     type:Date,
@@ -38,3 +37,5 @@ const HiringSchema = new mongoose.Schema({
   }
 
 })
+
+module.exports = mongoose.model('hiring', HiringSchema);

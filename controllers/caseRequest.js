@@ -3,7 +3,7 @@ const CaseRequest = require("../models/CaseRequest");
 exports.addCaseRequest = async (req, res, next) => {
   try {
     const newCaseRequest = await CaseRequest.create(req.body);
-    newCaseRequest.client_id = res.user.id;
+    newCaseRequest.client_id = req.user.id;
     await newCaseRequest.save();
 
     return res.status(201).json({
