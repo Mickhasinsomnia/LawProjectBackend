@@ -24,9 +24,9 @@ const HiringSchema = new mongoose.Schema({
      default: ""
   },
   status: {
-      type: String,
-      enum: ['pending', 'confirmed', 'cancelled', 'completed'],
-      default: 'pending'
+    type: String,
+      enum: ['active', 'cancelled','completed'],
+      default: 'active'
   },
   start_date:{
     type:Date,

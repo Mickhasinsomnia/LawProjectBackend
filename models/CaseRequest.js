@@ -8,7 +8,7 @@ const CaseRequestSchema = new mongoose.Schema({
   },
   category_id:{
     type:mongoose.Schema.Types.ObjectId,
-    ref:'User',
+    ref:'Category',
     required:true
   },
   description:{
@@ -21,7 +21,7 @@ const CaseRequestSchema = new mongoose.Schema({
   },
   status: {
       type: String,
-      enum: ['confirmed','pending','cancelled'],
+      enum: ['open', 'assigned', 'cancelled'],
       default: 'pending'
   },
 })
