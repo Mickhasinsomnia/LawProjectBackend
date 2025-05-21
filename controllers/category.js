@@ -10,7 +10,6 @@ exports.getCategory = async (req, res, next) => {
         message: 'Category not found'
       });
     }
-
     return res.status(200).json({
       success: true,
       data: category

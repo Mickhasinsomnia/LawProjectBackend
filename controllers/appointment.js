@@ -1,7 +1,20 @@
 const Appointment = require("../models/Appointment");
+const Hiring = require('../models/Hiring')
 
 exports.createAppointment = async (req, res, next) => {
   try {
+
+    const hiring = Hiring.findById(req.params.id);
+
+    if(!hiring){
+      return res.status(404).json({
+        success: false,
+        message: "Hiring not found",
+      });
+    }
+
+    req.body.hiringId = req.params.id;
+
     const newAppointment = await Appointment.create(req.body);
 
     return res.status(201).json({
@@ -20,7 +33,7 @@ exports.createAppointment = async (req, res, next) => {
 
 exports.updateAppointment = async (req, res, next) => {
   try {
-    let activity = await Appointment.findById(req.params.id);  // Use await here
+    let activity = await Appointment.findById(req.params.id);
 
     if (!activity) {
       return res.status(404).json({

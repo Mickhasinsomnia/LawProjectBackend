@@ -9,6 +9,6 @@ router.route('/').post(protect,addCaseRequest);
 
 router.route('/:id').put(updateCaseRequest).delete(cancelCaseRequest);
 
-router.route('/:id').get(getCaseRequestById);
+router.route('/:id').get(protect,authorize('user'),getCaseRequestById);
 
 module.exports = router;

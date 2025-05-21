@@ -1,5 +1,9 @@
 const CaseRequest = require("../models/CaseRequest");
 
+
+//@desc  Create a new case request
+//@route POST /api/v1/caseRequest
+//@access Private
 exports.addCaseRequest = async (req, res, next) => {
   try {
     const newCaseRequest = await CaseRequest.create(req.body);
@@ -20,6 +24,9 @@ exports.addCaseRequest = async (req, res, next) => {
   }
 };
 
+//@desc     Cancel a case request
+//@route    DELETE /api/v1/caseRequest/:id
+//@access   Private
 exports.cancelCaseRequest = async (req, res, next) => {
   try {
     const caseRequest = await CaseRequest.findById(req.params.id);
@@ -58,6 +65,9 @@ exports.cancelCaseRequest = async (req, res, next) => {
   }
 };
 
+//@desc     Update a case request
+//@route    PUT /api/v1/caseRequest/:id
+//@access   Private
 exports.updateCaseRequest = async (req, res, next) => {
   try {
     const caseRequest = await CaseRequest.findById(req.params.id);
@@ -103,8 +113,7 @@ exports.getCaseRequestById = async (req, res, next) => {
   try {
     const caseRequestId = req.params.id;
 
-    const caseRequest = await CaseRequest.findById(caseRequestId);
-
+    const caseRequest = await CaseRequest.findById(caseRequestId).populate({ path: 'category_id', select: 'name' });
     if (!caseRequest) {
       return res.status(404).json({
         success: false,

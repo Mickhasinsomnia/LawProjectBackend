@@ -1,6 +1,10 @@
 const Hiring = require('../models/Hiring');
 const CaseRequest = require('../models/CaseRequest');
 
+
+//@desc  Create new job Hiring
+//@route POST /api/v1/hiring
+//@access Private
 exports.addHiring = async (req, res, next) => {
   try {
     const acceptedCase = await CaseRequest.findById(req.params.id);
@@ -34,6 +38,9 @@ exports.addHiring = async (req, res, next) => {
   }
 };
 
+//@desc     Update job hiring
+//@route    DELETE /api/v1/hiring/:id
+//@access   Private
 exports.updateHiring = async (req, res, next) => {
   try {
     const hiring = await Hiring.findById(req.params.id);
@@ -72,6 +79,10 @@ exports.updateHiring = async (req, res, next) => {
   }
 };
 
+
+//@desc     Cancel job hiring
+//@route    DELETE /api/v1/hiring/:id
+//@access   Private
 exports.cancelHiring = async (req, res, next) => {
   try {
     const hiring = await Hiring.findById(req.params.id);
@@ -90,7 +101,7 @@ exports.cancelHiring = async (req, res, next) => {
       });
     }
 
-    hiring.status.status = 'cancelled';
+    hiring.status = 'cancelled';
     await hiring.save();
 
     const caseRequest = await CaseRequest.findById(hiring.case_id);
