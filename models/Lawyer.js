@@ -1,48 +1,51 @@
-const mongoose=require('mongoose')
+const mongoose = require('mongoose');
 
-const LawyerSchema=new mongoose.Schema({
-  userId: {
+const LawyerSchema = new mongoose.Schema({
+  user_id: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
-    required: true,
   },
-  specialization: {
+  name: {
+    type: String,
+  },
+  photo: {
+    type: String
+  },
+  price: {
+    type: Number,
+    required: true
+  },
+  experience: {
+    type: Number,
+    required: true
+  },
+  expertise: {
     type: String,
     required: true
   },
-  // lawyerVerificationStatus: {
-  //     type: String,
-  //     enum: ['real', 'fake', 'pending'],
-  //     default: 'pending'
-  //   },
-
-  //   barristerStatus: {
-  //       type: String,
-  //       enum: ['real', 'fake', 'pending'],
-  //       default: 'pending'
-  //     },
-  experience:{
-    type:Number,
-    require:true,
-    min:0
+  win_rate: {
+    type: Number,
+    min: 0,
+    max: 1
   },
-  CaseWin:{
-    type:Number,
-    require:true,
-    min:0
+  clients_count: {
+    type: Number,
+    default: 0
   },
-  avgRating: {
-      type: Number,
-      default: 0,
-      min: 0,
-      max: 5,
-      set: val => Math.round(val * 100) / 100,
-    },
-    reviewCount: {
-      type: Number,
-      default: 0,
-      min: 0,
-    }
+  has_law_license: {
+    type: Boolean,
+    default: false
+  },
+  is_verified_by_council: {
+    type: Boolean,
+    default: false
+  },
+  total_score: {
+    type: Number,
+    default: 0 // Calculated based on other fields
+  }
 }, {
-  _id: false,
+  timestamps: true
 });
+
+module.exports = mongoose.model('Lawyer', LawyerSchema);

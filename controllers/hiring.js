@@ -1,6 +1,34 @@
 const Hiring = require('../models/Hiring');
 const CaseRequest = require('../models/CaseRequest');
 
+//@desc  Get hiring by ID
+//@route GET /api/v1/hiring/:id
+//@access Private
+exports.getHiring = async (req, res, next) => {
+  try {
+    const hiring = await Hiring.findById(req.params.id).populate('case_id');
+
+    if (!hiring) {
+      return res.status(404).json({
+        success: false,
+        message: "Hiring not found",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      data: hiring,
+    });
+  } catch (err) {
+    console.error(err);
+    return res.status(400).json({
+      success: false,
+      message: "Failed to get hiring",
+      error: err.message,
+    });
+  }
+};
+
 
 //@desc  Create new job Hiring
 //@route POST /api/v1/hiring
@@ -16,10 +44,13 @@ exports.addHiring = async (req, res, next) => {
       });
     }
 
-    req.body.lawyer_id = req.user.id;
-    req.body.case_id = req.params.id;
+    const hiringData = {
+      ...req.body,
+      lawyer_id: req.user.id,
+      case_id: req.params.id,
+    };
 
-    const newHire = await Hiring.create(req.body);
+    const newHire = await Hiring.create(hiringData);
 
     acceptedCase.status = "assigned";
     await acceptedCase.save();

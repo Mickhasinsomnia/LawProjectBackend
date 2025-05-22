@@ -7,6 +7,7 @@ const caseRequest = require('./routes/caseRequest')
 const clientCase = require ('./routes/clientCase')
 const hiring = require ('./routes/hiring')
 const category = require ('./routes/category')
+const lawyer = require('./routes/lawyer')
 
 
 dotenv.config({ path: "./config/config.env" });
@@ -28,6 +29,7 @@ app.use('/api/v1/caseRequest', caseRequest);
 app.use('/api/v1/clientCase', clientCase);
 app.use('/api/v1/hiring', hiring);
 app.use('/api/v1/category', category);
+app.use('/api/v1/lawyer', lawyer);
 
 
 process.on("unhandledRejection", (err, promise) => {
