@@ -5,6 +5,12 @@ const Lawyer = require("../models/Lawyer");
 // @access  Private
 exports.addLawyer = async (req, res) => {
   try {
+
+    const data = await Lawyer.findOne({ user_id: req.user.id });
+    if(data){
+      return res.status(400).json({ message: "Lawyer data already existed" });
+    }
+
     const lawyerData = {
       ...req.body,
       user_id: req.user.id,

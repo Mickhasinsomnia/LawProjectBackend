@@ -1,9 +1,8 @@
 const Appointment = require("../models/Appointment");
-const Hiring = require('../models/Hiring')
+const Hiring = require("../models/Hiring");
 
 exports.createAppointment = async (req, res, next) => {
   try {
-
     const hiring = await Hiring.findById(req.params.id);
 
     if (!hiring) {
@@ -13,6 +12,12 @@ exports.createAppointment = async (req, res, next) => {
       });
     }
 
+    if (hiring.status !== "active") {
+      return res.status(400).json({
+        success: false,
+        message: "Hiring is not active or has been canceled",
+      });
+    }
 
     const appointmentData = {
       ...req.body,
@@ -20,7 +25,6 @@ exports.createAppointment = async (req, res, next) => {
     };
 
     const newAppointment = await Appointment.create(appointmentData);
-
 
     return res.status(201).json({
       success: true,
@@ -47,17 +51,42 @@ exports.updateAppointment = async (req, res, next) => {
       });
     }
 
-    // if(req.user.role != 'admin' && activity.lawyerId != req.user.id){
-    //   return res.status(403).json({
-    //     success: false,
-    //     message: `User ${req.user.id} is not authorized to update this appointment`,
-    //   });
-    // }
+    if (
+      req.user.role !== "admin" &&
+      activity.lawyerId.toString() !== req.user.id
+    ) {
+      return res.status(403).json({
+        success: false,
+        message: `User ${req.user.id} is not authorized to update this appointment`,
+      });
+    }
 
-    activity = await Appointment.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
-      runValidators: true,
-    });
+    if (activity.status === "cancelled") {
+      return res.status(400).json({
+        success: false,
+        message:
+          "This appointment has already been cancelled and cannot be updated.",
+      });
+    }
+
+    const hiring = await Hiring.findById(activity.hiringId);
+    if (!hiring || hiring.status !== "active") {
+      return res.status(400).json({
+        success: false,
+        message: "The associated hiring is no longer active",
+      });
+    }
+
+    if (req.body.status) {
+      delete req.body.status;
+    }
+
+    if (req.body.task) activity.task = req.body.task;
+    if (req.body.note) activity.note = req.body.note;
+    if (req.body.location) activity.location = req.body.location;
+    if (req.body.timeStamp) activity.timeStamp = req.body.timeStamp;
+
+    await activity.save();
 
     return res.status(200).json({
       success: true,
@@ -84,17 +113,25 @@ exports.deleteAppointment = async (req, res, next) => {
       });
     }
 
-    await Appointment.deleteOne({ _id: req.params.id });
+    if (activity.status === "cancelled") {
+      return res.status(400).json({
+        success: false,
+        message: "This appointment is already cancelled",
+      });
+    }
+
+    activity.status = "cancelled";
+    await activity.save();
 
     return res.status(200).json({
       success: true,
-      message: "Appointment deleted successfully",
+      message: "Appointment cancelled successfully",
     });
   } catch (err) {
     console.error(err);
     return res.status(500).json({
       success: false,
-      message: "Failed to delete appointment",
+      message: "Failed to cancel appointment",
       error: err.message,
     });
   }

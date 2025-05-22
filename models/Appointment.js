@@ -4,7 +4,6 @@ const AppointmentSchema=new mongoose.Schema({
   hiringId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
-    required: true,
   },
   timeStamp: {
     type: Date,
@@ -24,8 +23,8 @@ const AppointmentSchema=new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ['pending', 'confirmed', 'cancelled', 'completed'],
-    default: 'pending'
+    enum: ['confirmed', 'cancelled', 'completed'],
+    default: 'confirmed'
   },
 })
 

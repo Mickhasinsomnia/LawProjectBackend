@@ -1,5 +1,6 @@
 const Hiring = require('../models/Hiring');
 const CaseRequest = require('../models/CaseRequest');
+const Lawyer = require('../models/Lawyer')
 
 //@desc  Get hiring by ID
 //@route GET /api/v1/hiring/:id
@@ -35,14 +36,29 @@ exports.getHiring = async (req, res, next) => {
 //@access Private
 exports.addHiring = async (req, res, next) => {
   try {
-    const acceptedCase = await CaseRequest.findById(req.params.id);
+    const lawyer = await Lawyer.findOne({ user_id: req.user.id });
+    if (!lawyer) {
+      return res.status(403).json({
+        success: false,
+        message: 'User must complete lawyer profile before creating a hiring',
+      });
+    }
 
+    const acceptedCase = await CaseRequest.findById(req.params.id);
     if (!acceptedCase) {
       return res.status(404).json({
         success: false,
         message: "Case request not found",
       });
     }
+
+    if (acceptedCase.status !== "open") {
+      return res.status(400).json({
+        success: false,
+        message: "Case is not available for hiring. Status must be 'open'.",
+      });
+    }
+
 
     const hiringData = {
       ...req.body,
@@ -69,13 +85,21 @@ exports.addHiring = async (req, res, next) => {
   }
 };
 
+
 //@desc     Update job hiring
 //@route    DELETE /api/v1/hiring/:id
 //@access   Private
 exports.updateHiring = async (req, res, next) => {
   try {
-    const hiring = await Hiring.findById(req.params.id);
+    const lawyer = await Lawyer.findOne({ user: req.user.id });
+    if (!lawyer && req.user.role !== 'admin') {
+      return res.status(403).json({
+        success: false,
+        message: 'User must complete lawyer profile before updating a hiring',
+      });
+    }
 
+    const hiring = await Hiring.findById(req.params.id);
     if (!hiring) {
       return res.status(404).json({
         success: false,
@@ -111,13 +135,21 @@ exports.updateHiring = async (req, res, next) => {
 };
 
 
+
 //@desc     Cancel job hiring
 //@route    DELETE /api/v1/hiring/:id
 //@access   Private
 exports.cancelHiring = async (req, res, next) => {
   try {
-    const hiring = await Hiring.findById(req.params.id);
+    const lawyer = await Lawyer.findOne({ user: req.user.id });
+    if (!lawyer && req.user.role !== 'admin') {
+      return res.status(403).json({
+        success: false,
+        message: 'User must complete lawyer profile before cancelling a hiring',
+      });
+    }
 
+    const hiring = await Hiring.findById(req.params.id);
     if (!hiring) {
       return res.status(404).json({
         success: false,
