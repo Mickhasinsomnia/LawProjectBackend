@@ -6,13 +6,19 @@ const CaseRequest = require("../models/CaseRequest");
 //@access Private
 exports.addCaseRequest = async (req, res, next) => {
   try {
-    const newCaseRequest = await CaseRequest.create(req.body);
-    newCaseRequest.client_id = req.user.id;
-    await newCaseRequest.save();
+    const newCaseRequest = await CaseRequest.create({
+      ...req.body,
+      client_id: req.user.id,
+    });
+
+    const populatedCaseRequest = await newCaseRequest.populate({
+      path: 'category_id',
+      select: 'name',
+    });
 
     return res.status(201).json({
       success: true,
-      data: newCaseRequest,
+      data: populatedCaseRequest,
     });
   } catch (err) {
     console.error(err);
@@ -23,6 +29,7 @@ exports.addCaseRequest = async (req, res, next) => {
     });
   }
 };
+
 
 //@desc     Cancel a case request
 //@route    DELETE /api/v1/caseRequest/:id
