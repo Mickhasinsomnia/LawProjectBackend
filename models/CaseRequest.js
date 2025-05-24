@@ -14,6 +14,11 @@ const CaseRequestSchema = new mongoose.Schema({
     type:String,
     required:true
   },
+  lawyer_id:{
+    type:mongoose.Schema.Types.ObjectId,
+    ref:'lawyer',
+    required:true
+  },
   note:{
     type:String,
     default: ""

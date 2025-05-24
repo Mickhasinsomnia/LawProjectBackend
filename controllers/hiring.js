@@ -141,7 +141,7 @@ exports.updateHiring = async (req, res, next) => {
 //@access   Private
 exports.cancelHiring = async (req, res, next) => {
   try {
-    const lawyer = await Lawyer.findOne({ user: req.user.id });
+    const lawyer = await Lawyer.findOne({ user_id: req.user.id });
     if (!lawyer && req.user.role !== 'admin') {
       return res.status(403).json({
         success: false,
