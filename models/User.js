@@ -36,6 +36,10 @@ const UserSchema = new mongoose.Schema({
         minlength: 6,
         select: false
     },
+    lineId:{
+      type:String,
+      required:[true,'Please add a line ID'],
+    },
     location: {
       type: String,
       required: [true, 'Please add a location']

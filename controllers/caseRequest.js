@@ -152,16 +152,10 @@ exports.getCaseRequestById = async (req, res, next) => {
   }
 };
 
+
 exports.getCaseRequestsByClientId = async (req, res, next) => {
   try {
-    const clientId = req.params.clientId;
-
-    if (req.user.role !== "admin" && req.user.id !== clientId) {
-      return res.status(403).json({
-        success: false,
-        message: "You are not authorized to view case requests for this client",
-      });
-    }
+    const clientId = req.user.id;
 
     const caseRequests = await CaseRequest.find({ client_id: clientId });
 
@@ -169,6 +163,34 @@ exports.getCaseRequestsByClientId = async (req, res, next) => {
       return res.status(404).json({
         success: false,
         message: "No case requests found for this client",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      data: caseRequests,
+    });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({
+      success: false,
+      message: "Failed to retrieve case requests",
+      error: err.message,
+    });
+  }
+};
+
+// For lawyers
+exports.getCaseRequestsByLawyerId = async (req, res, next) => {
+  try {
+    const lawyerId = req.user.id;
+
+    const caseRequests = await CaseRequest.find({ lawyer_id: lawyerId });
+
+    if (caseRequests.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "No case requests found for this lawyer",
       });
     }
 
