@@ -42,7 +42,7 @@ const CaseRequestSchema = new mongoose.Schema({
     enum: ['reserved', 'cancelled', 'completed', 'pending'],
     default: 'pending'
   },
-  notes: {
+  note: {
     type: String,
     default: ''
   },

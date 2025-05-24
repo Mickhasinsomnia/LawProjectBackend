@@ -135,4 +135,4 @@ exports.deleteAppointment = async (req, res, next) => {
       error: err.message,
     });
   }
-};
+}

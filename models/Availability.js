@@ -22,7 +22,7 @@ const Availability = new mongoose.Schema({
     type: Boolean,
     default: true
   },
-  notes: {
+  note: {
     type: String,
     default: ''
   },

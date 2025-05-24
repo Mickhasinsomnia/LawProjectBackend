@@ -52,6 +52,13 @@ exports.addHiring = async (req, res, next) => {
       });
     }
 
+    if(acceptedCase.lawyer_id.toString()!=req.user.id){
+      return res.status(403).json({
+        success: false,
+        message: "You are not authorized to access this case request",
+      });
+    }
+
     if (acceptedCase.status !== "open") {
       return res.status(400).json({
         success: false,
@@ -62,7 +69,8 @@ exports.addHiring = async (req, res, next) => {
 
     const hiringData = {
       ...req.body,
-      lawyer_id: req.user.id,
+      lawyer_id: acceptedCase.lawyer_id,
+      client_id:acceptedCase.client_id,
       case_id: req.params.id,
     };
 

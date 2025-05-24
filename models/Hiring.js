@@ -10,6 +10,10 @@ const HiringSchema = new mongoose.Schema({
     type:mongoose.Schema.Types.ObjectId,
     ref:'Lawyer',
   },
+  client_id:{
+    type:mongoose.Schema.Types.ObjectId,
+    ref:'User',
+  },
   approved_at:{
     type:Date,
     required:true
