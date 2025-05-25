@@ -38,7 +38,7 @@ const CaseRequestSchema = new mongoose.Schema({
   },
   consultation_status: {
     type: String,
-    enum: ['reserved', 'cancelled', 'completed', 'pending'],
+    enum: ['pending', 'cancelled', 'confirmed'],
     default: 'pending'
   },
   note: {

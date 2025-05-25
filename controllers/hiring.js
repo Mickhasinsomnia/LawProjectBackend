@@ -114,7 +114,7 @@ exports.addHiring = async (req, res, next) => {
       });
     }
 
-    if (acceptedCase.status !== "open") {
+    if (acceptedCase.consultation_status !== "pending") {
       return res.status(400).json({
         success: false,
         message: "Case is not available for hiring. Status must be 'open'.",
@@ -131,7 +131,7 @@ exports.addHiring = async (req, res, next) => {
 
     const newHire = await Hiring.create(hiringData);
 
-    acceptedCase.status = "assigned";
+    acceptedCase.consultation_status = "confirmed";
     await acceptedCase.save();
 
     return res.status(201).json({
