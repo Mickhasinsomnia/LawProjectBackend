@@ -1,6 +1,8 @@
 const Appointment = require("../models/Appointment");
 const Hiring = require("../models/Hiring");
 
+// Currently does not check the lawyer's schedule
+
 exports.createAppointment = async (req, res, next) => {
   try {
     const hiring = await Hiring.findById(req.params.id);
@@ -22,6 +24,7 @@ exports.createAppointment = async (req, res, next) => {
     const appointmentData = {
       ...req.body,
       hiringId: req.params.id,
+      permission: req.body.permission
     };
 
     const newAppointment = await Appointment.create(appointmentData);
@@ -40,61 +43,68 @@ exports.createAppointment = async (req, res, next) => {
   }
 };
 
-exports.updateAppointment = async (req, res, next) => {
+exports.updateAppointment = async (req, res) => {
   try {
-    let activity = await Appointment.findById(req.params.id);
-
-    if (!activity) {
-      return res.status(404).json({
-        success: false,
-        message: `No appointment found with the id of ${req.params.id}`,
-      });
+    const appointment = await Appointment.findById(req.params.id);
+    if (!appointment) {
+      return res.status(404).json({ success: false, message: "Appointment not found" });
     }
 
-    if (
-      req.user.role !== "admin" &&
-      activity.lawyerId.toString() !== req.user.id
-    ) {
-      return res.status(403).json({
-        success: false,
-        message: `User ${req.user.id} is not authorized to update this appointment`,
-      });
+    const hiring = await Hiring.findById(appointment.hiringId);
+    if (!hiring) {
+      return res.status(404).json({ success: false, message: "Associated hiring not found" });
     }
 
-    if (activity.status === "cancelled") {
-      return res.status(400).json({
-        success: false,
-        message:
-          "This appointment has already been cancelled and cannot be updated.",
-      });
+    if (appointment.status === "cancelled") {
+      return res.status(400).json({ success: false, message: "Cannot update a cancelled appointment" });
     }
 
-    const hiring = await Hiring.findById(activity.hiringId);
-    if (!hiring || hiring.status !== "active") {
-      return res.status(400).json({
-        success: false,
-        message: "The associated hiring is no longer active",
-      });
+    if(permission==="shared" || permission==="lawyer"){
+      if (req.user.role ==="user"){
+        return res.status(403).json({
+          success: false,
+          message: "You are not authorized to update this appointment",
+        });
+      }
+      if(req.user.id!=hiring.lawyer_id && req.user.role!="admin"){
+        return res.status(403).json({
+          success: false,
+          message: "You are not authorized to update this appointment",
+        });
+      }
     }
 
-    if (req.body.status) {
-      delete req.body.status;
+    if(permission==="user"){
+      if (req.user.role ==="lawyer"){
+        return res.status(403).json({
+          success: false,
+          message: "You are not authorized to update this appointment",
+        });
+      }
+      if(req.user.id!=hiring.client_id && req.user.role!="admin"){
+        return res.status(403).json({
+          success: false,
+          message: "You are not authorized to update this appointment",
+        });
+      }
     }
 
-    if (req.body.task) activity.task = req.body.task;
-    if (req.body.note) activity.note = req.body.note;
-    if (req.body.location) activity.location = req.body.location;
-    if (req.body.timeStamp) activity.timeStamp = req.body.timeStamp;
 
-    await activity.save();
+    const { task, note, location, timeStamp } = req.body;
+    if (task) appointment.task = task;
+    if (note) appointment.note = note;
+    if (location) appointment.location = location;
+    if (timeStamp) appointment.timeStamp = timeStamp;
+
+    await appointment.save();
 
     return res.status(200).json({
       success: true,
-      data: activity,
+      data: appointment,
     });
   } catch (err) {
     console.error(err);
-    return res.status(400).json({
+    return res.status(500).json({
       success: false,
       message: "Failed to update appointment",
       error: err.message,
@@ -102,26 +112,64 @@ exports.updateAppointment = async (req, res, next) => {
   }
 };
 
+
 exports.deleteAppointment = async (req, res, next) => {
   try {
-    const activity = await Appointment.findById(req.params.id);
-
-    if (!activity) {
+    const appointment = await Appointment.findById(req.params.id);
+    if (!appointment) {
       return res.status(404).json({
         success: false,
         message: "No appointment found with the given id",
       });
     }
 
-    if (activity.status === "cancelled") {
+    if (appointment.status === "cancelled") {
       return res.status(400).json({
         success: false,
         message: "This appointment is already cancelled",
       });
     }
 
-    activity.status = "cancelled";
-    await activity.save();
+    const hiring = await Hiring.findById(appointment.hiringId);
+    if (!hiring) {
+      return res.status(404).json({
+        success: false,
+        message: "Associated hiring not found",
+      });
+    }
+
+    if(permission==="shared" || permission==="lawyer"){
+      if (req.user.role ==="user"){
+        return res.status(403).json({
+          success: false,
+          message: "You are not authorized to cancel this appointment",
+        });
+      }
+      if(req.user.id!=hiring.lawyer_id && req.user.role!="admin"){
+        return res.status(403).json({
+          success: false,
+          message: "You are not authorized to cancel this appointment",
+        });
+      }
+    }
+
+    if(permission==="user"){
+      if (req.user.role ==="lawyer"){
+        return res.status(403).json({
+          success: false,
+          message: "You are not authorized to cancel this appointment",
+        });
+      }
+      if(req.user.id!=hiring.client_id && req.user.role!="admin"){
+        return res.status(403).json({
+          success: false,
+          message: "You are not authorized to cancel this appointment",
+        });
+      }
+    }
+
+    appointment.status = "cancelled";
+    await appointment.save();
 
     return res.status(200).json({
       success: true,
@@ -135,4 +183,4 @@ exports.deleteAppointment = async (req, res, next) => {
       error: err.message,
     });
   }
-}
+};
