@@ -30,6 +30,61 @@ exports.getHiring = async (req, res, next) => {
   }
 };
 
+//@desc  Get all hiring for specific client
+//@route GET /api/v1/hiring/client/:clientId
+//@access Private
+exports.getHiringByClientId = async (req, res, next) => {
+  try {
+    const hiring = await Hiring.find({ client_id: req.user.id });
+
+    if (hiring.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "No hiring found for this client",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      data: hiring,
+    });
+  } catch (err) {
+    console.error(err);
+    return res.status(400).json({
+      success: false,
+      message: "Failed to get hiring",
+      error: err.message,
+    });
+  }
+};
+
+//@desc  Get all hiring for specific client
+//@route GET /api/v1/hiring/lawyer/:lawyerId
+//@access Private
+exports.getHiringByLawyerId = async (req, res, next) => {
+  try {
+    const hiring = await Hiring.find({ lawyer_id: req.user.id });
+
+    if (hiring.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "No hiring found for this lawyer",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      data: hiring,
+    });
+  } catch (err) {
+    console.error(err);
+    return res.status(400).json({
+      success: false,
+      message: "Failed to get hiring",
+      error: err.message,
+    });
+  }
+};
 
 //@desc  Create new job Hiring
 //@route POST /api/v1/hiring

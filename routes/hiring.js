@@ -1,11 +1,16 @@
-const {addHiring,updateHiring,cancelHiring,getHiring} = require('../controllers/hiring')
+const {addHiring,updateHiring,cancelHiring,getHiring,getHiringByClientId,getHiringByLawyerId} = require('../controllers/hiring')
 
 const express = require('express');
 const router = express.Router();
 const {protect,authorize} = require ('../middleware/auth')
 
-router.route('/:id').get(protect,authorize('user','lawyer'),getHiring).put(protect,authorize('lawyer'),updateHiring).delete(protect,authorize('lawyer'),cancelHiring);
+router.get('/client/:clientId', protect, authorize('user','admin'), getHiringByClientId);
+router.get('/lawyer/:lawyerId', protect, authorize('lawyer','admin'), getHiringByLawyerId);
 
-router.post('/create/:id', protect, authorize('lawyer'), addHiring);
+router.post('/create/:id',protect, authorize('lawyer','admin'), addHiring);
+
+router.route('/:id').get(protect,getHiring).put(protect,authorize('lawyer'),updateHiring).delete(protect,authorize('lawyer'),cancelHiring);
+
+
 
 module.exports = router;

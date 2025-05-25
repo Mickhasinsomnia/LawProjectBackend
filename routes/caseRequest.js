@@ -1,14 +1,19 @@
-const {addCaseRequest,cancelCaseRequest,updateCaseRequest,getCaseRequestById} = require('../controllers/caseRequest')
+const {addCaseRequest,cancelCaseRequest,updateCaseRequest,getCaseRequestById,getCaseRequestsByClientId,getCaseRequestsByLawyerId} = require('../controllers/caseRequest')
 
 const {protect,authorize} = require('../middleware/auth')
 
 const express = require('express');
 const router = express.Router();
 
-router.route('/').post(protect,authorize('user'),addCaseRequest);
+router.get('/client/:clientId', protect, authorize('user','admin'), getCaseRequestsByClientId);
+router.get('/lawyer/:lawyerId', protect, authorize('lawyer','admin'), getCaseRequestsByLawyerId);
 
-router.route('/:id').put(protect,authorize('user'),updateCaseRequest).delete(protect,authorize('user'),cancelCaseRequest);
+router.route('/').post(protect,authorize('user','admin'),addCaseRequest);
+
+router.route('/:id').put(protect,authorize('user','admin'),updateCaseRequest).delete(protect,authorize('user','admin'),cancelCaseRequest);
 
 router.route('/:id').get(protect,getCaseRequestById);
+
+
 
 module.exports = router;

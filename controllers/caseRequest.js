@@ -116,6 +116,9 @@ exports.updateCaseRequest = async (req, res, next) => {
   }
 };
 
+//@desc  Get a case request from id
+//@route GET /api/v1/caseRequest/:id
+//@access Private
 exports.getCaseRequestById = async (req, res, next) => {
   try {
     const caseRequestId = req.params.id;
@@ -152,7 +155,9 @@ exports.getCaseRequestById = async (req, res, next) => {
   }
 };
 
-
+//@desc  Get all case requests for a specific client
+//@route GET /api/v1/caseRequest/client/clientId
+//@access Private
 exports.getCaseRequestsByClientId = async (req, res, next) => {
   try {
     const clientId = req.user.id;
@@ -180,7 +185,9 @@ exports.getCaseRequestsByClientId = async (req, res, next) => {
   }
 };
 
-// For lawyers
+//@desc  Get all case requests for a specific client
+//@route GET /api/v1/caseRequest/lawyer/lawyerId
+//@access Private
 exports.getCaseRequestsByLawyerId = async (req, res, next) => {
   try {
     const lawyerId = req.user.id;

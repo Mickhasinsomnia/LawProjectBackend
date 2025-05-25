@@ -1,8 +1,6 @@
 const Appointment = require("../models/Appointment");
 const Hiring = require("../models/Hiring");
 
-// Currently does not check the lawyer's schedule
-
 exports.createAppointment = async (req, res, next) => {
   try {
     const hiring = await Hiring.findById(req.params.id);
