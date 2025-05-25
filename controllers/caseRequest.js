@@ -123,7 +123,11 @@ exports.getCaseRequestById = async (req, res, next) => {
   try {
     const caseRequestId = req.params.id;
 
-    const caseRequest = await CaseRequest.findById(caseRequestId).populate({ path: 'category_id', select: 'name' });
+    const caseRequest = await CaseRequest.findById(caseRequestId)
+          .populate({ path: 'client_id', select: 'name email' })
+          .populate({ path: 'lawyer_id', select: 'name email' })
+          .populate({ path: 'category_id', select: 'name' });
+
     if (!caseRequest) {
       return res.status(404).json({
         success: false,
@@ -133,7 +137,7 @@ exports.getCaseRequestById = async (req, res, next) => {
 
     if (
       req.user.role !== "admin" &&
-      req.user.id !== caseRequest.client_id.toString()
+      req.user.id !== caseRequest.client_id._id.toString() && req.user.id != caseRequest.lawyer_id._id.toString()
     ) {
       return res.status(403).json({
         success: false,

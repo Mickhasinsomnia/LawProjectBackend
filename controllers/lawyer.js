@@ -13,7 +13,7 @@ exports.addLawyer = async (req, res) => {
 
     const lawyerData = {
       ...req.body,
-      user_id: req.user.id,
+      _id: req.user.id,
       name:req.user.name
     };
 

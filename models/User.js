@@ -36,7 +36,7 @@ const UserSchema = new mongoose.Schema({
         minlength: 6,
         select: false
     },
-    lineId:{
+    line_id:{
       type:String,
       required:[true,'Please add a line ID'],
     },

@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const LawyerSchema = new mongoose.Schema({
-  user_id: {
+  _id: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
   },
@@ -42,10 +42,11 @@ const LawyerSchema = new mongoose.Schema({
   },
   total_score: {
     type: Number,
-    default: 0 // Calculated based on other fields
+    default: 0
   }
 }, {
-  timestamps: true
+  timestamps: true,
+  _id: false // Prevent Mongoose from auto-generating _id
 });
 
 module.exports = mongoose.model('Lawyer', LawyerSchema);

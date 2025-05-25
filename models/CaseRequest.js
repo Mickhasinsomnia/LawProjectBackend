@@ -4,7 +4,6 @@ const CaseRequestSchema = new mongoose.Schema({
   client_id: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
-    required: true
   },
   lawyer_id: {
     type: mongoose.Schema.Types.ObjectId,
