@@ -6,7 +6,7 @@ const Lawyer = require("../models/Lawyer");
 exports.addLawyer = async (req, res) => {
   try {
 
-    const data = await Lawyer.findOne({ user_id: req.user.id });
+    const data = await Lawyer.findOne({ _id: req.user.id });
     if(data){
       return res.status(400).json({ message: "Lawyer data already existed" });
     }
@@ -142,7 +142,7 @@ exports.deleteLawyer = async (req, res) => {
 // @access  Public
 exports.getAllLawyers = async (req, res) => {
   try {
-    const lawyers = await Lawyer.find().populate("user_id", "name email");
+    const lawyers = await Lawyer.find().populate("_id", "name email");
 
     return res.status(200).json({
       success: true,
