@@ -14,7 +14,6 @@ exports.addLawyer = async (req, res) => {
     const lawyerData = {
       ...req.body,
       _id: req.user.id,
-      name:req.user.name
     };
 
     const newLawyer = await Lawyer.create(lawyerData);
@@ -38,7 +37,7 @@ exports.addLawyer = async (req, res) => {
 // @access  Public
 exports.getLawyerById = async (req, res) => {
   try {
-    const lawyer = await Lawyer.findById(req.params.id).populate("user_id", "name email");
+    const lawyer = await Lawyer.findById(req.params.id).populate("_id", "name email");
 
     if (!lawyer) {
       return res.status(404).json({
@@ -75,14 +74,20 @@ exports.updateLawyer = async (req, res) => {
       });
     }
 
-    if (req.user.role !== "admin" && req.user.id !== lawyer.user_id.toString()) {
+    if (req.user.role !== "admin" && req.user.id !== lawyer._id.toString()) {
       return res.status(403).json({
         success: false,
         message: "You are not authorized to update this profile",
       });
     }
 
-    Object.assign(lawyer, req.body);
+    const {photo,price,experience,expertise} = req.body;
+
+    if (photo !== undefined) lawyer.photo = photo;
+    if (price !== undefined) lawyer.price = price;
+    if (experience !== undefined) lawyer.experience = experience;
+    if (expertise !== undefined) lawyer.expertise = expertise;
+
     await lawyer.save();
 
     return res.status(200).json({
@@ -99,6 +104,7 @@ exports.updateLawyer = async (req, res) => {
     });
   }
 };
+
 
 // @desc    Delete a lawyer profile
 // @route   DELETE /api/v1/lawyers/:id
