@@ -5,21 +5,26 @@ const Lawyer = require("../models/Lawyer");
 // @access  Private
 exports.addLawyer = async (req, res) => {
   try {
-
-    const data = await Lawyer.findOne({ _id: req.user.id });
-    if(data){
-      return res.status(400).json({ message: "Lawyer data already existed" });
+    const existing = await Lawyer.findOne({ _id: req.user.id });
+    if (existing) {
+      return res.status(400).json({ message: "Lawyer data already exists" });
     }
 
+    const { photo, price, experience, expertise } = req.body;
+
     const lawyerData = {
-      ...req.body,
       _id: req.user.id,
+      photo,
+      price,
+      experience,
+      expertise,
     };
 
     const newLawyer = await Lawyer.create(lawyerData);
 
     return res.status(201).json({
       success: true,
+      message: "Lawyer profile created successfully",
       data: newLawyer,
     });
   } catch (err) {
@@ -31,6 +36,7 @@ exports.addLawyer = async (req, res) => {
     });
   }
 };
+
 
 // @desc    Get a lawyer profile by ID
 // @route   GET /api/v1/lawyers/:id
