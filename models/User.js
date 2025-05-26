@@ -41,8 +41,14 @@ const UserSchema = new mongoose.Schema({
       required:[true,'Please add a line ID'],
     },
     location: {
-      type: String,
-      required: [true, 'Please add a location']
+      district: {
+        type: String,
+        required: [true, 'Please add a district']
+      },
+      province: {
+        type: String,
+        required: [true, 'Please add a province']
+      }
     },
 
     resetPasswordToken: String,
