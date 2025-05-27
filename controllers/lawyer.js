@@ -173,3 +173,26 @@ exports.getAllLawyers = async (req, res) => {
     });
   }
 };
+
+// @desc    Admin change verify status
+// @route   DELETE /api/v1/lawyers/status/:id
+// @access  Private/Admin
+exports.changeVerifyStatus = async (req,res,next)=>{
+  const lawyer = await Lawyer.findById(req.params.id);
+
+  if (!lawyer) {
+    return res.status(404).json({
+      success: false,
+      message: "Lawyer not found",
+    });
+  }
+
+  const { is_verified_by_council, has_law_license } = req.body;
+
+  if (is_verified_by_council !== undefined) lawyer.is_verified_by_council = is_verified_by_council;
+  if (has_law_license !== undefined) lawyer.has_law_license = has_law_license;
+
+  return res.status(200).json({ success: true, data: lawyer });
+
+
+}

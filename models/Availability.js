@@ -1,35 +1,78 @@
-const mongoose = require('mongoose')
+const mongoose = require('mongoose');
 
-const Availability = new mongoose.Schema({
-  layer_id: {
+const AvailabilitySchema = new mongoose.Schema({
+  lawyerId: {
     type: mongoose.Schema.Types.ObjectId,
-    required: true,
-    ref: 'Layer'
-  },
-  date: {
-    type: Date,
+    ref: 'Lawyer',
     required: true
   },
-  start_time: {
-    type: String,
-    required: true
-  },
-  end_time: {
-    type: String,
-    required: true
-  },
-  is_available: {
-    type: Boolean,
-    default: true
-  },
-  note: {
-    type: String,
-    default: ''
-  },
-  created_at: {
-    type: Date,
-    default: Date.now
+  weeklyAvailability: {
+    Monday: {
+      type: [String],
+      default: [],
+      validate: {
+        validator: times =>
+          times.every(time => /^([01]\d|2[0-3]):([0-5]\d)$/.test(time)),
+        message: 'Invalid time format in Monday'
+      }
+    },
+    Tuesday: {
+      type: [String],
+      default: [],
+      validate: {
+        validator: times =>
+          times.every(time => /^([01]\d|2[0-3]):([0-5]\d)$/.test(time)),
+        message: 'Invalid time format in Tuesday'
+      }
+    },
+    Wednesday: {
+      type: [String],
+      default: [],
+      validate: {
+        validator: times =>
+          times.every(time => /^([01]\d|2[0-3]):([0-5]\d)$/.test(time)),
+        message: 'Invalid time format in Wednesday'
+      }
+    },
+    Thursday: {
+      type: [String],
+      default: [],
+      validate: {
+        validator: times =>
+          times.every(time => /^([01]\d|2[0-3]):([0-5]\d)$/.test(time)),
+        message: 'Invalid time format in Thursday'
+      }
+    },
+    Friday: {
+      type: [String],
+      default: [],
+      validate: {
+        validator: times =>
+          times.every(time => /^([01]\d|2[0-3]):([0-5]\d)$/.test(time)),
+        message: 'Invalid time format in Friday'
+      }
+    },
+    Saturday: {
+      type: [String],
+      default: [],
+      validate: {
+        validator: times =>
+          times.every(time => /^([01]\d|2[0-3]):([0-5]\d)$/.test(time)),
+        message: 'Invalid time format in Saturday'
+      }
+    },
+    Sunday: {
+      type: [String],
+      default: [],
+      validate: {
+        validator: times =>
+          times.every(time => /^([01]\d|2[0-3]):([0-5]\d)$/.test(time)),
+        message: 'Invalid time format in Sunday'
+      }
+    }
   }
-})
+}, {
+  timestamps: true
+});
 
-module.exports = mongoose.model('Availability', Availability)
+module.exports = mongoose.model('LawyerAvailability', AvailabilitySchema);
