@@ -10,9 +10,9 @@ exports.addLawyer = async (req, res) => {
       return res.status(400).json({ message: "Lawyer data already exists" });
     }
 
-    const { photo, slogan, summary, consultationRate, specialized, verificationDocs } = req.body;
+    const { photo, slogan, summary, consultationRate,documentDeliveryRate, specialized, verificationDocs } = req.body;
 
-    const lawyerData = { _id: req.user.id, photo, slogan, summary, consultationRate, specialized, verificationDocs };
+    const lawyerData = { _id: req.user.id, photo, slogan, summary, consultationRate,documentDeliveryRate, specialized, verificationDocs };
 
 
     const newLawyer = await Lawyer.create(lawyerData);
@@ -84,7 +84,7 @@ exports.updateLawyer = async (req, res) => {
       });
     }
 
-    const { photo, slogan, summary, consultationRate, specialized, verificationDocs } = req.body;
+    const { photo, slogan, summary, consultationRate,documentDeliveryRate, specialized, verificationDocs } = req.body;
 
 
     if (photo !== undefined) lawyer.photo = photo;
@@ -93,6 +93,7 @@ exports.updateLawyer = async (req, res) => {
     if (consultationRate !== undefined) lawyer.consultationRate = consultationRate;
     if (specialized !== undefined) lawyer.specialized = specialized;
     if (verificationDocs !== undefined) lawyer.verificationDocs = verificationDocs;
+    if (documentDeliveryRate !== undefined) lawyer.documentDeliveryRate = documentDeliveryRate;
 
     await lawyer.save();
 
