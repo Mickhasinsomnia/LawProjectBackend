@@ -8,26 +8,21 @@ const LawyerSchema = new mongoose.Schema({
   photo: {
     type: String
   },
-  price: {
-    type: Number,
-    required: true
-  },
-  experience: {
-    type: Number,
-    required: true
-  },
-  expertise: {
+  slogan : {
     type: String,
     required: true
   },
-  win_rate: {
-    type: Number,
-    min: 0,
-    max: 1
+  summary : {
+    type: String,
+    required: true
   },
-  clients_count: {
-    type: Number,
-    default: 0
+  consultationRate: {
+    min: { type: Number, required: true, min: 0 },
+    max: { type: Number, required: true, min: 0 }
+  },
+  specialized: {
+    type: [{ type: String, enum: ["คดีแพ่ง", "คดีอาญา", "คดีแรงงาน", "คดีเช่าซื้อหรือเช่าที่อยู่อาศัย", "คดีละเมิด / หมิ่นประมาท", "คดีหุ้นส่วนและการร่วมลงทุน", "คดีสัญญาและการผิดสัญญา", "คดีฉ้อโกงออนไลน์", "คดีคนต่างด้าว / ตรวจคนเข้าเมือง", "คดีหย่าและสิทธิการเลี้ยงดูบุตร", "คดีที่ดินและสิทธิครอบครอง", "คดีหนี้และการบังคับคดี"] }],
+    default: []
   },
   has_law_license: {
     type: Boolean,
@@ -37,13 +32,14 @@ const LawyerSchema = new mongoose.Schema({
     type: Boolean,
     default: false
   },
-  total_score: {
-    type: Number,
-    default: 0
+  verificationDocs: {
+    type: [String],
+    default: []
   }
+
 }, {
   timestamps: true,
-  _id: false // Prevent Mongoose from auto-generating _id
+  _id: false
 });
 
 module.exports = mongoose.model('Lawyer', LawyerSchema);

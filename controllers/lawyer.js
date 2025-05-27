@@ -10,15 +10,10 @@ exports.addLawyer = async (req, res) => {
       return res.status(400).json({ message: "Lawyer data already exists" });
     }
 
-    const { photo, price, experience, expertise } = req.body;
+    const { photo, slogan, summary, consultationRate, specialized, verificationDocs } = req.body;
 
-    const lawyerData = {
-      _id: req.user.id,
-      photo,
-      price,
-      experience,
-      expertise,
-    };
+    const lawyerData = { _id: req.user.id, photo, slogan, summary, consultationRate, specialized, verificationDocs };
+
 
     const newLawyer = await Lawyer.create(lawyerData);
 
@@ -37,13 +32,15 @@ exports.addLawyer = async (req, res) => {
   }
 };
 
-
 // @desc    Get a lawyer profile by ID
 // @route   GET /api/v1/lawyers/:id
 // @access  Public
 exports.getLawyerById = async (req, res) => {
   try {
-    const lawyer = await Lawyer.findById(req.params.id).populate("_id", "name email");
+    const lawyer = await Lawyer.findById(req.params.id).populate(
+      "_id",
+      "name email",
+    );
 
     if (!lawyer) {
       return res.status(404).json({
@@ -87,12 +84,15 @@ exports.updateLawyer = async (req, res) => {
       });
     }
 
-    const {photo,price,experience,expertise} = req.body;
+    const { photo, slogan, summary, consultationRate, specialized, verificationDocs } = req.body;
+
 
     if (photo !== undefined) lawyer.photo = photo;
-    if (price !== undefined) lawyer.price = price;
-    if (experience !== undefined) lawyer.experience = experience;
-    if (expertise !== undefined) lawyer.expertise = expertise;
+    if (slogan !== undefined) lawyer.slogan = slogan;
+    if (summary !== undefined) lawyer.summary = summary;
+    if (consultationRate !== undefined) lawyer.consultationRate = consultationRate;
+    if (specialized !== undefined) lawyer.specialized = specialized;
+    if (verificationDocs !== undefined) lawyer.verificationDocs = verificationDocs;
 
     await lawyer.save();
 
@@ -111,7 +111,6 @@ exports.updateLawyer = async (req, res) => {
   }
 };
 
-
 // @desc    Delete a lawyer profile
 // @route   DELETE /api/v1/lawyers/:id
 // @access  Private/Admin or Owner
@@ -126,14 +125,17 @@ exports.deleteLawyer = async (req, res) => {
       });
     }
 
-    if (req.user.role !== "admin" && req.user.id !== lawyer.user_id.toString()) {
+    if (
+      req.user.role !== "admin" &&
+      req.user.id !== lawyer._id.toString()
+    ) {
       return res.status(403).json({
         success: false,
         message: "You are not authorized to delete this profile",
       });
     }
 
-    await lawyer.remove();
+    await lawyer.deleteOne();
 
     return res.status(200).json({
       success: true,
