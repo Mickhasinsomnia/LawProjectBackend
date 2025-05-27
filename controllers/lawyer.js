@@ -192,6 +192,8 @@ exports.changeVerifyStatus = async (req,res,next)=>{
   if (is_verified_by_council !== undefined) lawyer.is_verified_by_council = is_verified_by_council;
   if (has_law_license !== undefined) lawyer.has_law_license = has_law_license;
 
+  await lawyer.save();
+
   return res.status(200).json({ success: true, data: lawyer });
 
 
