@@ -2,6 +2,12 @@ const WorkingDay = require('../models/WorkingDay');
 
 exports.createWorkingDay = async (req, res) => {
   try {
+    const existing = await WorkingDay.findOne({ lawyerId: req.user.id });
+    if (existing) {
+      return res.status(400).json({ message: "Working day data already exists" });
+    }
+
+
     const {Monday,Tuesday,Wednesday,Thursday,Friday,Saturday,Sunday} = req.body;
 
 

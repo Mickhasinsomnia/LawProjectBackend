@@ -1,4 +1,5 @@
 const CaseRequest = require("../models/CaseRequest");
+const WorkingDay = require("../models/WorkingDay");
 //new damn big fix
 
 //@desc  Create a new case request
@@ -12,8 +13,8 @@ exports.addCaseRequest = async (req, res, next) => {
     });
 
     const populatedCaseRequest = await newCaseRequest.populate({
-      path: 'category_id',
-      select: 'name',
+      path: "category_id",
+      select: "name",
     });
 
     return res.status(201).json({
@@ -29,7 +30,6 @@ exports.addCaseRequest = async (req, res, next) => {
     });
   }
 };
-
 
 //@desc     Cancel a case request
 //@route    DELETE /api/v1/caseRequest/:id
@@ -124,9 +124,9 @@ exports.getCaseRequestById = async (req, res, next) => {
     const caseRequestId = req.params.id;
 
     const caseRequest = await CaseRequest.findById(caseRequestId)
-          .populate({ path: 'client_id', select: 'name email' })
-          .populate({ path: 'lawyer_id', select: 'name email' })
-          .populate({ path: 'category_id', select: 'name' });
+      .populate({ path: "client_id", select: "name email" })
+      .populate({ path: "lawyer_id", select: "name email" })
+      .populate({ path: "category_id", select: "name" });
 
     if (!caseRequest) {
       return res.status(404).json({
@@ -137,7 +137,8 @@ exports.getCaseRequestById = async (req, res, next) => {
 
     if (
       req.user.role !== "admin" &&
-      req.user.id !== caseRequest.client_id._id.toString() && req.user.id != caseRequest.lawyer_id._id.toString()
+      req.user.id !== caseRequest.client_id._id.toString() &&
+      req.user.id != caseRequest.lawyer_id._id.toString()
     ) {
       return res.status(403).json({
         success: false,
