@@ -28,7 +28,7 @@ const AppointmentSchema = new mongoose.Schema({
   },
   permission: {
     type: String,
-    enum: ["shared", "lawyer", "user"],
+    enum: ["shared", "lawyer", "client"],
     default: "shared",
   },
 });

@@ -6,7 +6,7 @@ const router = express.Router();
 
 const {protect,authorize} = require('../middleware/auth')
 
-router.post('/create/:id', protect, authorize('lawyer'), createAppointment);
+router.post('/create/:id', protect, authorize('lawyer','user','admin'), createAppointment);
 
 router.route('/:id').put(updateAppointment).delete(deleteAppointment);
 

@@ -19,6 +19,14 @@ exports.createAppointment = async (req, res, next) => {
       });
     }
 
+    if (req.user.role === 'user' && req.body.permission === 'shared') {
+      return res.status(403).json({
+        success: false,
+        message: "Only lawyers can create shared appointments."
+      });
+    }
+
+
     const appointmentData = {
       ...req.body,
       hiringId: req.params.id,

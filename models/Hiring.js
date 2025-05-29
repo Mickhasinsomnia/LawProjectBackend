@@ -14,9 +14,9 @@ const HiringSchema = new mongoose.Schema({
     type:mongoose.Schema.Types.ObjectId,
     ref:'User',
   },
-  approved_at:{
-    type:Date,
-    required:true
+  approved_at: {
+    type: Date,
+    default: Date.now
   },
   task:{
     type:String,
@@ -24,7 +24,7 @@ const HiringSchema = new mongoose.Schema({
   },
   note:{
     type:String,
-     default: ""
+    default: ""
   },
   status: {
     type: String,
@@ -33,13 +33,8 @@ const HiringSchema = new mongoose.Schema({
   },
   start_date:{
     type:Date,
-    required:true
+    default: Date.now
   },
-  end_date:{
-    type:Date,
-    required:true
-  }
-
 })
 
 module.exports = mongoose.model('hiring', HiringSchema);
