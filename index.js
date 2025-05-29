@@ -5,9 +5,10 @@ const appointment= require('./routes/appointment')
 const auth = require('./routes/auth')
 const caseRequest = require('./routes/caseRequest')
 const hiring = require ('./routes/hiring')
+const workingDay = require ('./routes/workingDay')
 const category = require ('./routes/category')
 const lawyer = require('./routes/lawyer')
-const post = require('./routes/post')
+const forum = require('./routes/forum')
 
 
 dotenv.config({ path: "./config/config.env" });
@@ -27,9 +28,10 @@ app.use('/api/v1/appointment', appointment);
 app.use('/api/v1/auth', auth);
 app.use('/api/v1/caseRequest', caseRequest);
 app.use('/api/v1/hiring', hiring);
+app.use('/api/v1/workingDay', workingDay);
 app.use('/api/v1/category', category);
 app.use('/api/v1/lawyer', lawyer);
-app.use('/api/v1/post', post);
+app.use('/api/v1/forum', forum);
 
 
 process.on("unhandledRejection", (err, promise) => {
