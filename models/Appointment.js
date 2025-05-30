@@ -5,6 +5,16 @@ const AppointmentSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "Hiring",
   },
+  client_id: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true
+  },
+  lawyer_id: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Lawyer',
+    required: true
+  },
   timeStamp: {
     type: Date,
     required: true,

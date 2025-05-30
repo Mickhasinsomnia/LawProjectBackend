@@ -19,18 +19,32 @@ exports.createAppointment = async (req, res, next) => {
       });
     }
 
-    if (req.user.role === 'user' && req.body.permission === 'shared') {
+    const { permission } = req.body;
+
+
+    if (req.user.role === 'user' && permission !== 'client') {
       return res.status(403).json({
         success: false,
-        message: "Only lawyers can create shared appointments."
+        message: "Users can only create client appointments.",
       });
     }
 
+    if (req.user.role === 'lawyer' && permission === 'client') {
+      return res.status(403).json({
+        success: false,
+        message: "Lawyers cannot create client appointments.",
+      });
+    }
+    const client = hiring.client_id;
+    const lawyer = hiring.lawyer_id;
 
     const appointmentData = {
       ...req.body,
       hiringId: req.params.id,
-      permission: req.body.permission
+      permission: req.body.permission,
+      client_id:client,
+      lawyer_id:lawyer
+
     };
 
     const newAppointment = await Appointment.create(appointmentData);
@@ -190,3 +204,9 @@ exports.deleteAppointment = async (req, res, next) => {
     });
   }
 };
+
+exports.getAppointments = async (req,res,next) =>{
+  const user = req.user.id;
+
+  const appointment=Appointment.find()
+}

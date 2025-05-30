@@ -117,7 +117,7 @@ exports.addHiring = async (req, res, next) => {
     if (acceptedCase.consultation_status !== "pending") {
       return res.status(400).json({
         success: false,
-        message: "Case is not available for hiring. Status must be 'open'.",
+        message: "Case is not available for hiring. Status must be 'pending'.",
       });
     }
 
