@@ -1,4 +1,5 @@
 const CaseRequest = require("../models/CaseRequest");
+const Slot = require('../models/Slot');
 //new damn big fix
 
 //@desc  Create a new case request
@@ -6,6 +7,27 @@ const CaseRequest = require("../models/CaseRequest");
 //@access Private
 exports.addCaseRequest = async (req, res, next) => {
   try {
+
+    // const { consultation_date, consultation_start_time, consultation_end_time, lawyer_id } = req.body;
+
+    // const date = new Date(consultation_date);
+    // date.setHours(0, 0, 0, 0);
+
+    // const conflictingSlot = await Slot.findOne({
+    //   lawyer_id: lawyer_id,
+    //   date,
+    //   $or: [
+    //     {
+    //       startTime: { $lt: consultation_end_time },
+    //       endTime: { $gt: consultation_start_time }
+    //     }
+    //   ]
+    // });
+
+    // if (conflictingSlot) {
+    //   return res.status(400).json({ success: false, message: "Requested time overlaps with an unavailable slot" });
+    // }
+
     const newCaseRequest = await CaseRequest.create({
       ...req.body,
       client_id: req.user.id,
@@ -44,32 +66,23 @@ exports.cancelCaseRequest = async (req, res, next) => {
       });
     }
 
-    if (
-      req.user.role !== "admin" &&
-      req.user.id !== caseRequest.client_id.toString()
-    ) {
-      return res.status(403).json({
-        success: false,
-        message: `User ${req.user.id} is not authorized to cancel this case request`,
-      });
-    }
-
-    caseRequest.status = "cancelled";
+    caseRequest.status = req.user.role === "lawyer" ? "rejected" : "cancelled";
     await caseRequest.save();
 
     return res.status(200).json({
       success: true,
-      message: "Case request cancelled successfully",
+      message: `Case request ${caseRequest.status} successfully`,
     });
   } catch (err) {
     console.error(err);
     return res.status(500).json({
       success: false,
-      message: "Failed to cancel case request",
+      message: "Failed to update case request status",
       error: err.message,
     });
   }
 };
+
 
 //@desc     Update a case request
 //@route    PUT /api/v1/caseRequest/:id

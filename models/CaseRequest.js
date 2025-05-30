@@ -32,13 +32,13 @@ const CaseRequestSchema = new mongoose.Schema({
     type: Number,
     required: true
   },
-  consultation_date: {
-    type: Date,
-    required: true
-  },
+  consultation_date: { type: Date, required: true },
+  // consultation_start_time: { type: String, required: true },
+  // consultation_end_time: { type: String, required: true },
+
   consultation_status: {
     type: String,
-    enum: ['pending', 'cancelled', 'confirmed'],
+    enum: ['pending', 'cancelled', 'confirmed','rejected'],
     default: 'pending'
   },
   note: {
