@@ -10,7 +10,7 @@ router.get('/lawyer/:lawyerId', protect, authorize('lawyer','admin'), getCaseReq
 
 router.route('/').post(protect,authorize('user','admin'),addCaseRequest);
 
-router.route('/:id').put(protect,authorize('user','admin'),updateCaseRequest).delete(protect,authorize('user','admin'),cancelCaseRequest);
+router.route('/:id').put(protect,authorize('user','admin'),updateCaseRequest).delete(protect,authorize('user','admin','lawyer'),cancelCaseRequest);
 
 router.route('/:id').get(protect,getCaseRequestById);
 

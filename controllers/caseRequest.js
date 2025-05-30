@@ -66,12 +66,12 @@ exports.cancelCaseRequest = async (req, res, next) => {
       });
     }
 
-    caseRequest.status = req.user.role === "lawyer" ? "rejected" : "cancelled";
+    caseRequest.consultation_status = req.user.role === "lawyer" ? "rejected" : "cancelled";
     await caseRequest.save();
 
     return res.status(200).json({
       success: true,
-      message: `Case request ${caseRequest.status} successfully`,
+      message: `Case request ${caseRequest.consultation_status} successfully`,
     });
   } catch (err) {
     console.error(err);
