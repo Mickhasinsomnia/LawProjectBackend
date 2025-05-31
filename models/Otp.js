@@ -11,7 +11,17 @@ const OtpSchema = new mongoose.Schema({
   otp:{
     type:String,
      required:true,
-  }
+  },
+  status: {
+    type: String,
+      enum: ['verify', 'pending'],
+      default: 'pending'
+  },
+  createdAt: {
+      type: Date,
+      default: Date.now,
+      expires: 300,
+    },
 })
 
 module.exports = mongoose.model('Otp', OtpSchema);

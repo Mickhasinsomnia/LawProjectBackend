@@ -1,5 +1,6 @@
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
+const Otp = require("../models/Otp");
 //Protect routes
 exports.protect = async (req, res, next) => {
   let token;
@@ -43,6 +44,21 @@ exports.authorize = (...role) => {
   };
 };
 
-exports.otpCheck = async(req,res,next)=>{
+exports.otpStatusCheck = async (req, res, next) => {
+  try {
+    const found = await Otp.findOne({ tel: req.body.tel });
 
-}
+    if (!found) {
+      return res.status(400).json({ success: false, message: 'OTP entry not found' });
+    }
+
+    if (found.status !== 'verify') {
+      return res.status(400).json({ success: false, message: 'OTP not verified' });
+    }
+
+    next();
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ success: false, message: 'Server error' });
+  }
+};
