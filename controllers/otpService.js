@@ -10,6 +10,12 @@ exports.createOtpEntry = async (req, res, next) => {
     if (!tel) {
       return res.status(400).json({ success: false, message: "Telephone number required" });
     }
+
+    const found = await Otp.findOne({ tel: tel });
+
+    if(found){
+      await found.deleteOne();
+    }
     const otp = generateOtp();
     await Otp.create({ tel, otp });
     return res.status(201).json({ success: true, message: "Verify with otp", otp });
