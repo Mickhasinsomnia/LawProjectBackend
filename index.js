@@ -1,5 +1,6 @@
 const express = require("express");
 const dotenv = require("dotenv");
+const rateLimit = require('express-rate-limit');
 const connectDB = require("./config/db");
 const appointment= require('./routes/appointment')
 const auth = require('./routes/auth')
@@ -25,6 +26,14 @@ const server = app.listen(
 
 app.use(express.json());
 
+
+const otpLimiter = rateLimit({
+  windowMs: 1 * 60 * 1000,
+  max: 4,
+  message: "Too many OTP requests, please try again in 1 minute."
+});
+
+
 app.use('/api/v1/appointment', appointment);
 app.use('/api/v1/auth', auth);
 app.use('/api/v1/caseRequest', caseRequest);
@@ -33,7 +42,7 @@ app.use('/api/v1/workingDay', workingDay);
 app.use('/api/v1/category', category);
 app.use('/api/v1/lawyer', lawyer);
 app.use('/api/v1/forum', forum);
-app.use('/api/v1/otpService', otpService);
+app.use('/api/v1/otpService', otpLimiter,otpService);
 
 
 process.on("unhandledRejection", (err, promise) => {
