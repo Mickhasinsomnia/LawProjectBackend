@@ -205,8 +205,35 @@ exports.deleteAppointment = async (req, res, next) => {
   }
 };
 
-exports.getAppointments = async (req,res,next) =>{
-  const user = req.user.id;
+exports.getAppointments = async (req, res, next) => {
+  try {
+    const user = req.user;
+    let appointments = [];
 
-  const appointment=Appointment.find()
-}
+    if (user.role === 'user') {
+      appointments = await Appointment.find({
+        client_id: user.id,
+        permission: { $in: ['shared', 'client'] }
+      });
+    }
+
+    if (user.role === 'lawyer') {
+      appointments = await Appointment.find({
+        lawyer_id: user.id,
+        permission: { $in: ['shared', 'lawyer'] }
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      data: appointments,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to fetch appointments',
+      error: error.message,
+    });
+  }
+};

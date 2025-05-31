@@ -25,6 +25,11 @@ const UserSchema = new mongoose.Schema({
             'Please add a valid phone number'
         ]
     },
+    thai_id: {
+      type: String,
+      match: [/^\d-\d{4}-\d{5}-\d{2}-\d$/, 'Invalid Thai ID format'],
+      required: [true, 'Please add thai id'],
+    },
     role: {
         type:String,
         enum: ['user','lawyer','admin'],

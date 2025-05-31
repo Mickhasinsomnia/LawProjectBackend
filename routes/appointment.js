@@ -1,4 +1,4 @@
-const {createAppointment,updateAppointment,deleteAppointment} = require('../controllers/appointment')
+const {createAppointment,updateAppointment,deleteAppointment,getAppointments} = require('../controllers/appointment')
 
 const express = require('express');
 
@@ -10,4 +10,5 @@ router.post('/create/:id', protect, authorize('lawyer','user','admin'), createAp
 
 router.route('/:id').put(updateAppointment).delete(deleteAppointment);
 
+router.get('/user/:id', protect, authorize('lawyer', 'user', 'admin'), getAppointments);
 module.exports = router;

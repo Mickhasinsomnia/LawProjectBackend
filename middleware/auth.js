@@ -42,3 +42,7 @@ exports.authorize = (...role) => {
     next();
   };
 };
+
+exports.otpCheck = async(req,res,next)=>{
+
+}
