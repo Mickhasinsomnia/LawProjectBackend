@@ -57,7 +57,7 @@ exports.getNews = async (req, res) => {
   }
 };
 
-exports.updateForum = async (req, res) => {
+exports.updateNews = async (req, res) => {
   try {
     const news = await News.findById(req.params.id);
     if (!news)
@@ -83,8 +83,8 @@ exports.updateForum = async (req, res) => {
 };
 
 
-// Delete a Forum (only owner)
-exports.deleteForum = async (req, res) => {
+
+exports.deleteNews = async (req, res) => {
   try {
     const forum = await News.findById(req.params.id);
     if (!forum)
