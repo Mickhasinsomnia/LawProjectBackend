@@ -8,12 +8,7 @@ exports.createForum = async (req, res) => {
       user_id: req.user.id,
     });
 
-    const populatedForum = await newForum.populate({
-      path: "user_id",
-      select: "name",
-    });
-
-    res.status(201).json({ success: true, data: populatedForum });
+    res.status(201).json({ success: true, data: newForum });
   } catch (err) {
     res
       .status(400)
@@ -28,7 +23,7 @@ exports.createForum = async (req, res) => {
 // Get all Forums
 exports.getForums = async (req, res) => {
   try {
-    const forums = await Forum.find().populate("user_id", "name");
+    const forums = await Forum.find().populate("poster_id", "name");
     res.status(200).json({ success: true, data: forums });
   } catch (err) {
     res
@@ -41,10 +36,10 @@ exports.getForums = async (req, res) => {
   }
 };
 
-// Get single Forum
+
 exports.getForum = async (req, res) => {
   try {
-    const forum = await Forum.findById(req.params.id).populate("user_id", "name");
+    const forum = await Forum.findById(req.params.id).populate("poster_id", "name");
     if (!forum)
       return res
         .status(404)
@@ -73,14 +68,13 @@ exports.updateForum = async (req, res) => {
       return res.status(403).json({ success: false, message: "Unauthorized" });
     }
 
-    const { title, description, tags } = req.body;
+    const { title, content } = req.body;
 
     if (title !== undefined) forum.title = title;
-    if (description !== undefined) forum.description = description;
-    if (tags !== undefined) forum.tags = tags;
+    if (content !== undefined) forum.content = content;
 
     const updated = await forum.save();
-    const populatedForum = await updated.populate("user_id", "name");
+    const populatedForum = await updated.populate("poster_id", "name");
 
     res.status(200).json({ success: true, data: populatedForum });
   } catch (err) {
