@@ -64,9 +64,10 @@ exports.updateForum = async (req, res) => {
     if (!forum)
       return res.status(404).json({ success: false, message: "Forum not found" });
 
-    if (forum.user_id.toString() !== req.user.id) {
+    if (forum.user_id.toString() !== req.user.id && req.user.role !== 'admin') {
       return res.status(403).json({ success: false, message: "Unauthorized" });
     }
+
 
     const { title, content } = req.body;
 
@@ -96,9 +97,10 @@ exports.deleteForum = async (req, res) => {
         .status(404)
         .json({ success: false, message: "Forum not found" });
 
-    if (forum.user_id.toString() !== req.user.id) {
+    if (forum.user_id.toString() !== req.user.id && req.user.role !== 'admin') {
       return res.status(403).json({ success: false, message: "Unauthorized" });
     }
+
 
     await Forum.deleteOne({ _id: req.params.id });
 

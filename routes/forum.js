@@ -7,7 +7,7 @@ const router = express.Router();
 router.get('/', getForums);
 router.get('/:id', getForum);
 router.post('/', protect, authorize('user'), createForum);
-router.put('/:id', protect, authorize('user'), updateForum);
-router.delete('/:id', protect, authorize('user'), deleteForum);
+router.put('/:id', protect, authorize('user','admin'), updateForum);
+router.delete('/:id', protect, authorize('user','admin'), deleteForum);
 
 module.exports = router;
