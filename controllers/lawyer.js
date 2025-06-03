@@ -1,4 +1,10 @@
 const Lawyer = require("../models/Lawyer");
+const {
+  generateFileName,
+  uploadFile,
+  getObjectSignedUrl,
+  deleteFile,
+} = require("./s3.js");
 
 // @desc    Create a new lawyer profile
 // @route   POST /api/v1/lawyers
@@ -10,10 +16,15 @@ exports.addLawyer = async (req, res) => {
       return res.status(400).json({ message: "Lawyer data already exists" });
     }
 
+    if (req.file) {
+      const imageName = generateFileName();
+      await uploadFile(req.file, imageName, req.file.mimetype);
+      req.body.photo = imageName;
+    }
+
     const { photo, slogan, summary, lawfirm_name, consultationRate,documentDeliveryRate, civilCase_specialized,criminalCase_specialized, verificationDocs } = req.body;
 
     const lawyerData = { _id: req.user.id, photo, slogan, summary, lawfirm_name, consultationRate,documentDeliveryRate, civilCase_specialized, criminalCase_specialized,verificationDocs };
-
 
     const newLawyer = await Lawyer.create(lawyerData);
 
