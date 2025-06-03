@@ -103,6 +103,11 @@ const sendTokenResponse = (user, statusCode, res) => {
 //@access Private
 exports.getMe = async (req, res, next) => {
   const user = await User.findById(req.user.id);
+
+  if (user.photo && !user.photo.startsWith("http")) {
+    user.photo = await getObjectSignedUrl(user.photo);
+  }
+
   res.status(200).json({
     success: true,
     data: user,
@@ -119,3 +124,44 @@ exports.logout = async (req, res, next) => {
   });
   res.status(200).json({ success: true, data: {} });
 };
+
+//@desc Update user profile
+//@route PUT /api/v1/auth/updateprofile
+//@access Private
+  exports.updateProfile = async (req, res, next) => {
+    try {
+      const fieldsToUpdate = {};
+      const user = User.findById(req.user.id);
+
+
+      if (req.file) {
+        const imageName = generateFileName();
+        await deleteFile(user.photo);
+        await uploadFile(req.file, imageName, req.file.mimetype);
+        req.body.photo = imageName;
+      }
+
+      const allowedFields = ['name', 'tel', 'line_id', 'location', 'thai_id','photo'];
+      allowedFields.forEach((field) => {
+        if (req.body[field] !== undefined) {
+          fieldsToUpdate[field] = req.body[field];
+        }
+      });
+
+      const updatedUser = await User.findByIdAndUpdate(req.user.id, fieldsToUpdate, {
+        new: true,
+        runValidators: true
+      });
+
+      res.status(200).json({
+        success: true,
+        data: updatedUser
+      });
+    } catch (err) {
+      console.error(err);
+      res.status(400).json({
+        success: false,
+        message: 'Could not update profile'
+      });
+    }
+  };

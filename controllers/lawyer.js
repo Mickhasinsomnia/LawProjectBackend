@@ -16,15 +16,9 @@ exports.addLawyer = async (req, res) => {
       return res.status(400).json({ message: "Lawyer data already exists" });
     }
 
-    // if (req.file) {
-    //   const imageName = generateFileName();
-    //   await uploadFile(req.file, imageName, req.file.mimetype);
-    //   req.body.photo = imageName;
-    // }
+    const { slogan, summary, lawfirm_name, consultationRate,documentDeliveryRate, civilCase_specialized,criminalCase_specialized, verificationDocs } = req.body;
 
-    const { photo, slogan, summary, lawfirm_name, consultationRate,documentDeliveryRate, civilCase_specialized,criminalCase_specialized, verificationDocs } = req.body;
-
-    const lawyerData = { _id: req.user.id, photo, slogan, summary, lawfirm_name, consultationRate,documentDeliveryRate, civilCase_specialized, criminalCase_specialized,verificationDocs };
+    const lawyerData = { _id: req.user.id, slogan, summary, lawfirm_name, consultationRate,documentDeliveryRate, civilCase_specialized, criminalCase_specialized,verificationDocs };
 
     const newLawyer = await Lawyer.create(lawyerData);
 
@@ -60,9 +54,6 @@ exports.getLawyerById = async (req, res) => {
       });
     }
 
-    // if (lawyer.photo && !lawyer.photo.startsWith("http")) {
-    //   lawyer.photo = await getObjectSignedUrl(lawyer.photo);
-    // }
 
     return res.status(200).json({
       success: true,
@@ -99,16 +90,10 @@ exports.updateLawyer = async (req, res) => {
       });
     }
 
-    // if (req.file) {
-    //   const imageName = generateFileName();
-    //   await deleteFile(lawyer.photo);
-    //   await uploadFile(req.file, imageName, req.file.mimetype);
-    //   req.body.photo = imageName;
-    // }
 
-    const { photo,slogan, summary, lawfirm_name, consultationRate,documentDeliveryRate, civilCase_specialized,criminalCase_specialized, verificationDocs } = req.body;
+    const { slogan, summary, lawfirm_name, consultationRate,documentDeliveryRate, civilCase_specialized,criminalCase_specialized, verificationDocs } = req.body;
 
-    if (photo !== undefined) lawyer.photo = photo;
+
     if (slogan !== undefined) lawyer.slogan = slogan;
     if (summary !== undefined) lawyer.summary = summary;
     if (lawfirm_name !== undefined) lawyer.lawfirm_name=lawfirm_name
@@ -159,13 +144,11 @@ exports.deleteLawyer = async (req, res) => {
       });
     }
 
-    // let deleteImage = lawyer.photo;
+
 
     await lawyer.deleteOne();
 
-    // if (deleteImage && !deleteImage.startsWith("http")) {
-    //   await deleteFile(deleteImage);
-    // }
+
 
     return res.status(200).json({
       success: true,

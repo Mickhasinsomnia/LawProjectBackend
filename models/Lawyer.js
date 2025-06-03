@@ -5,9 +5,6 @@ const LawyerSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
   },
-  photo: {
-    type: String
-  },
   slogan : {
     type: String,
     required: true
