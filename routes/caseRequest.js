@@ -5,8 +5,8 @@ const {protect,authorize} = require('../middleware/auth')
 const express = require('express');
 const router = express.Router();
 
-router.get('/client/:clientId', protect, authorize('user','admin'), getCaseRequestsByClientId);
-router.get('/lawyer/:lawyerId', protect, authorize('lawyer','admin'), getCaseRequestsByLawyerId);
+router.get('/client/:id', protect, authorize('user','admin'), getCaseRequestsByClientId);
+router.get('/lawyer/:id', protect, authorize('lawyer','admin'), getCaseRequestsByLawyerId);
 
 router.route('/').post(protect,authorize('user','admin'),addCaseRequest);
 

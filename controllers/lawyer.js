@@ -37,10 +37,10 @@ exports.addLawyer = async (req, res) => {
 // @access  Public
 exports.getLawyerById = async (req, res) => {
   try {
-    const lawyer = await Lawyer.findById(req.params.id).populate(
-      "_id",
-      "name tel location",
-    );
+    const lawyer = await Lawyer.findById(req.params.id).populate({
+      path: '_id',
+      select: 'name tel location'
+    });
 
     if (!lawyer) {
       return res.status(404).json({

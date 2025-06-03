@@ -172,7 +172,7 @@ exports.getCaseRequestById = async (req, res, next) => {
 //@access Private
 exports.getCaseRequestsByClientId = async (req, res, next) => {
   try {
-    const clientId = req.user.id;
+    const clientId = req.params.id;
 
     const caseRequests = await CaseRequest.find({ client_id: clientId });
 
@@ -197,12 +197,12 @@ exports.getCaseRequestsByClientId = async (req, res, next) => {
   }
 };
 
-//@desc  Get all case requests for a specific client
+//@desc  Get all case requests for a specific lawyer
 //@route GET /api/v1/caseRequest/lawyer/lawyerId
 //@access Private
 exports.getCaseRequestsByLawyerId = async (req, res, next) => {
   try {
-    const lawyerId = req.user.id;
+    const lawyerId = req.params.id;
 
     const caseRequests = await CaseRequest.find({ lawyer_id: lawyerId });
 
