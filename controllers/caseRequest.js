@@ -33,14 +33,11 @@ exports.addCaseRequest = async (req, res, next) => {
       client_id: req.user.id,
     });
 
-    const populatedCaseRequest = await newCaseRequest.populate({
-      path: "category_id",
-      select: "name",
-    });
+
 
     return res.status(201).json({
       success: true,
-      data: populatedCaseRequest,
+      data: newCaseRequest,
     });
   } catch (err) {
     console.error(err);
@@ -138,8 +135,6 @@ exports.getCaseRequestById = async (req, res, next) => {
     const caseRequest = await CaseRequest.findById(caseRequestId)
       .populate({ path: "client_id", select: "name email" })
       .populate({ path: "lawyer_id", select: "name email" })
-      .populate({ path: "category_id", select: "name" });
-
     if (!caseRequest) {
       return res.status(404).json({
         success: false,

@@ -10,11 +10,12 @@ const CaseRequestSchema = new mongoose.Schema({
     ref: 'Lawyer',
     required: true
   },
-  category_id: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Category',
+  category_type: {
+    type: String,
+    enum: ['civil', 'criminal'],
     required: true
   },
+
   description: {
     type: String,
     required: true

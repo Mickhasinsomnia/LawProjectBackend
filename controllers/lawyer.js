@@ -39,7 +39,7 @@ exports.getLawyerById = async (req, res) => {
   try {
     const lawyer = await Lawyer.findById(req.params.id).populate(
       "_id",
-      "name email",
+      "name tel location",
     );
 
     if (!lawyer) {
