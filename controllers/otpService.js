@@ -41,6 +41,10 @@ exports.verifyOtp = async (req,res,next) =>{
        return res.status(400).json({ success: false, message: "OTP not found or invalid" });
     }
 
+    if (found.status === 'verify') {
+          return res.status(200).json({ success: true, message: "OTP already verified" });
+    }
+
     found.status = "verify";
     await found.save();
 

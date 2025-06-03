@@ -10,9 +10,9 @@ exports.addLawyer = async (req, res) => {
       return res.status(400).json({ message: "Lawyer data already exists" });
     }
 
-    const { photo, slogan, summary, consultationRate,documentDeliveryRate, specialized, verificationDocs } = req.body;
+    const { photo, slogan, summary, lawfirm_name, consultationRate,documentDeliveryRate, civilCase_specialized,criminalCase_specialized, verificationDocs } = req.body;
 
-    const lawyerData = { _id: req.user.id, photo, slogan, summary, consultationRate,documentDeliveryRate, specialized, verificationDocs };
+    const lawyerData = { _id: req.user.id, photo, slogan, summary, lawfirm_name, consultationRate,documentDeliveryRate, civilCase_specialized, criminalCase_specialized,verificationDocs };
 
 
     const newLawyer = await Lawyer.create(lawyerData);
@@ -84,14 +84,16 @@ exports.updateLawyer = async (req, res) => {
       });
     }
 
-    const { photo, slogan, summary, consultationRate,documentDeliveryRate, specialized, verificationDocs } = req.body;
+    const { photo, slogan, summary, lawfirm_name, consultationRate,documentDeliveryRate, civilCase_specialized,criminalCase_specialized, verificationDocs } = req.body;
 
 
     if (photo !== undefined) lawyer.photo = photo;
     if (slogan !== undefined) lawyer.slogan = slogan;
     if (summary !== undefined) lawyer.summary = summary;
+    if (lawfirm_name !== undefined) lawyer.lawfirm_name=lawfirm_name
     if (consultationRate !== undefined) lawyer.consultationRate = consultationRate;
-    if (specialized !== undefined) lawyer.specialized = specialized;
+    if (civilCase_specialized !== undefined) lawyer.civilCase_specialized = civilCase_specialized;
+     if (criminalCase_specialized !== undefined) lawyer.criminalCase_specialized = criminalCase_specialized;
     if (verificationDocs !== undefined) lawyer.verificationDocs = verificationDocs;
     if (documentDeliveryRate !== undefined) lawyer.documentDeliveryRate = documentDeliveryRate;
 
