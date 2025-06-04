@@ -54,11 +54,11 @@ exports.getLawyerById = async (req, res) => {
       });
     }
 
-    const user = await User.findById(req.params.id);
+    // const user = await User.findById(req.params.id);
 
-    if (user.photo && !user.photo.startsWith("http")) {
-      user.photo = await getObjectSignedUrl(user.photo);
-    }
+    // if (user.photo && !user.photo.startsWith("http")) {
+    //   user.photo = await getObjectSignedUrl(user.photo);
+    // }
 
 
     return res.status(200).json({
