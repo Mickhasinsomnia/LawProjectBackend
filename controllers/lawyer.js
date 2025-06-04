@@ -1,5 +1,4 @@
 const Lawyer = require("../models/Lawyer");
-const User = require('../models/User');
 const {
 
   getObjectSignedUrl,
@@ -54,10 +53,9 @@ exports.getLawyerById = async (req, res) => {
       });
     }
 
-    const user = await User.findById(req.params.id);
-
-    if (user.photo && !user.photo.startsWith("http")) {
-      user.photo = await getObjectSignedUrl(user.photo);
+    const photo = lawyer?._id?.photo;
+    if (photo && !photo.startsWith("http")) {
+      lawyer._id.photo = await getObjectSignedUrl(photo);
     }
 
 
