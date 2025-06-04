@@ -1,4 +1,10 @@
 const User = require("../models/User");
+const {
+  generateFileName,
+  uploadFile,
+  getObjectSignedUrl,
+  deleteFile,
+} = require("./s3.js");
 //@desc Register user
 //@route POST /api/v1/auth/register
 //@access Public

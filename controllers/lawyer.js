@@ -1,10 +1,5 @@
 const Lawyer = require("../models/Lawyer");
-const {
-  generateFileName,
-  uploadFile,
-  getObjectSignedUrl,
-  deleteFile,
-} = require("./s3.js");
+
 
 // @desc    Create a new lawyer profile
 // @route   POST /api/v1/lawyers

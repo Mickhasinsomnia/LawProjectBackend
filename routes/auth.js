@@ -12,7 +12,7 @@ router.post('/register',otpStatusCheck,register);
 router.post('/login',login);
 router.get('/logout', logout);
 router.get('/getMe', protect,getMe);
-router.put('/updateProfile',upload.single('image'),updateProfile)
+router.put('/updateProfile',protect,upload.single('image'),updateProfile)
 
 
 module.exports = router;
