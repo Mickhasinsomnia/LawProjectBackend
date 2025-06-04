@@ -54,11 +54,11 @@ exports.getLawyerById = async (req, res) => {
       });
     }
 
-    // const user = await User.findById(req.params.id);
+    const user = await User.findById(req.params.id);
 
-    // if (user.photo && !user.photo.startsWith("http")) {
-    //   user.photo = await getObjectSignedUrl(user.photo);
-    // }
+    if (user.photo && !user.photo.startsWith("http")) {
+      user.photo = await getObjectSignedUrl(user.photo);
+    }
 
 
     return res.status(200).json({
@@ -180,13 +180,13 @@ exports.getAllLawyers = async (req, res) => {
       select: "name tel location photo"
     });
 
-    // for (const lawyer of lawyers) {
-    //   const user = lawyer._id;
+    for (const lawyer of lawyers) {
+      const user = lawyer._id;
 
-    //   if (user.photo && !user.photo.startsWith("http")) {
-    //     user.photo = await getObjectSignedUrl(user.photo);
-    //   }
-    // }
+      if (user.photo && !user.photo.startsWith("http")) {
+        user.photo = await getObjectSignedUrl(user.photo);
+      }
+    }
 
     return res.status(200).json({
       success: true,
