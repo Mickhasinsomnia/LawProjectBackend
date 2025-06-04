@@ -4,7 +4,7 @@ const dotenv = require('dotenv');
 const crypto = require('crypto');
 const sharp = require('sharp');
 
-dotenv.config({ path: '../config/config.env' });
+dotenv.config({ path: "./config/config.env" });
 
 console.log("Region:", process.env.AWS_BUCKET_REGION);
 
@@ -25,7 +25,7 @@ async function uploadFile(file, fileName, mimetype) {
   const fileBuffer = await sharp(file.buffer)
     .resize({ height: 1080, width: 1920, fit: "contain" })
     .toBuffer();
-    
+
   const uploadParams = {
     Bucket: bucketName,
     Body: fileBuffer,
