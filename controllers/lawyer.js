@@ -39,7 +39,7 @@ exports.getLawyerById = async (req, res) => {
   try {
     const lawyer = await Lawyer.findById(req.params.id).populate({
       path: '_id',
-      select: 'name tel location'
+      select: 'name tel location photo'
     });
 
     if (!lawyer) {
@@ -164,7 +164,8 @@ exports.deleteLawyer = async (req, res) => {
 // @access  Public
 exports.getAllLawyers = async (req, res) => {
   try {
-    const lawyers = await Lawyer.find().populate("_id", "name email");
+    const lawyers = await Lawyer.find().populate("_id", "name tel location photo");
+
 
     return res.status(200).json({
       success: true,
