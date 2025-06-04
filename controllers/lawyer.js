@@ -1,5 +1,10 @@
 const Lawyer = require("../models/Lawyer");
+const User = require('../models/User');
+const {
 
+  getObjectSignedUrl,
+
+} = require("./s3.js");
 
 // @desc    Create a new lawyer profile
 // @route   POST /api/v1/lawyers
@@ -47,6 +52,12 @@ exports.getLawyerById = async (req, res) => {
         success: false,
         message: "Lawyer not found",
       });
+    }
+
+    const user = await User.findById(req.params.id);
+
+    if (user.photo && !user.photo.startsWith("http")) {
+      user.photo = await getObjectSignedUrl(user.photo);
     }
 
 
@@ -164,8 +175,18 @@ exports.deleteLawyer = async (req, res) => {
 // @access  Public
 exports.getAllLawyers = async (req, res) => {
   try {
-    const lawyers = await Lawyer.find().populate("_id", "name tel location photo");
+    const lawyers = await Lawyer.find().populate({
+      path: "_id",
+      select: "name tel location photo"
+    });
 
+    // for (const lawyer of lawyers) {
+    //   const user = lawyer._id;
+
+    //   if (user.photo && !user.photo.startsWith("http")) {
+    //     user.photo = await getObjectSignedUrl(user.photo);
+    //   }
+    // }
 
     return res.status(200).json({
       success: true,
@@ -181,6 +202,7 @@ exports.getAllLawyers = async (req, res) => {
     });
   }
 };
+
 
 // @desc    Admin change verify status
 // @route   DELETE /api/v1/lawyers/status/:id

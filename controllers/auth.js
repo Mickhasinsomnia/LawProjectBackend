@@ -140,14 +140,14 @@ exports.logout = async (req, res, next) => {
       const user = await User.findById(req.user.id);
 
 
-      if (req.file) {
-        const imageName = generateFileName();
-        if (user.photo) {
-            await deleteFile(user.photo);
-        }
-        await uploadFile(req.file, imageName, req.file.mimetype);
-        req.body.photo = imageName;
-      }
+      // if (req.file) {
+      //   const imageName = generateFileName();
+      //   if (user.photo) {
+      //       await deleteFile(user.photo);
+      //   }
+      //   await uploadFile(req.file, imageName, req.file.mimetype);
+      //   req.body.photo = imageName;
+      // }
 
       const allowedFields = ['name', 'tel', 'line_id', 'location', 'thai_id','photo'];
       allowedFields.forEach((field) => {
