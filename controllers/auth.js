@@ -137,12 +137,14 @@ exports.logout = async (req, res, next) => {
   exports.updateProfile = async (req, res, next) => {
     try {
       const fieldsToUpdate = {};
-      const user = User.findById(req.user.id);
+      const user = await User.findById(req.user.id);
 
 
       if (req.file) {
         const imageName = generateFileName();
-        await deleteFile(user.photo);
+        if (user.photo) {
+            await deleteFile(user.photo);
+        }
         await uploadFile(req.file, imageName, req.file.mimetype);
         req.body.photo = imageName;
       }
