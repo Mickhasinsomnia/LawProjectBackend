@@ -173,3 +173,26 @@ exports.logout = async (req, res, next) => {
       });
     }
   };
+
+  //@desc Update user profile
+  //@route DELETE /api/v1/auth/deleteProfile
+  //@access Private
+    exports.deleteProfile = async (req, res, next) => {
+      try {
+        const user = await User.findById(req.user.id);
+        await deleteFile(user.photo);
+        await user.updateOne({ $unset: { photo: 1 } });
+
+
+        res.status(200).json({
+          success: true,
+          data: user
+        });
+      } catch (err) {
+        console.error(err);
+        res.status(400).json({
+          success: false,
+          message: 'Could not delete profile picture'
+        });
+      }
+    };
