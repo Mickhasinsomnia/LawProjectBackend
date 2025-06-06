@@ -116,7 +116,7 @@ exports.deleteNews = async (req, res) => {
         .status(404)
         .json({ success: false, message: "News not found" });
 
-
+    await deleteFile(news.image);
 
     await News.deleteOne({ _id: req.params.id });
 
