@@ -9,7 +9,7 @@ const hiring = require ('./routes/hiring')
 const workingDay = require ('./routes/workingDay')
 const lawyer = require('./routes/lawyer')
 const forum = require('./routes/forum')
-// const news = require ('./routes/news')
+const news = require ('./routes/news')
 const otpService = require('./routes/otpService')
 
 
@@ -41,7 +41,7 @@ app.use('/api/v1/hiring', hiring);
 app.use('/api/v1/workingDay', workingDay);
 app.use('/api/v1/lawyer', lawyer);
 app.use('/api/v1/forum', forum);
-// app.use('api/v1/news', news);
+app.use('/api/v1/news', news);
 app.use('/api/v1/otpService', otpLimiter,otpService);
 
 

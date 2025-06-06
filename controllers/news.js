@@ -3,7 +3,7 @@ const News = require("../models/News");
 
 exports.createNews = async (req, res) => {
   try {
-    const newNews = await Forum.create({
+    const newNews = await News.create({
       ...req.body,
       poster_id: req.user.id,
     });
@@ -14,7 +14,7 @@ exports.createNews = async (req, res) => {
       .status(400)
       .json({
         success: false,
-        message: "Failed to create Forum",
+        message: "Failed to create News",
         error: err.message,
       });
   }
@@ -30,7 +30,7 @@ exports.getAllNews = async (req, res) => {
       .status(500)
       .json({
         success: false,
-        message: "Failed to fetch forums",
+        message: "Failed to fetch news",
         error: err.message,
       });
   }
@@ -51,7 +51,7 @@ exports.getNews = async (req, res) => {
       .status(500)
       .json({
         success: false,
-        message: "Failed to fetch forum",
+        message: "Failed to fetch news",
         error: err.message,
       });
   }
@@ -66,13 +66,13 @@ exports.updateNews = async (req, res) => {
 
     const { title, content } = req.body;
 
-    if (title !== undefined) forum.title = title;
-    if (content !== undefined) forum.content = content;
+    if (title !== undefined) news.title = title;
+    if (content !== undefined) news.content = content;
 
-    const updated = await forum.save();
-    const populatedForum = await updated.populate("poster_id", "name");
+    const updated = await news.save();
+    const populatedNews = await updated.populate("poster_id", "name");
 
-    res.status(200).json({ success: true, data: populatedForum });
+    res.status(200).json({ success: true, data: populatedNews });
   } catch (err) {
     res.status(500).json({
       success: false,
@@ -86,8 +86,8 @@ exports.updateNews = async (req, res) => {
 
 exports.deleteNews = async (req, res) => {
   try {
-    const forum = await News.findById(req.params.id);
-    if (!forum)
+    const news = await News.findById(req.params.id);
+    if (!news)
       return res
         .status(404)
         .json({ success: false, message: "News not found" });
