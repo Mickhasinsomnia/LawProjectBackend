@@ -10,7 +10,7 @@ const router = express.Router();
 router.get('/', getAllNews);
 router.get('/:id', getNews);
 router.post('/', protect, authorize('admin'),upload.single('image'), createNews);
-router.put('/:id', protect, authorize('admin'), updateNews);
+router.put('/:id', protect, authorize('admin'),upload.single('image'), updateNews);
 router.delete('/:id', protect, authorize('admin'), deleteNews);
 
 module.exports = router;

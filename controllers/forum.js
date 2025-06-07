@@ -1,11 +1,23 @@
 const Forum = require("../models/Forum");
-
+const {
+  generateFileName,
+  uploadFile,
+  getObjectSignedUrl,
+  deleteFile,
+} = require("./s3.js");
 // Create a Forum
 exports.createForum = async (req, res) => {
   try {
+
+    if (req.file) {
+      const imageName = generateFileName();
+      await uploadFile(req.file, imageName, req.file.mimetype);
+      req.body.image = imageName;
+    }
+
     const newForum = await Forum.create({
       ...req.body,
-      user_id: req.user.id,
+      poster_id: req.user.id,
     });
 
     res.status(201).json({ success: true, data: newForum });
