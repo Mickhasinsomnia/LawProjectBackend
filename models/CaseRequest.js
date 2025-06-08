@@ -46,10 +46,7 @@ const CaseRequestSchema = new mongoose.Schema({
     type: String,
     default: ''
   },
-  created_at: {
-    type: Date,
-    default: Date.now
-  }
+  timestamps: true,
 });
 
 module.exports = mongoose.model('CaseRequest', CaseRequestSchema);

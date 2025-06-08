@@ -18,6 +18,18 @@ const PostSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  category: {
+      type: String,
+      enum: [
+        'คำถามกฎหมาย',        // Legal Questions
+        'คำปรึกษาทั่วไป',      // General Advice
+        'ประสบการณ์ผู้ใช้',    // User Experiences
+        'ข่าวสารกฎหมาย',       // Legal News
+        'กิจกรรมและสัมมนา',    // Events and Seminars
+      ],
+    required: true,
+  },
+   timestamps: true,
 });
 
 module.exports = mongoose.model("Post", PostSchema);

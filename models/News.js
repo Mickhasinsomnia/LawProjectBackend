@@ -17,7 +17,7 @@ const NewsSchema = new mongoose.Schema({
     type:String,
     required:true,
   },
-  type: {
+  category: {
     type: String,
     enum: [
       'ข่าวกฎหมายใหม่',
