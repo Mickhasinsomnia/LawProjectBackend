@@ -31,7 +31,6 @@ const UserSchema = new mongoose.Schema({
     thai_id: {
       type: String,
       match: [/^\d-\d{4}-\d{5}-\d{2}-\d$/, 'Invalid Thai ID format'],
-      default:""
     },
     role: {
         type:String,
