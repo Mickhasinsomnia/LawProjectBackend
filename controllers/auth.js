@@ -114,6 +114,8 @@ exports.getMe = async (req, res, next) => {
     user.photo = await getObjectSignedUrl(user.photo);
   }
 
+
+
   res.status(200).json({
     success: true,
     data: user,
