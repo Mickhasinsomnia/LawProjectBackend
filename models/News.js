@@ -17,6 +17,22 @@ const NewsSchema = new mongoose.Schema({
     type:String,
     required:true,
   },
+  type: {
+    type: String,
+    enum: [
+      'ข่าวกฎหมายใหม่',
+      'การตีความกฎหมาย',
+      'คดีความสำคัญ',
+      'กฎหมายแรงงาน',
+      'กฎหมายธุรกิจ',
+      'กฎหมายครอบครัว',
+      'กฎหมายอาญา',
+      'ข่าวกิจกรรมทางกฎหมาย',
+      'บทวิเคราะห์ทางกฎหมาย',
+    ],
+    required: true,
+  }
+
 })
 
 module.exports = mongoose.model('News', NewsSchema);
