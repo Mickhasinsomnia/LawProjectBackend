@@ -93,6 +93,15 @@ exports.updateNews = async (req, res) => {
     if (title !== undefined) news.title = title;
     if (content !== undefined) news.content = content;
 
+    if (req.file) {
+      const imageName = generateFileName();
+      if (news.image) {
+          await deleteFile(news.image);
+      }
+      await uploadFile(req.file, imageName, req.file.mimetype);
+      news.image = imageName;
+    }
+
     const updated = await news.save();
     const populatedNews = await updated.populate("poster_id", "name");
 

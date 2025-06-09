@@ -86,6 +86,15 @@ exports.updateForum = async (req, res) => {
     if (title !== undefined) forum.title = title;
     if (content !== undefined) forum.content = content;
 
+    if (req.file) {
+      const imageName = generateFileName();
+      if (forum.image) {
+          await deleteFile(forum.image);
+      }
+      await uploadFile(req.file, imageName, req.file.mimetype);
+      forum.image = imageName;
+    }
+
     const updated = await forum.save();
     const populatedForum = await updated.populate("poster_id", "name");
 
