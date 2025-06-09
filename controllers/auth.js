@@ -198,3 +198,33 @@ exports.logout = async (req, res, next) => {
         });
       }
     };
+
+exports.resetPassword = async (req,res,next)=>{
+  const userEmail = req.body.email;
+
+  if (!userEmail) {
+    return res.status(400).json({ success: false, message: 'Please enter your email' });
+  }
+
+  try {
+    const user = await User.findOne({ email: userEmail });
+
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
+
+    user.password = req.body.password;
+
+    await user.save();
+
+
+    res.status(200).json({ success: true, user });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+
+
+
+
+}

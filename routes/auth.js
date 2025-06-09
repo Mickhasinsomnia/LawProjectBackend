@@ -1,4 +1,4 @@
-const { register, login,logout,getMe,updateProfile,deleteProfile } = require('../controllers/auth');
+const { register, login,logout,getMe,updateProfile,deleteProfile,resetPassword } = require('../controllers/auth');
 
 const express = require('express');
 const multer = require('multer');
@@ -14,6 +14,7 @@ router.get('/logout', logout);
 router.get('/getMe', protect,getMe);
 router.put('/updateProfile',protect,upload.single('image'),updateProfile)
 router.delete('/deleteProfile', protect, deleteProfile);
+router.put('/resetPassword', otpStatusCheck, resetPassword);
 
 
 module.exports = router;
