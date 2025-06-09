@@ -1,4 +1,5 @@
 const Otp = require('../models/Otp');
+const User = require('../models/User');
 
 function generateOtp() {
   return Math.floor(100000 + Math.random() * 900000).toString();
@@ -24,6 +25,39 @@ exports.createOtpEntry = async (req, res, next) => {
     return res.status(500).json({ success: false, message: "Server error" });
   }
 };
+
+exports.createOtpByEmail = async (req, res, next) => {
+  try {
+    const email = req.body.email;
+    if (!email) {
+      return res.status(400).json({ success: false, message: "Email is required" });
+    }
+
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(400).json({ success: false, message: "User not found" });
+    }
+
+    const tel = user.tel;
+    if (!tel) {
+      return res.status(400).json({ success: false, message: "User has no phone number" });
+    }
+
+    const existingOtp = await Otp.findOne({ tel });
+    if (existingOtp) {
+      await existingOtp.deleteOne();
+    }
+
+    const otp = generateOtp();
+    await Otp.create({ tel, otp });
+
+    return res.status(201).json({ success: true, message: "OTP sent", otp });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
 
 exports.verifyOtp = async (req,res,next) =>{
   try {
