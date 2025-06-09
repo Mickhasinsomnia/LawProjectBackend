@@ -63,3 +63,36 @@ exports.otpStatusCheck = async (req, res, next) => {
     return res.status(500).json({ success: false, message: 'Server error' });
   }
 };
+
+exports.resetPasswordChek = async (req, res, next) => {
+  try {
+    const email = req.body.email;
+
+    if (!email) {
+      return res.status(400).json({ success: false, message: 'Email is required' });
+    }
+
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(400).json({ success: false, message: 'User not found' });
+    }
+
+    const tel = user.tel;
+    const found = await Otp.findOne({ tel });
+
+    if (!found) {
+      return res.status(400).json({ success: false, message: 'OTP entry not found' });
+    }
+
+    if (found.status !== 'verify') {
+      return res.status(400).json({ success: false, message: 'OTP not verified' });
+    }
+
+    await found.deleteOne();
+    next();
+
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ success: false, message: 'Server error' });
+  }
+};

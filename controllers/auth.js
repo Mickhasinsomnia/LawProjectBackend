@@ -200,7 +200,7 @@ exports.logout = async (req, res, next) => {
     };
 
 exports.resetPassword = async (req, res, next) => {
-  const { email, tel, password } = req.body;
+  const { email, password } = req.body;
 
   if (!email || !password) {
     return res.status(400).json({ success: false, message: 'Please enter your email and new password' });
@@ -211,11 +211,6 @@ exports.resetPassword = async (req, res, next) => {
 
     if (!user) {
       return res.status(404).json({ success: false, message: 'User not found' });
-    }
-
-
-    if (tel !== user.tel) {
-      return res.status(403).json({ success: false, message: "You're not authorized to reset this password" });
     }
 
     user.password = password;
