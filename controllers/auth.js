@@ -199,32 +199,31 @@ exports.logout = async (req, res, next) => {
       }
     };
 
-exports.resetPassword = async (req,res,next)=>{
-  const userEmail = req.body.email;
+exports.resetPassword = async (req, res, next) => {
+  const { email, tel, password } = req.body;
 
-  if (!userEmail) {
-    return res.status(400).json({ success: false, message: 'Please enter your email' });
+  if (!email || !password) {
+    return res.status(400).json({ success: false, message: 'Please enter your email and new password' });
   }
 
   try {
-    const user = await User.findOne({ email: userEmail });
+    const user = await User.findOne({ email });
 
     if (!user) {
       return res.status(404).json({ success: false, message: 'User not found' });
     }
 
-    user.password = req.body.password;
 
+    if (tel !== user.tel) {
+      return res.status(403).json({ success: false, message: "You're not authorized to reset this password" });
+    }
+
+    user.password = password;
     await user.save();
 
-
-    res.status(200).json({ success: true, user });
+    res.status(200).json({ success: true, message: 'Password reset successfully' });
   } catch (error) {
     console.error(error);
     res.status(500).json({ success: false, message: 'Server error' });
   }
-
-
-
-
-}
+};
