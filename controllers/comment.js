@@ -3,7 +3,7 @@ const Comment = require('../models/Comment');
 
 
 //@desc  Add new comment
-//POST /api/v1/posts/:postId/comment
+//POST /api/v1/forum/:forumId/comment
 //@access Private
 exports.addComment = async (req, res, next) => {
   try {
@@ -28,9 +28,13 @@ exports.addComment = async (req, res, next) => {
   }
 };
 
+
+//@desc  Get comment from forum
+//POST /api/v1/forum/:forumId/comment
+//@access Private
 exports.getCommentByForum = async (req,res,next) => {
 
-  const forum_id = req.params.id;
+  const forum_id = req.params.forumId;
 
   if (!forum_id) {
     return res.status(400).json({ success: false, error: 'Forum ID is required' });
