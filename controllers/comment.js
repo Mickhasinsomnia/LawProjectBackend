@@ -1,5 +1,5 @@
 const Comment = require('../models/Comment');
-
+const Forum = require('../models/Forum');
 
 
 //@desc  Add new comment
@@ -7,6 +7,18 @@ const Comment = require('../models/Comment');
 //@access Private
 exports.addComment = async (req, res, next) => {
   try {
+
+    const forum_id = req.params.forumId;
+
+    if (!forum_id) {
+        return res.status(400).json({ error: 'Forum ID is required in the request body.' });
+    }
+
+    const forum = await Forum.findById(req.params.forumId);
+
+    if (!forum) {
+        return res.status(404).json({ error: 'Forum not found.' });
+    }
 
     const comment = await Comment.create( {
       ...req.body,
@@ -41,6 +53,12 @@ exports.getCommentByForum = async (req,res,next) => {
   }
 
   try {
+    const forum = await Forum.findById(forum_id);
+
+    if (!forum) {
+      return res.status(404).json({ success: false, error: 'Forum not found.' });
+    }
+
     const comments = await Comment.find({ forum_id });
 
     if (!comments || comments.length === 0) {
