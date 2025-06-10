@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const PostSchema = new mongoose.Schema({
+const ForumSchema = new mongoose.Schema({
   poster_id: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
@@ -31,4 +31,4 @@ const PostSchema = new mongoose.Schema({
   },
 },{ timestamps: true } );
 
-module.exports = mongoose.model("Post", PostSchema);
+module.exports = mongoose.model("Forum", ForumSchema);
