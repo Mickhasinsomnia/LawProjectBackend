@@ -27,3 +27,31 @@ exports.addComment = async (req, res, next) => {
     });
   }
 };
+
+exports.getCommentByForum = async (req,res,next) => {
+
+  const forum_id = req.params.id;
+
+  if (!forum_id) {
+    return res.status(400).json({ success: false, error: 'Forum ID is required' });
+  }
+
+  try {
+    const comments = await Comment.find({ forum_id });
+
+    if (!comments || comments.length === 0) {
+
+      return res.status(404).json({ success: false, error: 'Comments not found' });
+
+
+    }
+
+
+    return res.status(200).json({ success: true, comments });
+
+  } catch (error) {
+    return res.status(500).json({ success: false, error: 'Server error' });
+  }
+
+
+}
