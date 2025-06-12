@@ -35,7 +35,14 @@ exports.createNews = async (req, res) => {
 
 exports.getAllNews = async (req, res) => {
   try {
-    const news = await News.find().populate("poster_id", "name");
+
+    const filter = {};
+
+    if(req.query.category){
+      filter.category = req.query.category;
+    }
+
+    const news = await News.find(filter).populate("poster_id", "name");
 
     for (const some of news) {
 

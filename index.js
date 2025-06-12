@@ -17,13 +17,9 @@ const otpService = require('./routes/otpService')
 dotenv.config({ path: "./config/config.env" });
 connectDB();
 
-const PORT = process.env.PORT || 5050;
+
 
 const app = express();
-const server = app.listen(
-  PORT,
-  console.log("Server running in", process.env.NODE_ENV, " mode on port", PORT),
-);
 
 app.use(express.json());
 const cors = require('cors');
@@ -48,9 +44,4 @@ app.use('/api/v1/forum', comment);
 app.use('/api/v1/otpService', otpLimiter,otpService);
 
 
-
-process.on("unhandledRejection", (err, promise) => {
-  console.log(`Error: ${err.message}`);
-
-  server.close(() => process.exit(1));
-});
+module.exports = app;
