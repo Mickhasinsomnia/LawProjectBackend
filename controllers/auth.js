@@ -64,6 +64,10 @@ exports.login = async (req, res, next) => {
         .json({ success: false, msg: "Invalid credentials" });
     }
 
+    if (user.photo && !user.photo.startsWith("http")) {
+          user.photo = await getObjectSignedUrl(user.photo);
+    }
+
     // const token = user.getSignedJwtToken();
     // res.status(200).json({sucess:true,token});
     sendTokenResponse(user, 200, res);
@@ -99,7 +103,8 @@ const sendTokenResponse = (user, statusCode, res) => {
     name: user.name,
     email: user.email,
     role:user.role,
-    token
+    token,
+    photo: user.photo || undefined,
   });
 };
 
