@@ -59,7 +59,7 @@ exports.getCommentByForum = async (req,res,next) => {
       return res.status(404).json({ success: false, error: 'Forum not found.' });
     }
 
-    const comments = await Comment.find({ forum_id });
+    const comments = await Comment.find({ forum_id }).populate("user_id","name");
 
     if (!comments || comments.length === 0) {
 
