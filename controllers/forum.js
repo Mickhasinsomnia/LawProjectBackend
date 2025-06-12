@@ -36,6 +36,14 @@ exports.createForum = async (req, res) => {
 exports.getForums = async (req, res) => {
   try {
     const forums = await Forum.find().populate("poster_id", "name");
+
+    for (const some of forums) {
+
+      if (some.image && !some.image.startsWith("http")) {
+        some.image = await getObjectSignedUrl(some.image);
+      }
+    }
+
     res.status(200).json({ success: true, data: forums });
   } catch (err) {
     res
@@ -56,6 +64,10 @@ exports.getForum = async (req, res) => {
       return res
         .status(404)
         .json({ success: false, message: "Forum not found" });
+
+    if (forum.image && !forum.image.startsWith("http")) {
+      forum.image = await getObjectSignedUrl(forum.image);
+    }
 
     res.status(200).json({ success: true, data: forum });
   } catch (err) {
@@ -122,7 +134,7 @@ exports.deleteForum = async (req, res) => {
       return res.status(403).json({ success: false, message: "Unauthorized" });
     }
 
-
+    await deleteFile(forum.image);
     await Forum.deleteOne({ _id: req.params.id });
 
     res.status(200).json({ success: true, message: "Forum deleted" });
