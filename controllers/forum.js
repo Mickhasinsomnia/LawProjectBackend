@@ -134,7 +134,9 @@ exports.deleteForum = async (req, res) => {
       return res.status(403).json({ success: false, message: "Unauthorized" });
     }
 
-    await deleteFile(forum.image);
+    if (forum.image) {
+      await deleteFile(forum.image);
+    }
     await Forum.deleteOne({ _id: req.params.id });
 
     res.status(200).json({ success: true, message: "Forum deleted" });
