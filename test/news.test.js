@@ -1,6 +1,7 @@
 const request = require('supertest');
 const app = require('../index');
 const mongoose = require('mongoose');
+const News = require('../models/News');
 
 describe('Only admin can post news', () => {
 
