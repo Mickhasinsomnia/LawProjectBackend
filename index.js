@@ -12,7 +12,7 @@ const forum = require('./routes/forum')
 const news = require ('./routes/news')
 const comment = require ('./routes/comment')
 const otpService = require('./routes/otpService')
-
+const chat = require('./routes/chat')
 
 dotenv.config({ path: "./config/config.env" });
 connectDB();
@@ -42,6 +42,6 @@ app.use('/api/v1/forum', forum);
 app.use('/api/v1/news', news);
 app.use('/api/v1/forum', comment);
 app.use('/api/v1/otpService', otpLimiter,otpService);
-
+app.use('/api/v1/chat', chat);
 
 module.exports = app;
