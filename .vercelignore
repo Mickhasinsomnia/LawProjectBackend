@@ -1,0 +1,10 @@
+# Ignore test files and folders
+*.test.js
+*.spec.js
+test/
+tests/
+__tests__/
+
+# Ignore coverage reports
+coverage/
+
