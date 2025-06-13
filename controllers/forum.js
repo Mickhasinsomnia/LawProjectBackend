@@ -130,7 +130,7 @@ exports.deleteForum = async (req, res) => {
         .status(404)
         .json({ success: false, message: "Forum not found" });
 
-    if (forum.user_id.toString() !== req.user.id && req.user.role !== 'admin') {
+    if (forum.poster_id.toString() !== req.user.id && req.user.role !== 'admin') {
       return res.status(403).json({ success: false, message: "Unauthorized" });
     }
 
