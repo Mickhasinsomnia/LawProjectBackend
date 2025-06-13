@@ -17,7 +17,10 @@ exports.addComment = async (req, res, next) => {
     const forum = await Forum.findById(req.params.forumId);
 
     if (!forum) {
-        return res.status(404).json({ error: 'Forum not found.' });
+      return res.status(404).json({
+        success: false,
+        message: "Forum not found",
+      });
     }
 
     const comment = await Comment.create( {
