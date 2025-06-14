@@ -18,7 +18,7 @@ exports.addChat = async (req, res) => {
 exports.getChat = async (req, res) => {
   try {
     const sender_id = req.user.id;
-    const receiver_id = req.query.receiver_id;
+    const receiver_id = req.params.id;
 
         if (!receiver_id) {
           return res.status(400).json({ error: 'receiver_id is required' });
