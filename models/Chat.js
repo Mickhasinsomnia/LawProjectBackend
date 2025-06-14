@@ -15,11 +15,6 @@ const ChatSchema = new mongoose.Schema({
     type:String,
     required:true
   },
-  timestamp:{
-    type:Date,
-    required:true,
-    default: Date.now
-  }
-})
+},{ timestamps: true })
 
 module.exports = mongoose.model('Chat', ChatSchema);
