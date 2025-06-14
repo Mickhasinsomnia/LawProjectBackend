@@ -1,7 +1,6 @@
 // routes/chat.js
 const express = require('express');
 const router = express.Router();
-const Chat = require('../models/Chat');
 const {protect} = require('../middleware/auth')
 const {addChat} = require ('../controllers/chat')
 
