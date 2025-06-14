@@ -1,6 +1,10 @@
 const mongoose = require("mongoose");
 const Chat = require("../models/Chat");
 
+
+//@desc  Add new chat message
+//POST /api/v1/chat
+//@access Private
 exports.addChat = async (req, res) => {
   try {
     const { receiver_id, text } = req.body;
@@ -15,6 +19,10 @@ exports.addChat = async (req, res) => {
   }
 };
 
+
+//@desc    Get chat messages between authenticated user and specified user
+//@route   POST /api/v1/chat/:id
+//@access  Private
 exports.getChat = async (req, res) => {
   try {
     const sender_id = req.user.id;
@@ -30,8 +38,23 @@ exports.getChat = async (req, res) => {
         { sender_id: receiver_id, receiver_id: sender_id },
       ],
     }).sort({ timestamp: 1 });
-
     res.status(200).json(chats);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+//@desc    Add a chat message from AI to the logged-in user
+//@route   POST /api/v1/chat/ai
+//@access  Private
+exports.addAiChat = async (req, res) => {
+  try {
+    const { receiver_id, text } = req.body;
+    const aiId = '6846998cb50a9e36e896e52f'; // will fix later
+
+    const newMessage = await Chat.create({ sender_id: aiId, receiver_id, text });
+
+    res.status(201).json(newMessage);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
