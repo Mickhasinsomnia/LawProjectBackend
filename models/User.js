@@ -3,10 +3,14 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
 const UserSchema = new mongoose.Schema({
-    name:{
-        type:String,
-        required:[true,'Please add a name']
-    },
+  name: {
+      type: String,
+      required: [true, 'Please add a name'],
+      match: [
+        /^(?:[A-Z][a-z]+ [A-Z][a-z]+|[ก-๙]{2,} [ก-๙]{2,})$/,
+          'Please add a valid name in the format "Name Surname"'
+      ]
+  },
     email:{
         type:String,
         required:[true,'Please add an email'],
