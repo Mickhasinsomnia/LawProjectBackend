@@ -1,6 +1,7 @@
 const express = require("express");
 const dotenv = require("dotenv");
 const rateLimit = require('express-rate-limit');
+const cors = require('cors');
 const connectDB = require("./config/db");
 const appointment= require('./routes/appointment')
 const auth = require('./routes/auth')
@@ -18,11 +19,10 @@ dotenv.config({ path: "./config/config.env" });
 connectDB();
 
 
-
 const app = express();
 
 app.use(express.json());
-const cors = require('cors');
+
 app.use(cors());
 
 const otpLimiter = rateLimit({
