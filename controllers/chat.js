@@ -50,7 +50,7 @@ exports.getChat = async (req, res) => {
 exports.addAiChat = async (req, res) => {
   try {
     const { receiver_id, text } = req.body;
-    const aiId = '6846998cb50a9e36e896e52f'; // will fix later
+    const aiId = '6828a931e92578c60ee00ebd'; // will fix later
 
     const newMessage = await Chat.create({ sender_id: aiId, receiver_id, text });
 
