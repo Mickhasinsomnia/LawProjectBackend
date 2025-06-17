@@ -35,7 +35,18 @@ exports.createForum = async (req, res) => {
 // Get all Forums
 exports.getForums = async (req, res) => {
   try {
-    const forums = await Forum.find().populate("poster_id", "name");
+
+    const filter = {};
+
+    if (req.query.category) {
+      filter.category = req.query.category;
+    }
+
+    if (req.query.title) {
+      filter.title = { $regex: req.query.title, $options: "i" };
+    }
+
+    const forums = await Forum.find(filter).populate("poster_id", "name");
 
     for (const some of forums) {
 
