@@ -80,3 +80,53 @@ exports.getCommentByForum = async (req,res,next) => {
 
 
 }
+
+//@desc  Edit comment in forum
+//PUT /api/v1/forum/:forumId/comment/:commentId
+//@access Private
+exports.editComment = async(req,res,next) => {
+  try{
+    const comment = await Comment.findById(req.params.commentId);
+    const { content } = req.body;
+
+    if (!comment)
+      return res.status(404).json({ success: false, message: "Comment not found" });
+
+
+    if (comment.user_id.toString() !== req.user.id && req.user.role !== 'admin') {
+      return res.status(403).json({ success: false, message: "Unauthorized" });
+    }
+
+    if(content!=undefined) comment.content = content;
+    await comment.save();
+    return res.status(200).json({ success: true, comment });
+  }
+  catch(error){
+    return res.status(500).json({ success: false, error: 'Server error' });
+  }
+}
+
+//@desc  Delete comment in forum
+//DELETE /api/v1/forum/:forumId/comment/:commentId
+//@access Private
+exports.deleteComment = async(req,res,next) => {
+  try{
+    const comment = await Comment.findById(req.params.commentId);
+
+
+    if (!comment)
+      return res.status(404).json({ success: false, message: "Comment not found" });
+
+
+    if (comment.user_id.toString() !== req.user.id && req.user.role !== 'admin') {
+      return res.status(403).json({ success: false, message: "Unauthorized" });
+    }
+
+    await Comment.deleteOne({_id:req.params.commentId});
+
+    return res.status(200).json({ success: true,  message: "Comment deleted" });
+  }
+  catch(error){
+    return res.status(500).json({ success: false, error: 'Server error' });
+  }
+}
