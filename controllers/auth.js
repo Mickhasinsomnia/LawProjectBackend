@@ -12,6 +12,14 @@ exports.register = async (req, res, next) => {
   try {
     const { name, email, password, tel,line_id, role, location,thai_id } = req.body;
 
+
+    const thaiIdRegex = /^\d-\d{4}-\d{5}-\d{2}-\d$/;
+        if (!thaiIdRegex.test(thai_id)) {
+          return res.status(400).json({
+            success: false,
+            message: 'Invalid Thai ID format. Use format: X-XXXX-XXXXX-XX-X',
+          });
+        }
     // Create User
     const user = await User.create({
       name,
@@ -120,10 +128,13 @@ exports.getMe = async (req, res, next) => {
   }
 
 
-
+  const userObj = user.toObject();
+  if (user.thai_id && user.thai_id !== "") {
+    userObj.thai_id = user.thai_id ? user.getDecryptedThaiId() : "";
+  }
   res.status(200).json({
     success: true,
-    data: user,
+    data: userObj,
   });
 };
 
@@ -143,7 +154,7 @@ exports.logout = async (req, res, next) => {
 //@access Private
   exports.updateProfile = async (req, res, next) => {
     try {
-      const fieldsToUpdate = {};
+
       const user = await User.findById(req.user.id);
 
 
@@ -156,21 +167,29 @@ exports.logout = async (req, res, next) => {
         req.body.photo = imageName;
       }
 
+      const { thai_id } = req.body;
+
+      const thaiIdRegex = /^\d-\d{4}-\d{5}-\d{2}-\d$/;
+      if (thai_id !== "" && !thaiIdRegex.test(thai_id)) {
+        return res.status(400).json({
+          success: false,
+          message: 'Invalid Thai ID format. Use format: X-XXXX-XXXXX-XX-X',
+        });
+      }
+
+
       const allowedFields = ['name', 'tel', 'line_id', 'location', 'thai_id','photo'];
       allowedFields.forEach((field) => {
         if (req.body[field] !== undefined) {
-          fieldsToUpdate[field] = req.body[field];
+          user[field] = req.body[field];
         }
       });
 
-      const updatedUser = await User.findByIdAndUpdate(req.user.id, fieldsToUpdate, {
-        new: true,
-        runValidators: true
-      });
+      await user.save();
 
       res.status(200).json({
         success: true,
-        data: updatedUser
+        data: user
       });
     } catch (err) {
       console.error(err);

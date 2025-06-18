@@ -1,13 +1,18 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const CryptoJS = require('crypto-js');
+const dotenv = require('dotenv')
+dotenv.config({ path: "./config/config.env" });
+
+const secretKey = process.env.THAI_ID_SECRET_KEY;
 
 const UserSchema = new mongoose.Schema({
   name: {
       type: String,
       required: [true, 'Please add a name'],
       match: [
-        /^(?:[A-Z][a-z]+ [A-Z][a-z]+|[ก-๙]{2,} [ก-๙]{2,})$/,
+        /^(?:[A-Za-z][a-z]+ [A-Za-z][a-z]+|[ก-๙]{2,} [ก-๙]{2,})$/,
           'Please add a valid name in the format "Name Surname"'
       ]
   },
@@ -71,10 +76,33 @@ const UserSchema = new mongoose.Schema({
 });
 
 //Encrypt password using bcrypt
-UserSchema.pre('save',async function(next) {
-    const salt = await bcrypt.genSalt(10);
-    this.password = await bcrypt.hash(this.password,salt);
+UserSchema.pre('save', async function(next) {
+  try {
+
+    if (this.isModified('password')) {
+      const salt = await bcrypt.genSalt(10);
+      this.password = await bcrypt.hash(this.password, salt);
+    }
+
+
+    if (this.isModified('thai_id') && this.thai_id) {
+      console.log('Encrypting thai_id:', this.thai_id);
+      const encrypted = CryptoJS.AES.encrypt(this.thai_id, secretKey).toString();
+      this.thai_id = encrypted;
+    }
+
+    next();
+  } catch (err) {
+    next(err);
+  }
 });
+
+// Decrypt method
+UserSchema.methods.getDecryptedThaiId = function () {
+  if (!this.thai_id) return null;
+  const bytes = CryptoJS.AES.decrypt(this.thai_id, secretKey);
+  return bytes.toString(CryptoJS.enc.Utf8);
+};
 
 //Sign JWT and return
 UserSchema.methods.getSignedJwtToken=function() {
