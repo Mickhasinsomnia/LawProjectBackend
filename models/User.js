@@ -34,7 +34,7 @@ const UserSchema = new mongoose.Schema({
     },
     thai_id: {
       type: String,
-      match: [/^\d-\d{4}-\d{5}-\d{2}-\d$/, 'Invalid Thai ID format'],
+      default:""
     },
     role: {
         type:String,
@@ -49,7 +49,7 @@ const UserSchema = new mongoose.Schema({
     },
     line_id:{
       type:String,
-      required:[true,'Please add a line ID'],
+      default:""
     },
     location: {
       district: {
