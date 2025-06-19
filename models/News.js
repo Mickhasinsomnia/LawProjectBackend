@@ -31,6 +31,10 @@ const NewsSchema = new mongoose.Schema({
       'บทวิเคราะห์ทางกฎหมาย',
     ],
     required: true,
+  },
+  view_count :{
+    type: Number,
+    default: 0
   }
 
 },{ timestamps: true })

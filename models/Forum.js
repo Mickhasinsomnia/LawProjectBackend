@@ -29,6 +29,10 @@ const ForumSchema = new mongoose.Schema({
       ],
     required: true,
   },
+  view_count :{
+    type: Number,
+    default: 0
+  }
 },{ timestamps: true } );
 
 module.exports = mongoose.model("Forum", ForumSchema);

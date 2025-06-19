@@ -73,6 +73,9 @@ exports.getNews = async (req, res) => {
         .status(404)
         .json({ success: false, message: "News not found" });
 
+    news.view_count += 1;
+    await news.save();
+
     if (news.image && !news.image.startsWith("http")) {
       news.image = await getObjectSignedUrl(news.image);
     }

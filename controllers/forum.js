@@ -76,6 +76,9 @@ exports.getForum = async (req, res) => {
         .status(404)
         .json({ success: false, message: "Forum not found" });
 
+    forum.view_count += 1;
+    await forum.save();
+
     if (forum.image && !forum.image.startsWith("http")) {
       forum.image = await getObjectSignedUrl(forum.image);
     }
