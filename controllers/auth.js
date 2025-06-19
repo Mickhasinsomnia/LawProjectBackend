@@ -14,7 +14,7 @@ exports.register = async (req, res, next) => {
 
 
     const thaiIdRegex = /^\d-\d{4}-\d{5}-\d{2}-\d$/;
-        if (!thaiIdRegex.test(thai_id)) {
+        if (thai_id && !thaiIdRegex.test(thai_id)) {
           return res.status(400).json({
             success: false,
             message: 'Invalid Thai ID format. Use format: X-XXXX-XXXXX-XX-X',

@@ -56,7 +56,7 @@ exports.otpStatusCheck = async (req, res, next) => {
       return res.status(400).json({ success: false, message: 'OTP not verified' });
     }
 
-    await found.deleteOne();
+
     next();
   } catch (err) {
     console.error(err);
