@@ -1,4 +1,4 @@
-const { register, login,logout,getMe,updateProfile,deleteProfile,resetPassword } = require('../controllers/auth');
+const { register, login,logout,getMe,updateProfile,updatePhoto,deletePhoto,resetPassword } = require('../controllers/auth');
 
 const express = require('express');
 const multer = require('multer');
@@ -12,8 +12,9 @@ router.post('/register',otpStatusCheck,register);
 router.post('/login',login);
 router.get('/logout', logout);
 router.get('/getMe', protect,getMe);
-router.put('/updateProfile',protect,upload.single('image'),updateProfile)
-router.delete('/deleteProfile', protect, deleteProfile);
+router.put('/updateProfile', protect, updateProfile);
+router.put('/updatePhoto', protect,upload.single('image'), updatePhoto);
+router.delete('/deletePhoto', protect, deletePhoto);
 router.put('/resetPassword', resetPasswordChek, resetPassword);
 
 

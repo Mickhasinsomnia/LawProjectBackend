@@ -130,7 +130,7 @@ exports.getMe = async (req, res, next) => {
 
   const userObj = user.toObject();
   if (user.thai_id && user.thai_id !== "") {
-    userObj.thai_id = user.thai_id ? user.getDecryptedThaiId() : "";
+    userObj.thai_id = user.getDecryptedThaiId();
   }
   res.status(200).json({
     success: true,
@@ -150,22 +150,12 @@ exports.logout = async (req, res, next) => {
 };
 
 //@desc Update user profile
-//@route PUT /api/v1/auth/updateprofile
+//@route PUT /api/v1/auth/updateProfile
 //@access Private
   exports.updateProfile = async (req, res, next) => {
     try {
 
       const user = await User.findById(req.user.id);
-
-
-      if (req.file) {
-        const imageName = generateFileName();
-        if (user.photo) {
-            await deleteFile(user.photo);
-        }
-        await uploadFile(req.file, imageName, req.file.mimetype);
-        req.body.photo = imageName;
-      }
 
       const { thai_id } = req.body;
 
@@ -178,7 +168,7 @@ exports.logout = async (req, res, next) => {
       }
 
 
-      const allowedFields = ['name', 'tel', 'line_id', 'location', 'thai_id','photo'];
+      const allowedFields = ['name', 'tel', 'line_id', 'location', 'thai_id'];
       allowedFields.forEach((field) => {
         if (req.body[field] !== undefined) {
           user[field] = req.body[field];
@@ -200,10 +190,44 @@ exports.logout = async (req, res, next) => {
     }
   };
 
-  //@desc Update user profile
-  //@route DELETE /api/v1/auth/deleteProfile
+  //@desc Update user profile photo
+  //@route PUT /api/v1/auth/updatePhoto
   //@access Private
-    exports.deleteProfile = async (req, res, next) => {
+  exports.updatePhoto = async (req, res, next) => {
+    try {
+      const user = await User.findById(req.user.id);
+
+      if (req.file) {
+        const imageName = generateFileName();
+        if (user.photo) {
+            await deleteFile(user.photo);
+        }
+        await uploadFile(req.file, imageName, req.file.mimetype);
+        req.body.photo = imageName;
+      }
+
+      user.photo = req.body.photo;
+
+      await user.save();
+
+
+      res.status(200).json({
+        success: true,
+        data: user
+      });
+    } catch (err) {
+      console.error(err);
+      res.status(400).json({
+        success: false,
+        message: 'Could not delete profile picture'
+      });
+    }
+  };
+
+  //@desc Delete user profile
+  //@route DELETE /api/v1/auth/deletePhoto
+  //@access Private
+    exports.deletePhoto = async (req, res, next) => {
       try {
         const user = await User.findById(req.user.id);
         await deleteFile(user.photo);
