@@ -234,3 +234,27 @@ exports.unlikeForum = async (req, res) => {
     });
   }
 };
+
+exports.likeCheck = async (req, res) =>{
+  const forumId = req.params.forumId;
+
+  if (!forumId) {
+    return res.status(400).json({ success: false, error: 'Forum ID is required' });
+  }
+  try {
+    const result = await ForumLike.find({ user_id: req.user.id, forum_id: forumId });
+
+    if (result.length !== 0) {
+      return res.status(400).json({ success: false, message: 'Already like.' });
+    }
+    res.status(200).json({ success: true, message: 'Can like.' });
+  }
+
+  catch (err) {
+    res.status(500).json({
+      success: false,
+      message: 'Failed to check like forum',
+      error: err.message,
+    });
+  }
+}
