@@ -199,8 +199,7 @@ exports.likeForum = async (req, res) => {
       .status(500)
       .json({
         success: false,
-        message: "Failed to fetch forum",
-        error: err.message,
+        message: "Failed to add like",
       });
   }
 };
@@ -235,26 +234,29 @@ exports.unlikeForum = async (req, res) => {
   }
 };
 
-exports.likeCheck = async (req, res) =>{
+//@desc  Check if user already liked the forum
+//GET /api/v1/forum/:forumId/like
+//@access Private
+exports.likeCheck = async (req, res) => {
   const forumId = req.params.forumId;
 
   if (!forumId) {
     return res.status(400).json({ success: false, error: 'Forum ID is required' });
   }
+
   try {
-    const result = await ForumLike.find({ user_id: req.user.id, forum_id: forumId });
+    const alreadyLiked = await ForumLike.exists({ user_id: req.user.id, forum_id: forumId });
 
-    if (result.length !== 0) {
-      return res.status(400).json({ success: false, message: 'Already like.' });
-    }
-    res.status(200).json({ success: true, message: 'Can like.' });
-  }
+    res.status(200).json({
+      success: true,
+      liked: Boolean(alreadyLiked)
+    });
 
-  catch (err) {
+  } catch (err) {
     res.status(500).json({
       success: false,
-      message: 'Failed to check like forum',
+      message: 'Failed to check like status',
       error: err.message,
     });
   }
-}
+};
