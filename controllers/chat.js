@@ -21,7 +21,7 @@ exports.addChat = async (req, res) => {
 
 
 //@desc    Get chat messages between authenticated user and specified user
-//@route   POST /api/v1/chat/:id
+//@route   GET /api/v1/chat/:id
 //@access  Private
 exports.getChat = async (req, res) => {
   try {

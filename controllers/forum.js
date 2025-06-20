@@ -1,4 +1,5 @@
 const Forum = require("../models/Forum");
+const Comment = require("../models/Comment");
 const {
   generateFileName,
   uploadFile,
@@ -36,24 +37,22 @@ exports.createForum = async (req, res) => {
 exports.getForums = async (req, res) => {
   try {
 
-    const filter = {};
+    const forums = await Forum.find().populate("poster_id", "name");
 
-    if (req.query.category) {
-      filter.category = req.query.category;
-    }
+    for (let i = 0; i < forums.length; i++) {
+         const forum = forums[i];
 
-    if (req.query.title) {
-      filter.title = { $regex: req.query.title, $options: "i" };
-    }
+         const obj = forum.toObject();
 
-    const forums = await Forum.find(filter).populate("poster_id", "name");
+         if (obj.image && !obj.image.startsWith("http")) {
+           obj.image = await getObjectSignedUrl(obj.image);
+         }
 
-    for (const some of forums) {
+         obj.comment_count = await Comment.countDocuments({ forum_id: obj._id });
 
-      if (some.image && !some.image.startsWith("http")) {
-        some.image = await getObjectSignedUrl(some.image);
-      }
-    }
+         forums[i] = obj;
+       }
+
 
     res.status(200).json({ success: true, data: forums });
   } catch (err) {

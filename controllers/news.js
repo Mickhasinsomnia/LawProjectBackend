@@ -35,17 +35,8 @@ exports.createNews = async (req, res) => {
 
 exports.getAllNews = async (req, res) => {
   try {
-    const filter = {};
 
-    if (req.query.category) {
-      filter.category = req.query.category;
-    }
-
-    if (req.query.title) {
-      filter.title = { $regex: req.query.title, $options: "i" };
-    }
-
-    const news = await News.find(filter).populate("poster_id", "name");
+    const news = await News.find().populate("poster_id", "name");
 
     for (const some of news) {
       if (some.image && !some.image.startsWith("http")) {
