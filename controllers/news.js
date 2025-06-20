@@ -1,4 +1,5 @@
 const News = require("../models/News");
+const NewsLike = require('../models/NewsLike')
 const {
   generateFileName,
   uploadFile,
@@ -38,11 +39,19 @@ exports.getAllNews = async (req, res) => {
 
     const news = await News.find().populate("poster_id", "name");
 
-    for (const some of news) {
-      if (some.image && !some.image.startsWith("http")) {
-        some.image = await getObjectSignedUrl(some.image);
-      }
-    }
+    for (let i = 0; i < news.length; i++) {
+         const some = news[i];
+
+         const obj = some.toObject();
+
+         if (obj.image && !obj.image.startsWith("http")) {
+           obj.image = await getObjectSignedUrl(obj.image);
+         }
+
+         obj.like_count = await NewsLike.countDocuments({ forum_id: obj._id });
+
+         news[i] = obj;
+       }
 
     res.status(200).json({ success: true, data: news });
   } catch (err) {
@@ -71,7 +80,10 @@ exports.getNews = async (req, res) => {
       news.image = await getObjectSignedUrl(news.image);
     }
 
-    res.status(200).json({ success: true, data: news });
+    const obj = news.toObject();
+    obj.like_count = await NewsLike.countDocuments({ news_id: obj._id });
+
+    res.status(200).json({ success: true, data: obj });
   } catch (err) {
     res
       .status(500)
@@ -140,5 +152,67 @@ exports.deleteNews = async (req, res) => {
         message: "Failed to delete news",
         error: err.message,
       });
+  }
+};
+
+// @desc    Like the news
+// @route   POST /api/v1/news/:newsId/like
+// @access  Private
+exports.likeNews = async (req, res) => {
+  const newsId = req.params.newsId;
+
+  if (!newsId) {
+    return res.status(400).json({ success: false, error: 'News ID is required' });
+  }
+
+  try {
+    const news = await News.findById(newsId);
+
+    if (!news) {
+      return res.status(404).json({ success: false, error: 'News not found.' });
+    }
+
+    await NewsLike.create({
+      news_id: newsId,
+      user_id: req.user.id,
+    });
+
+    res.status(200).json({ success: true });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: "Failed to like news",
+      error: err.message,
+    });
+  }
+};
+
+//@desc  Unlike the news
+//DELETE /api/v1/news/:newsId/like
+//@access Private
+exports.unlikeNews = async (req, res) => {
+  const newsId = req.params.newsId;
+
+  if (!newsId) {
+    return res.status(400).json({ success: false, error: 'News ID is required' });
+  }
+
+  try {
+    const result = await NewsLike.deleteOne({
+      news_id: newsId,
+      user_id: req.user.id,
+    });
+
+    if (result.deletedCount === 0) {
+      return res.status(404).json({ success: false, message: 'Like not found.' });
+    }
+
+    res.status(200).json({ success: true, message: 'News unliked successfully.' });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: 'Failed to unlike news',
+      error: err.message,
+    });
   }
 };

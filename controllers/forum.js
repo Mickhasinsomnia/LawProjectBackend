@@ -1,4 +1,5 @@
 const Forum = require("../models/Forum");
+const ForumLike = require('../models/ForumLike')
 const Comment = require("../models/Comment");
 const {
   generateFileName,
@@ -49,6 +50,7 @@ exports.getForums = async (req, res) => {
          }
 
          obj.comment_count = await Comment.countDocuments({ forum_id: obj._id });
+         obj.like_count = await ForumLike.countDocuments({ forum_id: obj._id });
 
          forums[i] = obj;
        }
@@ -82,7 +84,12 @@ exports.getForum = async (req, res) => {
       forum.image = await getObjectSignedUrl(forum.image);
     }
 
-    res.status(200).json({ success: true, data: forum });
+   const obj = forum.toObject();
+   obj.comment_count = await Comment.countDocuments({ forum_id: obj._id });
+   obj.like_count = await ForumLike.countDocuments({ forum_id: obj._id });
+
+
+    res.status(200).json({ success: true, data: obj });
   } catch (err) {
     res
       .status(500)
@@ -161,5 +168,69 @@ exports.deleteForum = async (req, res) => {
         message: "Failed to delete forum",
         error: err.message,
       });
+  }
+};
+
+//@desc  Like the forum
+//POST /api/v1/forum/:forumId/like
+//@access Private
+exports.likeForum = async (req, res) => {
+
+  const forumId = req.params.forumId;
+    if (!forumId) {
+      return res.status(400).json({ success: false, error: 'Forum ID is required' });
+    }
+    try {
+
+      const forum = await Forum.findById(forumId);
+
+      if (!forum) {
+        return res.status(404).json({ success: false, error: 'Forum not found.' });
+      }
+
+      const like = await ForumLike.create({
+        forum_id:forumId,
+        user_id:req.user.id
+      });
+
+    res.status(200).json({ success: true});
+  } catch (err) {
+    res
+      .status(500)
+      .json({
+        success: false,
+        message: "Failed to fetch forum",
+        error: err.message,
+      });
+  }
+};
+
+//@desc  Unlike the forum
+//DELETE /api/v1/forum/:forumId/like
+//@access Private
+exports.unlikeForum = async (req, res) => {
+  const forumId = req.params.forumId;
+
+  if (!forumId) {
+    return res.status(400).json({ success: false, error: 'Forum ID is required' });
+  }
+
+  try {
+    const result = await ForumLike.deleteOne({
+      forum_id: forumId,
+      user_id: req.user.id,
+    });
+
+    if (result.deletedCount === 0) {
+      return res.status(404).json({ success: false, message: 'Like not found.' });
+    }
+
+    res.status(200).json({ success: true, message: 'Forum unliked successfully.' });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: 'Failed to unlike forum',
+      error: err.message,
+    });
   }
 };

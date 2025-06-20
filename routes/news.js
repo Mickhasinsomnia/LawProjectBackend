@@ -1,5 +1,5 @@
 const express = require('express');
-const { createNews, getAllNews, getNews, updateNews, deleteNews } = require('../controllers/news');
+const { createNews, getAllNews, getNews, updateNews, deleteNews, likeNews, unlikeNews } = require('../controllers/news');
 const { protect, authorize } = require('../middleware/auth');
 const multer = require('multer');
 const storage = multer.memoryStorage()
@@ -12,5 +12,7 @@ router.get('/:id', getNews);
 router.post('/', protect, authorize('admin'),upload.single('image'), createNews);
 router.put('/:id', protect, authorize('admin'),upload.single('image'), updateNews);
 router.delete('/:id', protect, authorize('admin'), deleteNews);
+router.post('/:newsId/like', protect,likeNews);
+router.delete('/:newsId/like', protect,unlikeNews);
 
 module.exports = router;
