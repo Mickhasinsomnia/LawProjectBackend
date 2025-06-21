@@ -182,7 +182,7 @@ exports.likeNews = async (req, res) => {
     res.status(500).json({
       success: false,
       message: "Failed to like news",
-      error: err.message,
+
     });
   }
 };
@@ -212,6 +212,34 @@ exports.unlikeNews = async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Failed to unlike news',
+
+    });
+  }
+};
+
+
+//@desc  Check if user already liked the news
+//GET /api/v1/news/:newsId/like
+//@access Private
+exports.likeCheck = async (req, res) => {
+  const forumId = req.params.newsId;
+
+  if (!forumId) {
+    return res.status(400).json({ success: false, error: 'Forum ID is required' });
+  }
+
+  try {
+    const alreadyLiked = await NewsLike.exists({ user_id: req.user.id, forum_id: forumId });
+
+    res.status(200).json({
+      success: true,
+      liked: Boolean(alreadyLiked)
+    });
+
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: 'Failed to check like status',
       error: err.message,
     });
   }

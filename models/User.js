@@ -6,6 +6,7 @@ const dotenv = require('dotenv')
 dotenv.config({ path: "./config/config.env" });
 
 const secretKey = process.env.THAI_ID_SECRET_KEY;
+const secondKey = process.env.SECOND_SECRET;
 
 const UserSchema = new mongoose.Schema({
   name: {
@@ -86,9 +87,11 @@ UserSchema.pre('save', async function(next) {
 
 
     if (this.isModified('thai_id') && this.thai_id) {
-      console.log('Encrypting thai_id:', this.thai_id);
       const encrypted = CryptoJS.AES.encrypt(this.thai_id, secretKey).toString();
-      this.thai_id = encrypted;
+
+      const doubleEncrypted = CryptoJS.TripleDES.encrypt(encrypted, secondKey).toString();
+      this.thai_id =doubleEncrypted;
+
     }
 
     next();
@@ -100,8 +103,16 @@ UserSchema.pre('save', async function(next) {
 // Decrypt method
 UserSchema.methods.getDecryptedThaiId = function () {
   if (!this.thai_id) return null;
-  const bytes = CryptoJS.AES.decrypt(this.thai_id, secretKey);
-  return bytes.toString(CryptoJS.enc.Utf8);
+
+    const tripleDesDecrypted = CryptoJS.TripleDES.decrypt(this.thai_id, secondKey).toString(CryptoJS.enc.Utf8);
+
+
+    const originalValue = CryptoJS.AES.decrypt(tripleDesDecrypted, secretKey).toString(CryptoJS.enc.Utf8);
+
+    return originalValue;
+
+
+
 };
 
 //Sign JWT and return
