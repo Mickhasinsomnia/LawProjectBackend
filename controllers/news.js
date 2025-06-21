@@ -222,14 +222,15 @@ exports.unlikeNews = async (req, res) => {
 //GET /api/v1/news/:newsId/like
 //@access Private
 exports.likeCheck = async (req, res) => {
-  const forumId = req.params.newsId;
+  const newsId = req.params.newsId;
 
-  if (!forumId) {
+  if (!newsId) {
     return res.status(400).json({ success: false, error: 'Forum ID is required' });
   }
 
   try {
-    const alreadyLiked = await NewsLike.exists({ user_id: req.user.id, forum_id: forumId });
+    const alreadyLiked = await NewsLike.exists({ user_id: req.user.id, news_id: newsId });
+    console.log(alreadyLiked)
 
     res.status(200).json({
       success: true,
