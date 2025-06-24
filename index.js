@@ -31,7 +31,6 @@ const otpLimiter = rateLimit({
   message: "Too many OTP requests, please try again in 1 minute."
 });
 
-
 app.use('/api/v1/appointment', appointment);
 app.use('/api/v1/auth', auth);
 app.use('/api/v1/caseRequest', caseRequest);
