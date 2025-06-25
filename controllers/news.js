@@ -36,24 +36,23 @@ exports.createNews = async (req, res) => {
 
 exports.getAllNews = async (req, res) => {
   try {
+    const newsList = await News.find().populate("poster_id", "name");
 
-    const news = await News.find().populate("poster_id", "name");
+    const processedNews = await Promise.all(
+      newsList.map(async (newsItem) => {
+        const obj = newsItem.toObject();
 
-    for (let i = 0; i < news.length; i++) {
-         const some = news[i];
+        if (obj.image && !obj.image.startsWith("http")) {
+          obj.image = await getObjectSignedUrl(obj.image);
+        }
 
-         const obj = some.toObject();
+        obj.like_count = await NewsLike.countDocuments({ forum_id: obj._id });
 
-         if (obj.image && !obj.image.startsWith("http")) {
-           obj.image = await getObjectSignedUrl(obj.image);
-         }
+        return obj;
+      })
+    );
 
-         obj.like_count = await NewsLike.countDocuments({ forum_id: obj._id });
-
-         news[i] = obj;
-       }
-
-    res.status(200).json({ success: true, data: news });
+    res.status(200).json({ success: true, data: processedNews });
   } catch (err) {
     res.status(500).json({
       success: false,
@@ -62,6 +61,7 @@ exports.getAllNews = async (req, res) => {
     });
   }
 };
+
 
 
 

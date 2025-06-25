@@ -37,36 +37,38 @@ exports.createForum = async (req, res) => {
 // Get all Forums
 exports.getForums = async (req, res) => {
   try {
-
     const forums = await Forum.find().populate("poster_id", "name");
 
-    for (let i = 0; i < forums.length; i++) {
-         const forum = forums[i];
+    const processedForums = await Promise.all(
+      forums.map(async (forum) => {
+        const obj = forum.toObject();
 
-         const obj = forum.toObject();
+        if (obj.image && !obj.image.startsWith("http")) {
+          obj.image = await getObjectSignedUrl(obj.image);
+        }
 
-         if (obj.image && !obj.image.startsWith("http")) {
-           obj.image = await getObjectSignedUrl(obj.image);
-         }
+        const [commentCount, likeCount] = await Promise.all([
+          Comment.countDocuments({ forum_id: obj._id }),
+          ForumLike.countDocuments({ forum_id: obj._id }),
+        ]);
 
-         obj.comment_count = await Comment.countDocuments({ forum_id: obj._id });
-         obj.like_count = await ForumLike.countDocuments({ forum_id: obj._id });
+        obj.comment_count = commentCount;
+        obj.like_count = likeCount;
 
-         forums[i] = obj;
-       }
+        return obj;
+      })
+    );
 
-
-    res.status(200).json({ success: true, data: forums });
+    res.status(200).json({ success: true, data: processedForums });
   } catch (err) {
-    res
-      .status(500)
-      .json({
-        success: false,
-        message: "Failed to fetch forums",
-        error: err.message,
-      });
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch forums",
+      error: err.message,
+    });
   }
 };
+
 
 
 exports.getForum = async (req, res) => {
@@ -85,8 +87,14 @@ exports.getForum = async (req, res) => {
     }
 
    const obj = forum.toObject();
-   obj.comment_count = await Comment.countDocuments({ forum_id: obj._id });
-   obj.like_count = await ForumLike.countDocuments({ forum_id: obj._id });
+
+   const [commentCount, likeCount] = await Promise.all([
+     Comment.countDocuments({ forum_id: obj._id }),
+     ForumLike.countDocuments({ forum_id: obj._id }),
+   ]);
+
+   obj.comment_count = commentCount
+   obj.like_count = likeCount
 
 
     res.status(200).json({ success: true, data: obj });
