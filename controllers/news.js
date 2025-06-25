@@ -68,11 +68,11 @@ exports.getNews = async (req, res) => {
       .populate("poster_id", "name")
       .lean();
 
-    News.updateOne({ _id: req.params.id }, { $inc: { view_count: 1 } }).exec();
-
     if (!news) {
       return res.status(404).json({ success: false, message: "News not found" });
     }
+
+    News.updateOne({ _id: req.params.id }, { $inc: { view_count: 1 } }).exec();
 
     if (news.image && !news.image.startsWith("http")) {
       news.image = await getObjectSignedUrl(news.image);
