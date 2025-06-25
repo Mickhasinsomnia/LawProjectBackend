@@ -37,25 +37,24 @@ exports.createForum = async (req, res) => {
 // Get all Forums
 exports.getForums = async (req, res) => {
   try {
-    const forums = await Forum.find().populate("poster_id", "name");
+    const forums = await Forum.find().populate("poster_id", "name").lean();
 
     const processedForums = await Promise.all(
       forums.map(async (forum) => {
-        const obj = forum.toObject();
 
-        if (obj.image && !obj.image.startsWith("http")) {
-          obj.image = await getObjectSignedUrl(obj.image);
+        if (forum.image && !forum.image.startsWith("http")) {
+          forum.image = await getObjectSignedUrl(forum.image);
         }
 
         const [commentCount, likeCount] = await Promise.all([
-          Comment.countDocuments({ forum_id: obj._id }),
-          ForumLike.countDocuments({ forum_id: obj._id }),
+          Comment.countDocuments({ forum_id: forum._id }),
+          ForumLike.countDocuments({ forum_id: forum._id }),
         ]);
 
-        obj.comment_count = commentCount;
-        obj.like_count = likeCount;
+        forum.comment_count = commentCount;
+        forum.like_count = likeCount;
 
-        return obj;
+        return forum;
       })
     );
 
@@ -73,41 +72,39 @@ exports.getForums = async (req, res) => {
 
 exports.getForum = async (req, res) => {
   try {
-    const forum = await Forum.findById(req.params.id).populate("poster_id", "name");
-    if (!forum)
-      return res
-        .status(404)
-        .json({ success: false, message: "Forum not found" });
 
-    forum.view_count += 1;
-    await forum.save();
+    const forum = await Forum.findById(req.params.id)
+      .populate("poster_id", "name")
+      .lean();
+
+    if (!forum) {
+      return res.status(404).json({ success: false, message: "Forum not found" });
+    }
+
+    Forum.updateOne({ _id: req.params.id }, { $inc: { view_count: 1 } }).exec();
 
     if (forum.image && !forum.image.startsWith("http")) {
       forum.image = await getObjectSignedUrl(forum.image);
     }
 
-   const obj = forum.toObject();
+    const [commentCount, likeCount] = await Promise.all([
+      Comment.countDocuments({ forum_id: forum._id }),
+      ForumLike.countDocuments({ forum_id: forum._id }),
+    ]);
 
-   const [commentCount, likeCount] = await Promise.all([
-     Comment.countDocuments({ forum_id: obj._id }),
-     ForumLike.countDocuments({ forum_id: obj._id }),
-   ]);
+    forum.comment_count = commentCount;
+    forum.like_count = likeCount;
 
-   obj.comment_count = commentCount
-   obj.like_count = likeCount
-
-
-    res.status(200).json({ success: true, data: obj });
+    res.status(200).json({ success: true, data: forum });
   } catch (err) {
-    res
-      .status(500)
-      .json({
-        success: false,
-        message: "Failed to fetch forum",
-        error: err.message,
-      });
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch forum",
+      error: err.message,
+    });
   }
 };
+
 
 // Update a Forum (only owner)
 exports.updateForum = async (req, res) => {

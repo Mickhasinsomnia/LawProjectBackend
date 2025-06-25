@@ -36,19 +36,17 @@ exports.createNews = async (req, res) => {
 
 exports.getAllNews = async (req, res) => {
   try {
-    const newsList = await News.find().populate("poster_id", "name");
+    const newsList = await News.find().populate("poster_id", "name").lean();
 
     const processedNews = await Promise.all(
       newsList.map(async (newsItem) => {
-        const obj = newsItem.toObject();
 
-        if (obj.image && !obj.image.startsWith("http")) {
-          obj.image = await getObjectSignedUrl(obj.image);
+
+        if (newsItem.image && !newsItem.image.startsWith("http")) {
+          newsItem.image = await getObjectSignedUrl(newsItem.image);
         }
 
-        obj.like_count = await NewsLike.countDocuments({ forum_id: obj._id });
-
-        return obj;
+        return newsItem;
       })
     );
 
@@ -63,37 +61,35 @@ exports.getAllNews = async (req, res) => {
 };
 
 
-
-
 exports.getNews = async (req, res) => {
   try {
-    const news = await News.findById(req.params.id).populate("poster_id", "name");
-    if (!news)
-      return res
-        .status(404)
-        .json({ success: false, message: "News not found" });
 
-    news.view_count += 1;
-    await news.save();
+    const news = await News.findById(req.params.id)
+      .populate("poster_id", "name")
+      .lean();
+
+    News.updateOne({ _id: req.params.id }, { $inc: { view_count: 1 } }).exec();
+
+    if (!news) {
+      return res.status(404).json({ success: false, message: "News not found" });
+    }
 
     if (news.image && !news.image.startsWith("http")) {
       news.image = await getObjectSignedUrl(news.image);
     }
 
-    const obj = news.toObject();
-    obj.like_count = await NewsLike.countDocuments({ news_id: obj._id });
+    news.like_count = await NewsLike.countDocuments({ news_id: news._id });
 
-    res.status(200).json({ success: true, data: obj });
+    res.status(200).json({ success: true, data: news });
   } catch (err) {
-    res
-      .status(500)
-      .json({
-        success: false,
-        message: "Failed to fetch news",
-        error: err.message,
-      });
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch news",
+      error: err.message,
+    });
   }
 };
+
 
 exports.updateNews = async (req, res) => {
   try {
