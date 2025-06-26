@@ -14,14 +14,11 @@ exports.addComment = async (req, res, next) => {
         return res.status(400).json({ error: 'Forum ID is required in the request body.' });
     }
 
-    const forum = await Forum.findById(req.params.forumId);
-
-    if (!forum) {
-      return res.status(404).json({
-        success: false,
-        message: "Forum not found",
-      });
+    const exists = await Forum.exists({ _id: req.params.forumId });
+    if (!exists) {
+      return res.status(404).json({ success: false, message: "Forum not found" });
     }
+
 
     const comment = await Comment.create( {
       ...req.body,
@@ -45,7 +42,7 @@ exports.addComment = async (req, res, next) => {
 
 
 //@desc  Get comment from forum
-//POST /api/v1/forum/:forumId/comment
+//GET /api/v1/forum/:forumId/comment
 //@access Private
 exports.getCommentByForum = async (req,res,next) => {
 
