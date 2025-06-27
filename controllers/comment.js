@@ -1,6 +1,8 @@
 const Comment = require('../models/Comment');
 const Forum = require('../models/Forum');
-
+const {
+  getObjectSignedUrl,
+} = require("./s3.js");
 
 //@desc  Add new comment
 //POST /api/v1/forum/:forumId/comment
@@ -53,26 +55,31 @@ exports.getCommentByForum = async (req,res,next) => {
   }
 
   try {
-    const forum = await Forum.findById(forum_id);
+    const forumExists = await Forum.exists({ _id: forum_id });
 
-    if (!forum) {
-      return res.status(404).json({ success: false, error: 'Forum not found.' });
+    if (!forumExists) {
+      return res.status(404).json({ success: false, error: 'Forum does not exist.' });
     }
 
-    const comments = await Comment.find({ forum_id }).populate("user_id","name");
+    const comments = await Comment.find({ forum_id }).populate("user_id","name photo");
+
 
     if (!comments || comments.length === 0) {
 
       return res.status(404).json({ success: false, error: 'Comments not found' });
-
-
     }
 
+    for (const comment of comments) {
+          const user = comment.user_id;
+          if (user && user.photo && !user.photo.startsWith("http")) {
+            user.photo = await getObjectSignedUrl(user.photo);
+          }
+    }
 
     return res.status(200).json({ success: true, comments });
 
   } catch (error) {
-    return res.status(500).json({ success: false, error: 'Server error' });
+    return res.status(500).json({ success: false, error:"server error" });
   }
 
 

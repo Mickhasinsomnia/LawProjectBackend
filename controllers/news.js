@@ -46,6 +46,9 @@ exports.getAllNews = async (req, res) => {
           newsItem.image = await getObjectSignedUrl(newsItem.image);
         }
 
+        newsItem.like_count = await NewsLike.countDocuments({ news_id: newsItem._id });
+
+
         return newsItem;
       })
     );

@@ -37,7 +37,7 @@ exports.getChat = async (req, res) => {
         { sender_id, receiver_id },
         { sender_id: receiver_id, receiver_id: sender_id },
       ],
-    }).sort({ timestamp: 1 });
+    }).sort({ createdAt: 1});
     res.status(200).json(chats);
   } catch (error) {
     res.status(500).json({ error: error.message });

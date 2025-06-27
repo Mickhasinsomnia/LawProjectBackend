@@ -12,30 +12,14 @@ const CaseRequestSchema = new mongoose.Schema({
   },
   category_type: {
     type: String,
-    enum: ['civil', 'criminal'],
+    enum: ['civil', 'criminal','unknown'],
     required: true
   },
-
   description: {
     type: String,
     required: true
   },
-  consultation_type: {
-    type: String,
-    enum: ['per_session', 'per_hour'],
-    required: true
-  },
-  consultation_duration: {
-    type: Number,
-    required: true
-  },
-  consultation_price: {
-    type: Number,
-    required: true
-  },
   consultation_date: { type: Date, required: true },
-  // consultation_start_time: { type: String, required: true },
-  // consultation_end_time: { type: String, required: true },
 
   consultation_status: {
     type: String,

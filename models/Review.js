@@ -6,17 +6,9 @@ const LawyerReviewSchema = new mongoose.Schema({
     ref: 'User',
     required: true,
   },
-  username: {
-    type: String,
-    required: true,
-  },
   lawyerId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Camp',
-    required: true,
-  },
-  lawyerName: {
-    type: String,
+    ref: 'Lawyer',
     required: true,
   },
   rating: {

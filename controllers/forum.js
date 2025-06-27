@@ -37,13 +37,18 @@ exports.createForum = async (req, res) => {
 // Get all Forums
 exports.getForums = async (req, res) => {
   try {
-    const forums = await Forum.find().populate("poster_id", "name").lean();
+    const forums = await Forum.find().populate("poster_id", "name photo").lean();
 
     const processedForums = await Promise.all(
       forums.map(async (forum) => {
 
         if (forum.image && !forum.image.startsWith("http")) {
           forum.image = await getObjectSignedUrl(forum.image);
+        }
+
+
+        if (forum.poster_id && forum.poster_id.photo &&!forum.poster_id.photo.startsWith("http")) {
+              forum.poster_id.photo = await getObjectSignedUrl(forum.poster_id.photo);
         }
 
         const [commentCount, likeCount] = await Promise.all([

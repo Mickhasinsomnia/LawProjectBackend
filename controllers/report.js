@@ -4,7 +4,7 @@ const Comment = require("../models/Comment")
 const Forum = require("../models/Forum")
 
 //@desc  Create a report
-//DELETE /api/v1/forum/:forumId/report
+//POST /api/v1/forum/:forumId/report
 //@access Private
 exports.createReport = async (req, res) => {
   try {
