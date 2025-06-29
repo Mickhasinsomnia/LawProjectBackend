@@ -7,6 +7,9 @@ const {
   deleteFile,
 } = require("./s3.js");
 
+//@desc  Create a news
+//POST /api/v1/news
+//@access Private
 exports.createNews = async (req, res) => {
   try {
 
@@ -33,7 +36,9 @@ exports.createNews = async (req, res) => {
   }
 };
 
-
+//@desc Get all news
+//GET /api/v1/news
+//@access Public
 exports.getAllNews = async (req, res) => {
   try {
     const newsList = await News.find().populate("poster_id", "name").lean();
@@ -64,6 +69,9 @@ exports.getAllNews = async (req, res) => {
 };
 
 
+//@desc Get news by id
+//GET /api/v1/news/:id
+//@access Public
 exports.getNews = async (req, res) => {
   try {
 
@@ -93,7 +101,9 @@ exports.getNews = async (req, res) => {
   }
 };
 
-
+//@desc Update a news
+//PUT /api/v1/news/:id
+//@access Private
 exports.updateNews = async (req, res) => {
   try {
     const news = await News.findById(req.params.id);
@@ -129,7 +139,9 @@ exports.updateNews = async (req, res) => {
 };
 
 
-
+//@desc Delete a news
+//DELETE /api/v1/news/:id
+//@access Private
 exports.deleteNews = async (req, res) => {
   try {
     const news = await News.findById(req.params.id);

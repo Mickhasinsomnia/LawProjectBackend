@@ -11,6 +11,7 @@ const workingDay = require ('./routes/workingDay')
 const lawyer = require('./routes/lawyer')
 const forum = require('./routes/forum')
 const news = require ('./routes/news')
+const article = require('./routes/article')
 const comment = require ('./routes/comment')
 const otpService = require('./routes/otpService')
 const chat = require('./routes/chat')
@@ -40,6 +41,7 @@ app.use('/api/v1/workingDay', workingDay);
 app.use('/api/v1/lawyer', lawyer);
 app.use('/api/v1/forum', forum);
 app.use('/api/v1/news', news);
+app.use('/api/v1/article', article)
 app.use('/api/v1/forum', comment);
 app.use('/api/v1',report)
 app.use('/api/v1/otpService', otpLimiter,otpService);

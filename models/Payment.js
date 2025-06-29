@@ -16,6 +16,9 @@ const PaymentSchema = new mongoose.Schema({
     enum: ['pending', 'paid', 'completed'],
     default: 'pending'
   },
+  amount:{
+    type:Number
+  },
   paid_at:{
     type:Date,
   },

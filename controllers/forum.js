@@ -7,7 +7,10 @@ const {
   getObjectSignedUrl,
   deleteFile,
 } = require("./s3.js");
-// Create a Forum
+
+//@desc  Create a forum
+//POST /api/v1/forum
+//@access Private
 exports.createForum = async (req, res) => {
   try {
 
@@ -34,7 +37,9 @@ exports.createForum = async (req, res) => {
   }
 };
 
-// Get all Forums
+//@desc Get all forum
+//GET /api/v1/forum
+//@access Public
 exports.getForums = async (req, res) => {
   try {
     const forums = await Forum.find().populate("poster_id", "name photo").lean();
@@ -75,6 +80,9 @@ exports.getForums = async (req, res) => {
 
 
 
+//@desc Get forum by id
+//GET /api/v1/forum/:id
+//@access Public
 exports.getForum = async (req, res) => {
   try {
 
@@ -111,7 +119,9 @@ exports.getForum = async (req, res) => {
 };
 
 
-// Update a Forum (only owner)
+//@desc Update an forum
+//PUT /api/v1/forum/:id
+//@access Private
 exports.updateForum = async (req, res) => {
   try {
     const forum = await Forum.findById(req.params.id);
@@ -151,7 +161,9 @@ exports.updateForum = async (req, res) => {
 };
 
 
-// Delete a Forum (only owner)
+//@desc Delete a forum
+//DELETE /api/v1/forum/:id
+//@access Private
 exports.deleteForum = async (req, res) => {
   try {
     const forum = await Forum.findById(req.params.id);
@@ -192,9 +204,9 @@ exports.likeForum = async (req, res) => {
     }
     try {
 
-      const forum = await Forum.findById(forumId);
+      const exists = await Forum.exists({ _id: forumId });
 
-      if (!forum) {
+      if (!exists) {
         return res.status(404).json({ success: false, error: 'Forum not found.' });
       }
 
