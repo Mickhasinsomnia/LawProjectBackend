@@ -14,11 +14,7 @@ const HiringSchema = new mongoose.Schema({
     type:mongoose.Schema.Types.ObjectId,
     ref:'User',
   },
-  approved_at: {
-    type: Date,
-    default: Date.now
-  },
-  task:{
+  detail:{
     type:String,
      require:true
   },
@@ -30,10 +26,6 @@ const HiringSchema = new mongoose.Schema({
     type: String,
       enum: ['active', 'cancelled','completed'],
       default: 'active'
-  },
-  start_date:{
-    type:Date,
-    default: Date.now
   },
 },{ timestamps: true })
 

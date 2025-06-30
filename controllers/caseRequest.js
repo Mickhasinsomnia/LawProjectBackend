@@ -226,3 +226,34 @@ exports.getCaseRequestsByLawyerId = async (req, res, next) => {
     });
   }
 };
+
+//@desc  Get all case request
+//@route GET /api/v1/caseRequest
+//@access Private
+exports.getAllCaseRequest = async (req, res, next) => {
+  try {
+
+    const caseRequest = await CaseRequest.find()
+      .populate({ path: "client_id", select: "name" })
+      .populate({ path: "lawyer_id", select: "name" })
+    if (!caseRequest) {
+      return res.status(404).json({
+        success: false,
+        message: "Case request not found",
+      });
+    }
+;
+
+    return res.status(200).json({
+      success: true,
+      data: caseRequest,
+    });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({
+      success: false,
+      message: "Failed to retrieve case request",
+      error: err.message,
+    });
+  }
+};

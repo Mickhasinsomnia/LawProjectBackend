@@ -16,6 +16,7 @@ const comment = require ('./routes/comment')
 const otpService = require('./routes/otpService')
 const chat = require('./routes/chat')
 const report = require('./routes/report')
+const payment = require('./routes/payment')
 
 dotenv.config({ path: "./config/config.env" });
 connectDB();
@@ -46,5 +47,6 @@ app.use('/api/v1/forum', comment);
 app.use('/api/v1',report)
 app.use('/api/v1/otpService', otpLimiter,otpService);
 app.use('/api/v1/chat', chat);
+app.use('/api/v1/payment',payment)
 
 module.exports = app;

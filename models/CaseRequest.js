@@ -8,7 +8,6 @@ const CaseRequestSchema = new mongoose.Schema({
   lawyer_id: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Lawyer',
-    required: true
   },
   category_type: {
     type: String,

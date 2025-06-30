@@ -4,8 +4,8 @@ const express = require('express');
 const router = express.Router();
 const {protect,authorize} = require ('../middleware/auth')
 
-router.get('/client/:clientId', protect, authorize('user','admin'), getHiringByClientId);
-router.get('/lawyer/:lawyerId', protect, authorize('lawyer','admin'), getHiringByLawyerId);
+router.get('/client', protect, authorize('user','admin'), getHiringByClientId);
+router.get('/lawyer', protect, authorize('lawyer','admin'), getHiringByLawyerId);
 
 router.post('/create/:id',protect, authorize('lawyer','admin'), addHiring);
 

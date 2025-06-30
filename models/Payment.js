@@ -1,11 +1,7 @@
 const mongoose = require('mongoose')
 
 const PaymentSchema = new mongoose.Schema({
-  user_id:{
-    type:mongoose.Schema.Types.ObjectId,
-    ref:'User',
-    required:true
-  },
+
   hiring_id:{
     type:mongoose.Schema.Types.ObjectId,
     ref:'Hiring',
@@ -18,9 +14,6 @@ const PaymentSchema = new mongoose.Schema({
   },
   amount:{
     type:Number
-  },
-  paid_at:{
-    type:Date,
   },
 })
 
