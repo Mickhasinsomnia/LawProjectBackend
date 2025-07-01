@@ -17,6 +17,9 @@ import otpService from "./routes/otpService.js";
 import chat from "./routes/chat.js";
 import report from "./routes/report.js";
 import payment from "./routes/payment.js";
+import swaggerJsDoc from 'swagger-jsdoc';
+import swaggerUI from 'swagger-ui-express';
+
 
 dotenv.config({ path: "./config/config.env" });
 connectDB();
@@ -48,5 +51,24 @@ app.use('/api/v1',report)
 app.use('/api/v1/otpService', otpLimiter,otpService);
 app.use('/api/v1/chat', chat);
 app.use('/api/v1/payment',payment)
+
+const swaggerOptions = {
+  swaggerDefinition: {
+    openapi: '3.0.0',
+    info: {
+      title: 'Law API',
+      version: '1.0.0',
+      description: 'API documentation for the Law project'
+    },
+    servers: [
+      {
+        url: '/'
+      }
+    ],
+  },
+  apis: ['./swagger/swagger.yaml'],
+};
+const swaggerDocs=swaggerJsDoc(swaggerOptions);
+app.use('/api-docs',swaggerUI.serve, swaggerUI.setup(swaggerDocs));
 
 export default app;

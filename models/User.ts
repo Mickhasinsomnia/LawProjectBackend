@@ -25,8 +25,6 @@ export interface IUser extends Document {
     district: string;
     province: string;
   };
-  resetPasswordToken?: string;
-  resetPasswordExpire?: Date;
   createdAt: Date;
 
   matchPassword(enteredPassword: string): Promise<boolean>;
@@ -93,9 +91,6 @@ const UserSchema = new mongoose.Schema({
         required: [true, 'Please add a province']
       }
     },
-
-    resetPasswordToken: String,
-    resetPasswordExpire: Date,
     createdAt:{
         type: Date,
         default: Date.now

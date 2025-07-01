@@ -8,3 +8,5 @@ server.js
 
 # Ignore coverage reports
 coverage/
+
+swagger/

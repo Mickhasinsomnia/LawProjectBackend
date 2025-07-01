@@ -1,7 +1,7 @@
 import User from "../models/User.js";
 import { generateFileName, uploadFile, getObjectSignedUrl, deleteFile } from "./s3.js";
 import { Request, Response, NextFunction } from "express";
-
+import { IUser } from "../models/User.js";
 //@desc Register user
 //@route POST /api/v1/auth/register
 //@access Public
@@ -81,7 +81,7 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
 };
 
 //Get token from model, create cookie and send response
-const sendTokenResponse = (user: any, statusCode: number, res: Response) => {
+const sendTokenResponse = (user: IUser, statusCode: number, res: Response) => {
   //Create token
   const token = user.getSignedJwtToken();
   const options: any = {
