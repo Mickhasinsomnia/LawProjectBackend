@@ -18,8 +18,9 @@ const CaseRequestSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  consultation_date: { type: Date, required: true },
-
+  consultation_date: {
+    type: Date
+  },
   consultation_status: {
     type: String,
     enum: ['pending', 'cancelled', 'confirmed','rejected'],
@@ -29,6 +30,11 @@ const CaseRequestSchema = new mongoose.Schema({
     type: String,
     default: ''
   },
+  files:{
+    type: [String],
+    default:[]
+  }
+
 },{ timestamps: true });
 
 export default mongoose.model('CaseRequest', CaseRequestSchema);

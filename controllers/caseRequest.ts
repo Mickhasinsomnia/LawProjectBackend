@@ -1,6 +1,7 @@
 import CaseRequest from "../models/CaseRequest.js";
 import Slot from "../models/Slot.js";
 import { Request, Response, NextFunction } from "express";
+import { generateFileName, uploadFile, getObjectSignedUrl, deleteFile } from "./s3.js";
 //new damn big fix
 
 //@desc  Create a new case request
@@ -8,10 +9,23 @@ import { Request, Response, NextFunction } from "express";
 //@access Private
 export const addCaseRequest = async (req:Request, res:Response ,next: NextFunction) => {
   try {
+
+    const uploadedFileNames: string[] = [];
+
+    if (req.files && Array.isArray(req.files)) {
+          for (const file of req.files as Express.Multer.File[]) {
+            const fileName = generateFileName();
+            await uploadFile(file, fileName, file.mimetype);
+            uploadedFileNames.push(fileName);
+          }
+        }
+
     const newCaseRequest = await CaseRequest.create({
       ...req.body,
       client_id: req.user?.id,
+      files: uploadedFileNames,
     });
+
 
     res.status(201).json({
       success: true,
@@ -139,6 +153,18 @@ export const getCaseRequestById = async (req:Request, res:Response ,next: NextFu
       });
       return;
     }
+
+    if (caseRequest.files && Array.isArray(caseRequest.files)) {
+         const signedUrls = await Promise.all(
+           caseRequest.files.map(async (fileName) => {
+             if (!fileName.startsWith("http")) {
+               return await getObjectSignedUrl(fileName);
+             }
+             return fileName;
+           })
+         );
+         caseRequest.files = signedUrls;
+       }
 
     res.status(200).json({
       success: true,

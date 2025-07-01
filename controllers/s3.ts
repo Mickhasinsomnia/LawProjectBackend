@@ -27,9 +27,17 @@ interface UploadedFile {
 }
 
 async function uploadFile(file: UploadedFile, fileName: string, mimetype: string) {
-  const fileBuffer = await sharp(file.buffer)
-    .resize({ height: 1080, width: 1920, fit: "contain" })
-    .toBuffer();
+  let fileBuffer;
+
+   if (mimetype.startsWith("image/")) {
+     fileBuffer = await sharp(file.buffer)
+       .resize({ height: 1080, width: 1920, fit: "contain" })
+       .toBuffer();
+   } else if (mimetype === "application/pdf") {
+     fileBuffer = file.buffer;
+   } else {
+     throw new Error("Unsupported file type");
+   }
 
   const uploadParams = {
     Bucket: bucketName,
