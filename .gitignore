@@ -1,8 +1,8 @@
 config/config.env
-node_modules/*
+node_modules/
 .DS_Store
 
 .vscode/
-test/*
-
-coverage/*
+test/
+dist/
+coverage/

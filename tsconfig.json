@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "target": "ES2016",                    // output JS version
+    "module": "NodeNext",                    // keep ES modules output
+    "moduleResolution": "NodeNext",       // correctly resolves ESM & CJS modules in Node.js >=16
+    "esModuleInterop": true,               // allow default imports from CJS modules
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,                        // enable all strict type checks
+    "skipLibCheck": true,                   // skip type checks for external libs (faster build)
+    "outDir": "dist"
+  }
+}
