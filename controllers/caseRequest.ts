@@ -1,8 +1,7 @@
 import CaseRequest from "../models/CaseRequest.js";
-import Slot from "../models/Slot.js";
 import { Request, Response, NextFunction } from "express";
 import { generateFileName, uploadFile, getObjectSignedUrl, deleteFile } from "./s3.js";
-//new damn big fix
+
 
 //@desc  Create a new case request
 //@route POST /api/v1/caseRequest
@@ -105,6 +104,7 @@ export const updateCaseRequest = async (req:Request, res:Response ,next: NextFun
 
     if (req.body.description) caseRequest.description = req.body.description;
     if (req.body.note) caseRequest.note = req.body.note;
+    if (req.body.lawyer_id) caseRequest.lawyer_id = req.body.lawyer_id
 
     await caseRequest.save();
 

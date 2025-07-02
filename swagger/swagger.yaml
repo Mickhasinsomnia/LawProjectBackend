@@ -11,62 +11,6 @@ security:
   - bearerAuth: []
 
 paths:
-  /api/v1/auth/register:
-    post:
-      summary: Register a new user
-      tags: [Auth]
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/User'
-      responses:
-        '201':
-          description: User registered
-        '400':
-          description: Invalid input
-
-  /api/v1/auth/login:
-    post:
-      summary: User login
-      tags: [Auth]
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                email:
-                  type: string
-                password:
-                  type: string
-      responses:
-        '200':
-          description: Login successful
-        '401':
-          description: Unauthorized
-
-  /api/v1/auth/logout:
-    get:
-      summary: User logout
-      tags: [Auth]
-      security:
-        - bearerAuth: []
-      responses:
-        '200':
-          description: Logout successful
-
-  /api/v1/auth/getMe:
-    get:
-      summary: Get current user profile
-      tags: [Auth]
-      security:
-        - bearerAuth: []
-      responses:
-        '200':
-          description: User profile
 
   /api/v1/forum:
     get:
@@ -196,6 +140,140 @@ paths:
       parameters:
         - in: path
           name: forumId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Like status
+  /api/v1/news:
+    get:
+      summary: Get all news
+      tags: [News]
+      responses:
+        '200':
+          description: List of news
+    post:
+      summary: Create news
+      tags: [News]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                content:
+                  type: string
+                image:
+                  type: string
+                  format: binary
+                category:
+                  type: string
+                  description: News category
+        responses:
+          '201':
+            description: News created
+
+  /api/v1/news/{id}:
+    get:
+      summary: Get news by ID
+      tags: [News]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: News details
+    put:
+      summary: Update news
+      tags: [News]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                content:
+                  type: string
+                image:
+                  type: string
+                  format: binary
+                category:
+                  type: string
+                  description: News category
+      responses:
+        '200':
+          description: News updated
+    delete:
+      summary: Delete news
+      tags: [News]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: News deleted
+
+  /api/v1/news/{newsId}/like:
+    post:
+      summary: Like news
+      tags: [News]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: newsId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: News liked
+    delete:
+      summary: Unlike news
+      tags: [News]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: newsId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: News unliked
+    get:
+      summary: Check if news is liked by user
+      tags: [News]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: newsId
           required: true
           schema:
             type: string
@@ -338,68 +416,71 @@ paths:
         '200':
           description: Like status
 
-  /api/v1/appointment/create/{id}:
-    post:
-      summary: Create an appointment
-      tags: [Appointment]
-      security:
-        - bearerAuth: []
-      parameters:
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: string
-      responses:
-        '201':
-          description: Appointment created
-
-  /api/v1/appointment/{id}:
-    put:
-      summary: Update an appointment
-      tags: [Appointment]
-      parameters:
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: Appointment updated
-    delete:
-      summary: Delete an appointment
-      tags: [Appointment]
-      parameters:
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: string
-      responses:
-        '204':
-          description: Appointment deleted
-
-  /api/v1/appointment/user/{id}:
-    get:
-      summary: Get appointments for a user
-      tags: [Appointment]
-      parameters:
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: List of appointments
-
   /api/v1/lawyer:
     post:
       summary: Create a lawyer profile
       tags: [Lawyer]
       security:
         - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - slogan
+                - summary
+                - lawfirm_name
+                - consultationRate
+              properties:
+                slogan:
+                  type: string
+                  description: Lawyer's slogan
+                summary:
+                  type: string
+                  description: Brief summary of the lawyer
+                lawfirm_name:
+                  type: string
+                  description: Name of the law firm
+                consultationRate:
+                  type: object
+                  required:
+                    - min
+                    - max
+                  properties:
+                    min:
+                      type: number
+                      minimum: 0
+                    max:
+                      type: number
+                      minimum: 0
+                  description: Consultation rate range
+                documentDeliveryRate:
+                  type: object
+                  properties:
+                    min:
+                      type: number
+                      minimum: 0
+                    max:
+                      type: number
+                      minimum: 0
+                  description: Document delivery rate range
+                civilCase_specialized:
+                  type: array
+                  items:
+                    type: string
+                  description: List of civil case specializations
+                criminalCase_specialized:
+                  type: array
+                  items:
+                    type: string
+                  description: List of criminal case specializations
+                verificationDocs:
+                  type: array
+                  items:
+                    type: string
+                  description: List of verification document URLs or IDs
       responses:
         '201':
           description: Lawyer profile created
@@ -434,6 +515,57 @@ paths:
           required: true
           schema:
             type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                slogan:
+                  type: string
+                  description: Lawyer's slogan
+                summary:
+                  type: string
+                  description: Brief summary of the lawyer
+                lawfirm_name:
+                  type: string
+                  description: Name of the law firm
+                consultationRate:
+                  type: object
+                  properties:
+                    min:
+                      type: number
+                      minimum: 0
+                    max:
+                      type: number
+                      minimum: 0
+                  description: Consultation rate range
+                documentDeliveryRate:
+                  type: object
+                  properties:
+                    min:
+                      type: number
+                      minimum: 0
+                    max:
+                      type: number
+                      minimum: 0
+                  description: Document delivery rate range
+                civilCase_specialized:
+                  type: array
+                  items:
+                    type: string
+                  description: List of civil case specializations
+                criminalCase_specialized:
+                  type: array
+                  items:
+                    type: string
+                  description: List of criminal case specializations
+                verificationDocs:
+                  type: array
+                  items:
+                    type: string
+                  description: List of verification document URLs or IDs
       responses:
         '200':
           description: Lawyer updated
@@ -464,6 +596,19 @@ paths:
           required: true
           schema:
             type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                is_verified_by_council:
+                  type: boolean
+                  description: Set to true to verify, false to unverify
+                has_law_license:
+                  type: boolean
+                  description: Set to true if lawyer has a law license
       responses:
         '200':
           description: Status updated
@@ -669,12 +814,84 @@ paths:
         '204':
           description: Hiring cancelled
 
+  /api/v1/appointment/create/{id}:
+    post:
+      summary: Create an appointment
+      tags: [Appointment]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '201':
+          description: Appointment created
+
+  /api/v1/appointment/{id}:
+    put:
+      summary: Update an appointment
+      tags: [Appointment]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Appointment updated
+    delete:
+      summary: Delete an appointment
+      tags: [Appointment]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Appointment deleted
+
+  /api/v1/appointment/user/{id}:
+    get:
+      summary: Get appointments for a user
+      tags: [Appointment]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of appointments
+
   /api/v1/chat:
     post:
       summary: Add new chat message
       tags: [Chat]
       security:
         - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - receiver_id
+                - text
+              properties:
+                receiver_id:
+                  type: string
+                  description: The user ID of the chat recipient
+                text:
+                  type: string
+                  description: The chat message text
       responses:
         '201':
           description: Chat message added
@@ -717,6 +934,18 @@ paths:
           required: true
           schema:
             type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - amount
+              properties:
+                amount:
+                  type: number
+                  description: Payment amount
       responses:
         '201':
           description: Payment created
@@ -767,193 +996,8 @@ paths:
         '200':
           description: Working day updated
 
-  /api/v1/news:
-    get:
-      summary: Get all news
-      tags: [News]
-      responses:
-        '200':
-          description: List of news
-    post:
-      summary: Create news
-      tags: [News]
-      security:
-        - bearerAuth: []
-      requestBody:
-        required: true
-        content:
-          multipart/form-data:
-            schema:
-              type: object
-              properties:
-                title:
-                  type: string
-                content:
-                  type: string
-                image:
-                  type: string
-                  format: binary
-                category:
-                  type: string
-                  description: News category
-        responses:
-          '201':
-            description: News created
 
-  /api/v1/news/{id}:
-    get:
-      summary: Get news by ID
-      tags: [News]
-      parameters:
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: News details
-    put:
-      summary: Update news
-      tags: [News]
-      security:
-        - bearerAuth: []
-      parameters:
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: string
-      requestBody:
-        content:
-          multipart/form-data:
-            schema:
-              type: object
-              properties:
-                title:
-                  type: string
-                content:
-                  type: string
-                image:
-                  type: string
-                  format: binary
-                category:
-                  type: string
-                  description: News category
-      responses:
-        '200':
-          description: News updated
-    delete:
-      summary: Delete news
-      tags: [News]
-      security:
-        - bearerAuth: []
-      parameters:
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: string
-      responses:
-        '204':
-          description: News deleted
 
-  /api/v1/news/{newsId}/like:
-    post:
-      summary: Like news
-      tags: [News]
-      security:
-        - bearerAuth: []
-      parameters:
-        - in: path
-          name: newsId
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: News liked
-    delete:
-      summary: Unlike news
-      tags: [News]
-      security:
-        - bearerAuth: []
-      parameters:
-        - in: path
-          name: newsId
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: News unliked
-    get:
-      summary: Check if news is liked by user
-      tags: [News]
-      security:
-        - bearerAuth: []
-      parameters:
-        - in: path
-          name: newsId
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: Like status
-
-  /api/v1/otpService/send:
-    post:
-      summary: Send OTP
-      tags: [OTP]
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                tel:
-                  type: string
-      responses:
-        '200':
-          description: OTP sent
-
-  /api/v1/otpService/verify:
-    post:
-      summary: Verify OTP
-      tags: [OTP]
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                tel:
-                  type: string
-                otp:
-                  type: string
-      responses:
-        '200':
-          description: OTP verified
-
-  /api/v1/otpService/resetPassword:
-    post:
-      summary: Reset password by email
-      tags: [OTP]
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                email:
-                  type: string
-      responses:
-        '200':
-          description: Password reset
 
   /api/v1/forum/{forumId}/comment:
     post:

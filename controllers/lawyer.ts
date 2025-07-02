@@ -206,7 +206,7 @@ export const getAllLawyers = async (req: Request, res: Response, next:NextFuncti
 
 
 // @desc    Admin change verify status
-// @route   DELETE /api/v1/lawyers/status/:id
+// @route   PUT /api/v1/lawyers/status/:id
 // @access  Private/Admin
 export const changeVerifyStatus = async (req: Request, res: Response, next:NextFunction)=>{
   const lawyer = await Lawyer.findById(req.params.id);
