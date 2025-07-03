@@ -54,6 +54,11 @@ export const getLawyerById = async (req: Request, res: Response, next:NextFuncti
       return;
     }
 
+    const user = lawyer._id as {photo?:string};
+    if (user && user.photo && !user.photo.startsWith("http")) {
+      user.photo = await getObjectSignedUrl(user.photo);
+    }
+
     res.status(200).json({
       success: true,
       data: lawyer,

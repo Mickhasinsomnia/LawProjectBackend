@@ -625,6 +625,9 @@ paths:
           multipart/form-data:
             schema:
               type: object
+              required:
+                - category_type
+                - description
               properties:
                 category_type:
                   type: string
@@ -640,12 +643,20 @@ paths:
                 note:
                   type: string
                   description: Additional notes
-                file:
+                files:
                   type: array
                   items:
                     type: string
                     format: binary
-                  description: Attachments
+                  description: Attachments (multiple files allowed)
+                offered_Lawyers:
+                  type: array
+                  items:
+                    type: string
+                  description: Array of offered lawyer IDs
+                lawyer_id:
+                  type: string
+                  description: Preferred lawyer ID (optional)
         responses:
           '201':
             description: Case request created
@@ -716,6 +727,29 @@ paths:
           required: true
           schema:
             type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                description:
+                  type: string
+                  description: Description of the case
+                note:
+                  type: string
+                  description: Additional notes
+
+                consultation_date:
+                  type: string
+                  format: date-time
+                  description: Desired consultation date
+                offered_Lawyers:
+                  type: array
+                  items:
+                    type: string
+                  description: Array of offered lawyer IDs to add (optional)
       responses:
         '200':
           description: Case request updated
@@ -733,6 +767,57 @@ paths:
       responses:
         '204':
           description: Case request cancelled
+
+  /api/v1/caseRequest/{id}/file:
+    put:
+      summary: Add file(s) to a case request
+      tags: [CaseRequest]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                files:
+                  type: array
+                  items:
+                    type: string
+                    format: binary
+                  description: Files to add to the case request
+      responses:
+        '200':
+          description: File(s) added to case request
+
+    delete:
+      summary: Delete a file from a case request
+      tags: [CaseRequest]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: idx
+          required: true
+          schema:
+            type: integer
+            minimum: 0
+          description: Index of the file to delete from the case request
+      responses:
+        '200':
+          description: File deleted from case request
 
   /api/v1/hiring/client:
     get:
@@ -766,6 +851,21 @@ paths:
           required: true
           schema:
             type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - detail
+              properties:
+                detail:
+                  type: string
+                  description: Details about the hiring
+                note:
+                  type: string
+                  description: Optional note for the hiring
       responses:
         '201':
           description: Hiring created
@@ -796,6 +896,23 @@ paths:
           required: true
           schema:
             type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                detail:
+                  type: string
+                  description: Details about the hiring
+                note:
+                  type: string
+                  description: Optional note for the hiring
+                status:
+                  type: string
+                  enum: [active, cancelled, completed]
+                  description: Status of the hiring
       responses:
         '200':
           description: Hiring updated
@@ -826,6 +943,34 @@ paths:
           required: true
           schema:
             type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - task
+                - timeStamp
+                - location
+              properties:
+                task:
+                  type: string
+                  description: The task or purpose of the appointment
+                timeStamp:
+                  type: string
+                  format: date-time
+                  description: The date and time of the appointment (ISO 8601)
+                location:
+                  type: string
+                  description: The location of the appointment
+                note:
+                  type: string
+                  description: Optional note for the appointment
+                permission:
+                  type: string
+                  enum: [shared, lawyer, client]
+                  description: Permission level for the appointment
       responses:
         '201':
           description: Appointment created
@@ -840,6 +985,34 @@ paths:
           required: true
           schema:
             type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                task:
+                  type: string
+                  description: The task or purpose of the appointment
+                timeStamp:
+                  type: string
+                  format: date-time
+                  description: The date and time of the appointment (ISO 8601)
+                location:
+                  type: string
+                  description: The location of the appointment
+                note:
+                  type: string
+                  description: Optional note for the appointment
+                permission:
+                  type: string
+                  enum: [shared, lawyer, client]
+                  description: Permission level for the appointment
+                status:
+                  type: string
+                  enum: [confirmed, cancelled, completed]
+                  description: Status of the appointment
       responses:
         '200':
           description: Appointment updated
@@ -978,23 +1151,7 @@ paths:
         '200':
           description: Payment verified
 
-  /api/v1/workingDay:
-    post:
-      summary: Create working day
-      tags: [WorkingDay]
-      security:
-        - bearerAuth: []
-      responses:
-        '201':
-          description: Working day created
-    put:
-      summary: Update working day
-      tags: [WorkingDay]
-      security:
-        - bearerAuth: []
-      responses:
-        '200':
-          description: Working day updated
+
 
 
 

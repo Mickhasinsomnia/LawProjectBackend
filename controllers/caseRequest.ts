@@ -105,6 +105,13 @@ export const updateCaseRequest = async (req:Request, res:Response ,next: NextFun
     if (req.body.description) caseRequest.description = req.body.description;
     if (req.body.note) caseRequest.note = req.body.note;
     if (req.body.lawyer_id) caseRequest.lawyer_id = req.body.lawyer_id
+    if (req.body.consultation_date) caseRequest.consultation_date = req.body.consultation_date;
+    if (req.body.offered_Lawyers) {
+          const offered_Lawyers = req.body.offered_Lawyers;
+          if (!caseRequest.offered_Lawyers.includes(offered_Lawyers)) {
+            caseRequest.offered_Lawyers.push(offered_Lawyers);
+          }
+        }
 
     await caseRequest.save();
 
@@ -132,8 +139,9 @@ export const getCaseRequestById = async (req:Request, res:Response ,next: NextFu
     const caseRequestId = req.params.id;
 
     const caseRequest = await CaseRequest.findById(caseRequestId)
-      .populate({ path: "client_id", select: "name email" })
-      .populate({ path: "lawyer_id", select: "name email" })
+      .populate({ path: 'client_id', model: 'User', select: 'name email' })
+      .populate({ path: 'lawyer_id', model: 'User', select: 'name photo' })
+      .populate({ path: 'offered_Lawyers', model: 'User', select: 'name photo' });
     if (!caseRequest) {
       res.status(404).json({
         success: false,
@@ -142,17 +150,31 @@ export const getCaseRequestById = async (req:Request, res:Response ,next: NextFu
       return;
     }
 
-    if (
-      req.user?.role !== "admin" &&
-      req.user?.id !== caseRequest.client_id?._id.toString() &&
-      req.user?.id != caseRequest.lawyer_id?._id.toString()
-    ) {
+    if (req.user?.role !== "admin" && req.user?.id !== caseRequest.client_id?._id.toString() && req.user?.id != caseRequest.lawyer_id?._id.toString()) {
       res.status(403).json({
         success: false,
         message: "You are not authorized to view this case request",
       });
       return;
     }
+
+    const user = caseRequest.lawyer_id as { photo?: string; };
+    if (user && user.photo && !user.photo.startsWith("http")) {
+      user.photo = await getObjectSignedUrl(user.photo);
+    }
+
+
+
+    if (caseRequest.offered_Lawyers && Array.isArray(caseRequest.offered_Lawyers)) {
+      await Promise.all(
+        caseRequest.offered_Lawyers.map(async (lawyer: any) => {
+          if (lawyer.photo && !lawyer.photo.startsWith("http")) {
+            lawyer.photo = await getObjectSignedUrl(lawyer.photo);
+          }
+        })
+      );
+    }
+
 
     if (caseRequest.files && Array.isArray(caseRequest.files)) {
          const signedUrls = await Promise.all(
@@ -181,6 +203,93 @@ export const getCaseRequestById = async (req:Request, res:Response ,next: NextFu
     return;
   }
 };
+
+//@desc  Delete file from case request
+//@route Delete /api/v1/caseRequest/:id/file
+//@access Private
+export const deleteFileFromCase = async (req: Request, res: Response, next: NextFunction) => {
+  const caseRequestId = req.params.id;
+  const caseRequest = await CaseRequest.findById(caseRequestId);
+
+  if (!caseRequest) {
+    res.status(404).json({
+      success: false,
+      message: "Case request not found",
+    });
+    return;
+  }
+
+  if (req.user?.role !== "admin" && req.user?.id !== caseRequest.client_id?._id.toString()) {
+    res.status(403).json({
+      success: false,
+      message: "You are not authorized to delete this file",
+    });
+    return;
+  }
+
+  const idx = parseInt(req.query.idx as string, 10);
+
+  if (isNaN(idx) || idx < 0 || idx >= caseRequest.files.length) {
+    res.status(400).json({ error: 'Invalid file selected.' });
+    return;
+  }
+
+  await deleteFile(caseRequest.files[idx]);
+
+  caseRequest.files.splice(idx, 1);
+
+  await caseRequest.save();
+
+  res.status(200).json({
+    success: true,
+    message: "Delete file success",
+  });
+};
+
+
+
+//@desc  Add file to case request
+//@route PUT /api/v1/caseRequest/:id/file
+//@access Private
+export const addFileToCase = async (req:Request, res:Response ,next: NextFunction) =>{
+  const caseRequestId = req.params.id;
+  const caseRequest = await CaseRequest.findById(caseRequestId);
+  if (!caseRequest) {
+    res.status(404).json({
+      success: false,
+      message: "Case request not found",
+    });
+    return;
+  }
+
+  if (req.user?.role !== "admin" && req.user?.id !== caseRequest.client_id?._id.toString()) {
+    res.status(403).json({
+      success: false,
+      message: "You are not authorized to add file to this case",
+    });
+    return;
+  }
+
+  const uploadedFileNames: string[] = [];
+
+    for (const file of req.files as Express.Multer.File[]) {
+      const fileName = generateFileName();
+      await uploadFile(file, fileName, file.mimetype);
+      uploadedFileNames.push(fileName);
+    }
+
+    caseRequest.files.push(...uploadedFileNames);
+
+    await caseRequest.save();
+
+
+  res.status(200).json({
+    success: true,
+    message: "Upload file success",
+  });
+
+}
+
 
 //@desc  Get all case requests for a specific client
 //@route GET /api/v1/caseRequest/client/clientId
@@ -222,7 +331,12 @@ export const getCaseRequestsByLawyerId = async (req:Request, res:Response ,next:
   try {
     const lawyerId = req.params.id;
 
-    const caseRequests = await CaseRequest.find({ lawyer_id: lawyerId });
+    const caseRequests = await CaseRequest.find({
+          $or: [
+            { lawyer_id: lawyerId },
+            { candidate_lawyers: lawyerId }
+          ]
+        });
 
     if (caseRequests.length === 0) {
       res.status(404).json({

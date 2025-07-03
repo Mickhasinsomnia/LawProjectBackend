@@ -17,10 +17,12 @@ export const protect = async (req: Request, res: Response, next: NextFunction) =
   }
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET!);
+    if (process.env.JWT_SECRET) {
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      const userId = (decoded as { id: string }).id;
+      req.user = await User.findById(userId);
+    }
 
-    const userId = (decoded as { id: string }).id;
-    req.user = await User.findById(userId);
 
 
     next();

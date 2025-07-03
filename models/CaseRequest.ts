@@ -9,6 +9,12 @@ const CaseRequestSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Lawyer',
   },
+  offered_Lawyers: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Lawyer'
+      }
+    ],
   category_type: {
     type: String,
     enum: ['civil', 'criminal','unknown'],

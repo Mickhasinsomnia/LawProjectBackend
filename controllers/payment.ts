@@ -66,11 +66,15 @@ export const payVerify = async (req: Request, res: Response, next: NextFunction)
     const formData = new FormData();
     formData.append('file', req.file.buffer, req.file.originalname);
 
+    if (!process.env.SLIP_API || !process.env.SLIP_API) {
+      res.status(500).json({ success: false, message: 'Missing API configuration' });
+      return;
+    }
 
-    const response = await fetch(process.env.SLIP_API!, {
+    const response = await fetch(process.env.SLIP_API, {
       method: 'POST',
       headers: {
-        Authorization: `Bearer ${process.env.SLIP_TOKEN}`,
+        Authorization: `Bearer ${process.env.SLIP_API}`,
         ...formData.getHeaders(),
       },
       body: formData,

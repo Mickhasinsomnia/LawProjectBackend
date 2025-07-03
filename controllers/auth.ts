@@ -48,6 +48,11 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
       return;
     }
 
+    if (typeof email !== 'string' || typeof password !== 'string') {
+         res.status(400).json({ success: false, msg: 'Invalid input types' });
+         return;
+       }
+
 
     let user = await User.findOne({ email }).select("+password");
 

@@ -35,7 +35,7 @@ export const getHiring = async (req: Request, res: Response, next: NextFunction)
   };
 
 //@desc  Get all hiring for specific client
-//@route GET /api/v1/hiring/client/:clientId
+//@route GET /api/v1/hiring/client
 //@access Private
 export const getHiringByClientId = async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -66,7 +66,7 @@ export const getHiringByClientId = async (req: Request, res: Response, next: Nex
   };
 
 //@desc  Get all hiring for specific client
-//@route GET /api/v1/hiring/lawyer
+//@route GET /api/v1/hiring/lawyer/:lawyerId
 //@access Private
 export const getHiringByLawyerId = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -119,10 +119,13 @@ export const addHiring = async (req: Request, res: Response, next:NextFunction) 
       return;
     }
 
-    let lawyer_id = req.user?.id;
+    const lawyer_id = req.user?.id;
 
-    if (acceptedCase.lawyer_id) {
-      if (acceptedCase.lawyer_id.toString() !== req.user?.id) {
+
+    if (acceptedCase.offered_Lawyers) {
+      const allowedIds = acceptedCase.offered_Lawyers.map(id => id.toString());
+
+      if (lawyer_id && !allowedIds.includes(lawyer_id)) {
         res.status(403).json({
           success: false,
           message: "You are not authorized to access this case request",

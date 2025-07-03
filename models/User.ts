@@ -6,8 +6,8 @@ import dotenv from 'dotenv';
 
 dotenv.config({ path: './config/config.env' });
 
-const secretKey = process.env.THAI_ID_SECRET_KEY!;
-const secondKey = process.env.SECOND_SECRET!;
+const secretKey = process.env.THAI_ID_SECRET_KEY;
+const secondKey = process.env.SECOND_SECRET;
 
 
 
@@ -105,9 +105,11 @@ UserSchema.pre('save', async function (next) {
   }
 
   if (this.isModified('thai_id') && this.thai_id) {
-    const encrypted = CryptoJS.AES.encrypt(this.thai_id, secretKey).toString();
-    const doubleEncrypted = CryptoJS.TripleDES.encrypt(encrypted, secondKey).toString();
-    this.thai_id = doubleEncrypted;
+    if (secretKey && secondKey) {
+      const encrypted = CryptoJS.AES.encrypt(this.thai_id, secretKey).toString();
+      const doubleEncrypted = CryptoJS.TripleDES.encrypt(encrypted, secondKey).toString();
+      this.thai_id = doubleEncrypted;
+    }
   }
 
   next();
@@ -116,10 +118,11 @@ UserSchema.pre('save', async function (next) {
 // Decrypt thai_id
 UserSchema.methods.getDecryptedThaiId = function () {
   if (!this.thai_id) return null;
-
-  const tripleDesDecrypted = CryptoJS.TripleDES.decrypt(this.thai_id, secondKey).toString(CryptoJS.enc.Utf8);
-  const originalValue = CryptoJS.AES.decrypt(tripleDesDecrypted, secretKey).toString(CryptoJS.enc.Utf8);
-  return originalValue;
+  if (secretKey && secondKey) {
+    const tripleDesDecrypted = CryptoJS.TripleDES.decrypt(this.thai_id, secondKey).toString(CryptoJS.enc.Utf8);
+    const originalValue = CryptoJS.AES.decrypt(tripleDesDecrypted, secretKey).toString(CryptoJS.enc.Utf8);
+    return originalValue;
+  }
 };
 
 // Sign JWT token
