@@ -14,6 +14,6 @@ router.route('/').post(protect,authorize('user','admin'),upload.array('file', 5)
 router.route('/:id').put(protect,authorize('user','admin'),updateCaseRequest).delete(protect,authorize('user','admin','lawyer'),cancelCaseRequest);
 
 router.route('/:id').get(protect, getCaseRequestById);
-router.route('/:id/file').delete(protect,deleteFileFromCase).put(protect,upload.single('file'),addFileToCase);
+router.route('/:id/file').delete(protect,authorize('user','admin'),deleteFileFromCase).put(protect,authorize('user','admin'),upload.single('file'),addFileToCase);
 
 export default router;

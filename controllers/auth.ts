@@ -102,6 +102,36 @@ const sendTokenResponse = (user: IUser, statusCode: number, res: Response) => {
   return;
 };
 
+export const oauthLogin = async (req: Request, res: Response) => {
+  try {
+    const { email, name, image, provider } = req.body;
+
+    if (!email) {
+       res.status(400).json({ success: false, message: "Email is required" });
+      return;
+    }
+
+    let user = await User.findOne({ email });
+
+    if (!user) {
+      user = await User.create({
+        email,
+        name,
+        photo: image,
+        provider,
+        role: "user",
+      });
+    }
+
+    // Use your helper to create token and send response
+    sendTokenResponse(user, 200, res);
+
+  } catch (err) {
+    console.error("Google OAuth login error:", err);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
 //At the end of file
 //@desc Get current Logged in user
 //@route GET /api/vl/auth/me

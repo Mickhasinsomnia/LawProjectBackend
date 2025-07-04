@@ -5,7 +5,7 @@
   "scripts": {
     "build": "tsc",
     "start": "node dist/server.js",
-    "dev":"tsx server.js",
+    "dev": "nodemon --watch . --ext ts,js --exec \"tsx server.ts\"",
     "test": "jest"
   },
   "type": "module",

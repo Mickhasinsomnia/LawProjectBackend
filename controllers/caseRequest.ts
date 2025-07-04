@@ -292,11 +292,11 @@ export const addFileToCase = async (req:Request, res:Response ,next: NextFunctio
 
 
 //@desc  Get all case requests for a specific client
-//@route GET /api/v1/caseRequest/client/clientId
+//@route GET /api/v1/caseRequest/client
 //@access Private
 export const getCaseRequestsByClientId = async (req:Request, res:Response ,next: NextFunction) => {
   try {
-    const clientId = req.params.id;
+    const clientId = req.user?.id;
 
     const caseRequests = await CaseRequest.find({ client_id: clientId });
 
@@ -325,11 +325,11 @@ export const getCaseRequestsByClientId = async (req:Request, res:Response ,next:
 };
 
 //@desc  Get all case requests for a specific lawyer
-//@route GET /api/v1/caseRequest/lawyer/lawyerId
+//@route GET /api/v1/caseRequest/lawyer
 //@access Private
 export const getCaseRequestsByLawyerId = async (req:Request, res:Response ,next: NextFunction) => {
   try {
-    const lawyerId = req.params.id;
+    const lawyerId = req.user?.id;
 
     const caseRequests = await CaseRequest.find({
           $or: [

@@ -142,6 +142,7 @@ export const addHiring = async (req: Request, res: Response, next:NextFunction) 
       return;
     }
 
+    (acceptedCase as { lawyer_id: typeof lawyer_id }).lawyer_id = lawyer_id;
 
     const hiringData = {
       ...req.body,
