@@ -270,18 +270,12 @@ export const addFileToCase = async (req:Request, res:Response ,next: NextFunctio
     return;
   }
 
-  const uploadedFileNames: string[] = [];
-
-    for (const file of req.files as Express.Multer.File[]) {
-      const fileName = generateFileName();
-      await uploadFile(file, fileName, file.mimetype);
-      uploadedFileNames.push(fileName);
-    }
-
-    caseRequest.files.push(...uploadedFileNames);
-
-    await caseRequest.save();
-
+  if (req.file) {
+    const fileName = generateFileName();
+    await uploadFile(req.file, fileName, req.file.mimetype);
+     caseRequest.files.push(fileName);
+     await caseRequest.save();
+  }
 
   res.status(200).json({
     success: true,
@@ -298,7 +292,7 @@ export const getCaseRequestsByClientId = async (req:Request, res:Response ,next:
   try {
     const clientId = req.user?.id;
 
-    const caseRequests = await CaseRequest.find({ client_id: clientId });
+    const caseRequests = await CaseRequest.find({ client_id: clientId }).sort({ createdAt: -1});
 
     if (caseRequests.length === 0) {
       res.status(404).json({
@@ -336,7 +330,7 @@ export const getCaseRequestsByLawyerId = async (req:Request, res:Response ,next:
             { lawyer_id: lawyerId },
             { candidate_lawyers: lawyerId }
           ]
-        });
+        }).sort({ createdAt: -1});
 
     if (caseRequests.length === 0) {
       res.status(404).json({

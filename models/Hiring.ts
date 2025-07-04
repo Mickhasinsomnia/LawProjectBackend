@@ -16,7 +16,7 @@ const HiringSchema = new mongoose.Schema({
   },
   detail:{
     type:String,
-     require:true
+    default: ""
   },
   note:{
     type:String,

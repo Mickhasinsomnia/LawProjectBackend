@@ -6,8 +6,8 @@ const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 const router = express.Router();
 
-router.get('/client/:id', protect, authorize('user','admin'), getCaseRequestsByClientId);
-router.get('/lawyer/:id', protect, authorize('lawyer','admin'), getCaseRequestsByLawyerId);
+router.get('/client', protect, authorize('user','admin'), getCaseRequestsByClientId);
+router.get('/lawyer', protect, authorize('lawyer','admin'), getCaseRequestsByLawyerId);
 
 router.route('/').post(protect,authorize('user','admin'),upload.array('file', 5),addCaseRequest).get(protect,authorize('admin'),getAllCaseRequest);
 
