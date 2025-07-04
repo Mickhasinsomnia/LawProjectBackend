@@ -107,8 +107,7 @@ export const oauthLogin = async (req: Request, res: Response) => {
     const { email, name, image, provider } = req.body;
 
     if (!email) {
-       res.status(400).json({ success: false, message: "Email is required" });
-      return;
+      return res.status(400).json({ success: false, message: 'Email is required' });
     }
 
     let user = await User.findOne({ email });
@@ -116,19 +115,22 @@ export const oauthLogin = async (req: Request, res: Response) => {
     if (!user) {
       user = await User.create({
         email,
-        name,
+        name: name  ||'Unknown User',
         photo: image,
-        provider,
-        role: "user",
+        provider: provider ||'google',
+        role: 'user',
+        password: 'SOCIAL_' + Math.random().toString(36).slice(2),
+        location: {
+          district: '',
+          province: '',
+        },
       });
     }
 
-    // Use your helper to create token and send response
     sendTokenResponse(user, 200, res);
-
   } catch (err) {
-    console.error("Google OAuth login error:", err);
-    res.status(500).json({ success: false, message: "Server error" });
+    console.error('🔥 Google OAuth login error:', err);
+    res.status(500).json({ success: false, message: 'Server error' });
   }
 };
 

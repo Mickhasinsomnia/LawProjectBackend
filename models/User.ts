@@ -9,21 +9,20 @@ dotenv.config({ path: './config/config.env' });
 const secretKey = process.env.THAI_ID_SECRET_KEY;
 const secondKey = process.env.SECOND_SECRET;
 
-
-
 export interface IUser extends Document {
   _id: Types.ObjectId;
   name: string;
   email: string;
   photo?: string;
-  tel: string;
+  tel?: string;
   thai_id?: string;
   role: 'user' | 'lawyer' | 'admin';
-  password: string;
+  password?: string;
   line_id?: string;
-  location: {
-    district: string;
-    province: string;
+  provider: 'credentials' | 'google' | 'facebook';
+  location?: {
+    district?: string;
+    province?: string;
   };
   createdAt: Date;
 
@@ -34,72 +33,90 @@ export interface IUser extends Document {
 
 const UserSchema = new mongoose.Schema({
   name: {
-      type: String,
-      required: [true, 'Please add a name'],
-      match: [
-        /^(?:[A-Za-z][a-z]+ [A-Za-z][a-z]+|[ก-๙]{2,} [ก-๙]{2,})$/,
-          'Please add a valid name in the format "Name Surname"'
-      ]
-  },
-    email:{
-        type:String,
-        required:[true,'Please add an email'],
-        unique: true,
-        match: [
-            /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
-            'Please add a valid email'
-        ]
-    },
-    photo: {
-      type: String
-    },
-    tel: {
-        type: String,
-        required: [true, 'Please add a phone number'],
-        unique: true,
-        match: [
-            /^[0-9]{3}-[0-9]{3}-[0-9]{4}$/,
-            'Please add a valid phone number'
-        ]
-    },
-    thai_id: {
-      type: String,
-      default:""
-    },
-    role: {
-        type:String,
-        enum: ['user','lawyer','admin'],
-        default: 'user'
-    },
-    password: {
-        type:String,
-        required:[true,'Please add a password'],
-        minlength: 6,
-        select: false
-    },
-    line_id:{
-      type:String,
-      default:""
-    },
-    location: {
-      district: {
-        type: String,
-        required: [true, 'Please add a district']
+    type: String,
+    required: [true, 'Please add a name'],
+    validate: {
+      validator: function (this: IUser, value: string) {
+        if (this.provider === 'credentials') {
+          return /^(?:[A-Za-z][a-z]+ [A-Za-z][a-z]+|[ก-๙]{2,} [ก-๙]{2,})$/.test(value);
+        }
+        return true; // allow any name for social login
       },
-      province: {
-        type: String,
-        required: [true, 'Please add a province']
-      }
+      message: 'Please add a valid name in the format "Name Surname"',
     },
-    createdAt:{
-        type: Date,
-        default: Date.now
-    }
+  },
+  email: {
+    type: String,
+    required: [true, 'Please add an email'],
+    unique: true,
+    match: [
+      /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
+      'Please add a valid email',
+    ],
+  },
+  photo: {
+    type: String,
+  },
+  tel: {
+  type: String,
+  required: function (this: IUser) {
+    return this.provider === 'credentials';
+  },
+  unique: true,
+  match: [
+    /^[0-9]{3}-[0-9]{3}-[0-9]{4}$/,
+    'Please add a valid phone number'
+  ]
+},
+  thai_id: {
+    type: String,
+    default: '',
+  },
+  role: {
+    type: String,
+    enum: ['user', 'lawyer', 'admin'],
+    default: 'user',
+  },
+  password: {
+  type: String,
+  required: function (this: IUser) {
+    return this.provider === 'credentials';
+  },
+  minlength: 6,
+  select: false,
+},
+  line_id: {
+    type: String,
+    default: '',
+  },
+  provider: {
+    type: String,
+    enum: ['credentials', 'google', 'facebook'],
+    default: 'credentials',
+  },
+  location: {
+    district: {
+      type: String,
+      required: function (this: IUser) {
+        return this.provider === 'credentials';
+      },
+    },
+    province: {
+      type: String,
+      required: function (this: IUser) {
+        return this.provider === 'credentials';
+      },
+    },
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
 });
 
 // Encrypt password and thai_id before save
 UserSchema.pre('save', async function (next) {
-  if (this.isModified('password')) {
+  if (this.isModified('password') && this.password) {
     const salt = await bcrypt.genSalt(10);
     this.password = await bcrypt.hash(this.password, salt);
   }
@@ -139,9 +156,8 @@ UserSchema.methods.getSignedJwtToken = function () {
   );
 };
 
-
 // Match password
-UserSchema.methods.matchPassword = async function (enteredPassword:string) {
+UserSchema.methods.matchPassword = async function (enteredPassword: string) {
   return await bcrypt.compare(enteredPassword, this.password);
 };
 

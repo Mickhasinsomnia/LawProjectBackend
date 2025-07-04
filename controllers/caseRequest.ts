@@ -150,12 +150,19 @@ export const getCaseRequestById = async (req:Request, res:Response ,next: NextFu
       return;
     }
 
-    if (req.user?.role !== "admin" && req.user?.id !== caseRequest.client_id?._id.toString() && req.user?.id != caseRequest.lawyer_id?._id.toString()) {
-      res.status(403).json({
-        success: false,
-        message: "You are not authorized to view this case request",
-      });
-      return;
+     const allowedIds = caseRequest.offered_Lawyers.map(id => id.toString());
+
+    if (req.user?.id) {
+      if (req.user?.role !== "admin"
+        && req.user?.id !== caseRequest.client_id?._id.toString()
+        && req.user?.id != caseRequest.lawyer_id?._id.toString()
+        && allowedIds.includes(req.user?.id)) {
+        res.status(403).json({
+          success: false,
+          message: "You are not authorized to view this case request",
+        });
+        return;
+      }
     }
 
     const user = caseRequest.lawyer_id as { photo?: string; };
@@ -328,7 +335,7 @@ export const getCaseRequestsByLawyerId = async (req:Request, res:Response ,next:
     const caseRequests = await CaseRequest.find({
           $or: [
             { lawyer_id: lawyerId },
-            { candidate_lawyers: lawyerId }
+            { offered_Lawyers: lawyerId }
           ]
         }).sort({ createdAt: -1});
 
