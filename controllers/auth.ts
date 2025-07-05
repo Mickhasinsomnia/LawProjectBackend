@@ -31,7 +31,7 @@ export const register = async (req: Request, res: Response, next: NextFunction) 
 
     sendTokenResponse(user, 200, res); // Create token
   } catch (err: any) {
-    res.status(400).json({ success: false, message: "bad request" });
+    res.status(400).json({ success: false, message:err.message });
   }
 };
 
@@ -107,7 +107,8 @@ export const oauthLogin = async (req: Request, res: Response) => {
     const { email, name, image, provider } = req.body;
 
     if (!email) {
-      return res.status(400).json({ success: false, message: 'Email is required' });
+      res.status(400).json({ success: false, message: 'Email is required' });
+      return;
     }
 
     let user = await User.findOne({ email });

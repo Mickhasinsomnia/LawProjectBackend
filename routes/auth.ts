@@ -8,7 +8,7 @@ const upload = multer({ storage: storage });
 
 const router = express.Router();
 
-router.post('/register', otpStatusCheck, register);
+router.post('/register', register);
 router.post('/login', login);
 router.post('/oauthLogin',oauthLogin)
 router.get('/logout', logout);

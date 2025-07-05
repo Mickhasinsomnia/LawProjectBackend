@@ -27,17 +27,43 @@ interface UploadedFile {
 }
 
 async function uploadFile(file: UploadedFile, fileName: string, mimetype: string) {
+
+
+  const supportedMIMETypes = [
+    // Images
+    "image/jpeg",
+    "image/png",
+    "image/webp",
+
+    // Documents
+    "application/pdf",
+    "application/msword",
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    "text/plain",
+    "text/csv",
+
+    // Excel & PowerPoint
+    "application/vnd.ms-excel",
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "application/vnd.ms-powerpoint",
+    "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+  ];
+
+  if (!supportedMIMETypes.includes(mimetype)) {
+    throw new Error("Unsupported file type");
+  }
+
   let fileBuffer;
 
-   if (mimetype.startsWith("image/")) {
-     fileBuffer = await sharp(file.buffer)
-       .resize({ height: 1080, width: 1920, fit: "contain" })
-       .toBuffer();
-   } else if (mimetype === "application/pdf") {
-     fileBuffer = file.buffer;
-   } else {
-     throw new Error("Unsupported file type");
-   }
+  if (mimetype.startsWith("image/")) {
+    fileBuffer = await sharp(file.buffer)
+      .resize({ height: 1080, width: 1920, fit: "contain" })
+      .toBuffer();
+
+  } else {
+    fileBuffer = file.buffer;
+  }
+
 
   const uploadParams = {
     Bucket: bucketName,
