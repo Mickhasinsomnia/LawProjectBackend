@@ -29,4 +29,4 @@ const HiringSchema = new mongoose.Schema({
   },
 },{ timestamps: true })
 
-export default mongoose.model('hiring', HiringSchema);
+export default mongoose.model('Hiring', HiringSchema);

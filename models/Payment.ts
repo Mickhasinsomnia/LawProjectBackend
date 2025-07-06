@@ -8,11 +8,14 @@ const PaymentSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ['pending', 'paid', 'completed'],
+    enum: ['pending', 'paid'],
     default: 'pending'
   },
   amount: {
     type: Number
+  },
+  stripeSession_id: {
+    type: String,
   },
 });
 

@@ -1,14 +1,23 @@
 import Payment from '../models/Payment.js';
 import Hiring from '../models/Hiring.js';
-import fetch from 'node-fetch';
-import FormData from 'form-data';
+import Stripe from 'stripe'
 import { Request, Response, NextFunction } from 'express';
+import dotenv from 'dotenv';
+dotenv.config({ path: "./config/config.env" });
 
 export const addPayment = async (req: Request, res: Response) => {
   try {
-    const hiring = await Hiring.exists({ _id: req.params.id });
+    const hiring = await Hiring.findOne({ _id: req.params.id });
     if (!hiring) {
        res.status(404).json({success: false,message: 'Hiring not found'
+      });
+      return;
+    }
+
+    if (req.user?.role !== 'admin' && req.user?.id !== hiring.lawyer_id?.toString()) {
+      res.status(403).json({
+        success: false,
+        message: `User is not authorized to add payment.`,
       });
       return;
     }
@@ -33,24 +42,48 @@ export const addPayment = async (req: Request, res: Response) => {
 
 export const getPayment = async (req: Request, res: Response) => {
   try {
+    const userId = req.user?.id;
 
-    const payment = await Payment.find();
+    const payment = await Payment.findOne()
+      .populate({
+        path: "hiring_id",
+        match:{
+            $or: [
+              { client_id: userId },
+              { lawyer_id: userId }
+            ]
+          },
+        select: "client_id lawyer_id"
+      })
+      .lean();
 
-    res.status(201).json({ success: true, data: payment });
+    if (!payment || !payment.hiring_id) {
+      res.status(404).json({
+        success: false,
+        message: "Payment not found for this user",
+      });
+      return;
+    }
 
-  }
-  catch (err:any) {
+    res.status(200).json({ success: true, data: payment });
+  } catch (err: any) {
     console.error(err);
     res.status(400).json({
       success: false,
-      message: "Failed to create payment",
+      message: "Failed to fetch payment",
       error: err.message,
     });
   }
-}
+};
 
-export const payVerify = async (req: Request, res: Response, next: NextFunction) => {
+
+export const handlePayment = async (req: Request, res: Response, next: NextFunction) => {
   try {
+    const key = process.env.STRIPE_SECRET_KEY;
+    if (!key) {
+      res.status(500).json({ error: 'Stripe API key is not configured' });
+      return;
+    }
 
     const bill = await Payment.findById(req.params.id);
     if (!bill) {
@@ -58,42 +91,38 @@ export const payVerify = async (req: Request, res: Response, next: NextFunction)
       return;
     }
 
-    if (!req.file) {
-      res.status(401).json({ success: false, message: 'Please upload slip' });
+    if (bill.status==='paid'){
+      res.status(400).json({ success: false, message: 'Payment already completed' });
       return;
     }
 
-    const formData = new FormData();
-    formData.append('file', req.file.buffer, req.file.originalname);
-
-    if (!process.env.SLIP_API || !process.env.SLIP_API) {
-      res.status(500).json({ success: false, message: 'Missing API configuration' });
+    const stripe = new Stripe(key);
+    const amount = bill.amount;
+    if (!amount || amount <= 0) {
+      res.status(400).json({ success: false, message: 'Invalid payment amount' });
       return;
     }
 
-    const response = await fetch(process.env.SLIP_API, {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${process.env.SLIP_API}`,
-        ...formData.getHeaders(),
-      },
-      body: formData,
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ['promptpay'],
+      line_items: [
+        {
+          price_data:{
+            currency:'thb',
+            product_data:{
+              name:"Law Payment"
+            },
+            unit_amount: amount*100,
+          },
+           quantity: 1,
+        },
+      ],
+      mode: 'payment',
+      success_url: 'https://example.com/success',
+      cancel_url: 'https://example.com/cancel',
     });
-
-    const data = await response.json();
-
-    if (response.status === 200) {
-
-      bill.status = 'paid';
-      await bill.save();
-
-      res.status(200).json({ success: true, message: 'Payment verified and updated', data });
-    } else {
-      res.status(response.status).json({ success: false, message: 'Verification failed', data });
-    }
-
+    res.status(200).json({ url: session.url });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ success: false, message: 'Server error' });
+    next(error);
   }
 };

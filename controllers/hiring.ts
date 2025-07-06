@@ -199,7 +199,7 @@ export const updateHiring = async (req: Request, res: Response, next:NextFunctio
     if (req.user?.role !== 'admin' && req.user?.id !== hiring.lawyer_id?.toString()) {
       res.status(403).json({
         success: false,
-        message: `User ${req.user?.id} is not authorized to update this hiring`,
+        message: `User is not authorized to update this hiring`,
       });
       return;
     }
@@ -253,7 +253,7 @@ export const cancelHiring = async (req: Request, res: Response, next:NextFunctio
     if (req.user?.role !== 'admin' && req.user?.id !== hiring.lawyer_id?.toString()) {
       res.status(403).json({
         success: false,
-        message: `User ${req.user?.id} is not authorized to cancel this hiring`,
+        message: `User is not authorized to cancel this hiring`,
       });
       return;
     }

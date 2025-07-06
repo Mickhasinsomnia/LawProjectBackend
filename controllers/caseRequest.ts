@@ -97,7 +97,7 @@ export const updateCaseRequest = async (req:Request, res:Response ,next: NextFun
     ) {
       res.status(403).json({
         success: false,
-        message: `User ${req.user?.id} is not authorized to update this case request`,
+        message: `User is not authorized to update this case request`,
       });
       return;
     }
