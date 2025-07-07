@@ -1,7 +1,7 @@
 config/config.env
 node_modules/
 .DS_Store
-
+swagger/
 .vscode/
 test/
 dist/

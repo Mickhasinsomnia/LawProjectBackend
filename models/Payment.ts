@@ -17,6 +17,6 @@ const PaymentSchema = new mongoose.Schema({
   stripeSession_id: {
     type: String,
   },
-});
+  },{ timestamps: true });
 
 export default mongoose.model('Payment', PaymentSchema);

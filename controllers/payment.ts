@@ -44,7 +44,7 @@ export const getPayment = async (req: Request, res: Response) => {
   try {
     const userId = req.user?.id;
 
-    const payment = await Payment.findOne()
+    const payment = await Payment.find()
       .populate({
         path: "hiring_id",
         match:{
@@ -54,10 +54,9 @@ export const getPayment = async (req: Request, res: Response) => {
             ]
           },
         select: "client_id lawyer_id"
-      })
-      .lean();
+      }).sort({ createdAt: -1}).lean();
 
-    if (!payment || !payment.hiring_id) {
+    if (!payment || payment.length===0) {
       res.status(404).json({
         success: false,
         message: "Payment not found for this user",
@@ -75,6 +74,58 @@ export const getPayment = async (req: Request, res: Response) => {
     });
   }
 };
+
+export const getPaymentById = async (req: Request, res: Response) => {
+  try {
+    const userId = req.user?.id;
+    const paymentId = req.params.id;
+
+    const payment = await Payment.findById(paymentId)
+      .populate({
+        path: "hiring_id",
+        select: "client_id lawyer_id",
+      }).lean();
+
+    if (!payment) {
+      res.status(404).json({
+        success: false,
+        message: "Payment not found",
+      });
+      return;
+    }
+
+    const hiring = payment.hiring_id;
+
+    if (
+      req.user?.role !== 'admin' &&
+      hiring &&
+      (hiring as { client_id?: string }).client_id?.toString() !== userId &&
+      (hiring as { lawyer_id?: string }).lawyer_id?.toString() !== userId
+    ) {
+      res.status(403).json({
+        success: false,
+        message: "You are not authorized to view this payment",
+      });
+      return;
+    }
+
+    res.status(200).json({
+      success: true,
+      data: payment,
+    });
+    return;
+
+  } catch (err: any) {
+    console.error(err);
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch payment",
+      error: err.message,
+    });
+    return;
+  }
+};
+
 
 
 export const handlePayment = async (req: Request, res: Response, next: NextFunction) => {
@@ -118,8 +169,8 @@ export const handlePayment = async (req: Request, res: Response, next: NextFunct
         },
       ],
       mode: 'payment',
-      success_url: 'https://example.com/success',
-      cancel_url: 'https://example.com/cancel',
+      success_url: `${process.env.FRONTEND_URL}/payment/${bill._id}/success`,
+      cancel_url: `${process.env.FRONTEND_URL}/payment/${bill._id}`,
     });
 
     bill.stripeSession_id = session.id;
