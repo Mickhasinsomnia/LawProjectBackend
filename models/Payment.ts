@@ -4,7 +4,6 @@ const PaymentSchema = new mongoose.Schema({
   case_id: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'CaseRequest',
-    required: true
   },
   status: {
     type: String,
