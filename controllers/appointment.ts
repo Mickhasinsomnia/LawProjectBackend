@@ -2,75 +2,74 @@ import Appointment, { IAppointment } from "../models/Appointment.js";
 import Hiring from "../models/Hiring.js";
 import { Request, Response, NextFunction } from 'express';
 
-export const createAppointment = async (req:Request, res:Response ,next: NextFunction) => {
+export const createAppointment = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const hiring = await Hiring.findById(req.params.id);
 
     if (!hiring) {
-      res.status(404).json({
-        success: false,
-        message: "Hiring not found",
-      });
-      return;
+      return res.status(404).json({ success: false, message: "Hiring not found" });
     }
 
     if (hiring.status !== "active") {
-      res.status(400).json({
-        success: false,
-        message: "Hiring is not active or has been canceled",
-      });
-      return;
+      return res.status(400).json({ success: false, message: "Hiring is not active or has been canceled" });
     }
 
     const { permission } = req.body;
 
+    const userId = req.user?.id;
+    const userRole = req.user?.role;
 
-    if (req.user?.role === 'user' && permission !== 'client') {
-      res.status(403).json({
-        success: false,
-        message: "Users can only create client appointments.",
-      });
-      return;
+
+    if (userRole === 'user') {
+      if (permission !== 'client') {
+        res.status(403).json({ success: false, message: "Users can only create client appointments." });
+        return;
+      }
+      if (hiring.client_id && userId !== hiring.client_id.toString()) {
+        res.status(403).json({ success: false, message: "You are not the assigned client for this hiring." });
+        return;
+      }
     }
 
-    if (req.user?.role === 'lawyer' && permission === 'client') {
-      res.status(403).json({
-        success: false,
-        message: "Lawyers cannot create client appointments.",
-      });
-      return;
+    if (userRole === 'lawyer') {
+      if (permission === 'client') {
+        res.status(403).json({ success: false, message: "Lawyers cannot create client appointments." });
+        return;
+      }
+      if (hiring.lawyer_id && userId !== hiring.lawyer_id.toString()) {
+        res.status(403).json({ success: false, message: "You are not the assigned lawyer for this hiring." });
+        return;
+      }
     }
-    const client = hiring.client_id;
-    const lawyer = hiring.lawyer_id;
 
     const appointmentData = {
-      ...req.body,
-      hiringId: req.params.id,
-      permission: req.body.permission,
-      client_id:client,
-      lawyer_id:lawyer
-
+      task: req.body.task,
+      note: req.body.note,
+      location: req.body.location,
+      timeStamp: req.body.timeStamp,
+      hiringId: hiring._id,
+      permission,
+      client_id: hiring.client_id,
+      lawyer_id: hiring.lawyer_id,
     };
 
     const newAppointment = await Appointment.create(appointmentData);
 
-    res.status(201).json({
+    return res.status(201).json({
       success: true,
       data: newAppointment,
     });
-    return;
-  } catch (err:any) {
+  } catch (err: any) {
     console.error(err);
-    res.status(400).json({
+    return res.status(500).json({
       success: false,
       message: "Failed to create appointment",
       error: err.message,
     });
-    return;
   }
 };
 
-export const updateAppointment = async (req:Request, res:Response ,next: NextFunction) => {
+export const updateAppointment = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const appointment = await Appointment.findById(req.params.id);
     if (!appointment) {
@@ -83,62 +82,41 @@ export const updateAppointment = async (req:Request, res:Response ,next: NextFun
       res.status(404).json({ success: false, message: "Associated hiring not found" });
       return;
     }
+
     if (appointment.status === "cancelled") {
       res.status(400).json({ success: false, message: "Cannot update a cancelled appointment" });
       return;
     }
 
+    const { role, id: userId } = req.user!;
     const permission = appointment.permission;
 
-    if(permission==="shared" || permission==="lawyer"){
-      if (req.user?.role ==="user"){
-        res.status(403).json({
-          success: false,
-          message: "You are not authorized to update this appointment",
-        });
-        return;
-      }
-      if(req.user?.id!=hiring.lawyer_id && req.user?.role!="admin"){
-        res.status(403).json({
-          success: false,
-          message: "You are not authorized to update this appointment",
-        });
-        return;
-      }
+    const isLawyer = userId === hiring.lawyer_id?.toString();
+    const isClient = userId === hiring.client_id?.toString();
+    const isAdmin = role === 'admin';
+
+    if ((permission === "shared" || permission === "lawyer") && !isAdmin && !isLawyer) {
+      res.status(403).json({ success: false, message: "You are not authorized to update this appointment" });
+      return;
     }
 
-    if(permission==="client"){
-      if (req.user?.role ==="lawyer"){
-        res.status(403).json({
-          success: false,
-          message: "You are not authorized to update this appointment",
-        });
-        return;
-      }
-      if(req.user?.id!=hiring.client_id && req.user?.role!="admin"){
-        res.status(403).json({
-          success: false,
-          message: "You are not authorized to update this appointment",
-        });
-        return;
-      }
+    if (permission === "client" && !isAdmin && !isClient) {
+      res.status(403).json({ success: false, message: "You are not authorized to update this appointment" });
+      return;
     }
-
 
     const { task, note, location, timeStamp } = req.body;
-    if (task) appointment.task = task;
-    if (note) appointment.note = note;
-    if (location) appointment.location = location;
-    if (timeStamp) appointment.timeStamp = timeStamp;
+
+    if (task !== undefined) appointment.task = task;
+    if (note !== undefined) appointment.note = note;
+    if (location !== undefined) appointment.location = location;
+    if (timeStamp !== undefined) appointment.timeStamp = timeStamp;
 
     await appointment.save();
 
-    res.status(200).json({
-      success: true,
-      data: appointment,
-    });
+    res.status(200).json({ success: true, data: appointment });
     return;
-  } catch (err:any) {
+  } catch (err: any) {
     console.error(err);
     res.status(500).json({
       success: false,
@@ -149,79 +127,48 @@ export const updateAppointment = async (req:Request, res:Response ,next: NextFun
   }
 };
 
-
-export const deleteAppointment = async (req:Request, res:Response ,next: NextFunction) => {
+export const deleteAppointment = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const appointment = await Appointment.findById(req.params.id);
     if (!appointment) {
-      res.status(404).json({
-        success: false,
-        message: "No appointment found with the given id",
-      });
+      res.status(404).json({ success: false, message: "No appointment found with the given id" });
       return;
     }
 
     if (appointment.status === "cancelled") {
-      res.status(400).json({
-        success: false,
-        message: "This appointment is already cancelled",
-      });
+      res.status(400).json({ success: false, message: "This appointment is already cancelled" });
       return;
     }
 
     const hiring = await Hiring.findById(appointment.hiringId);
     if (!hiring) {
-      res.status(404).json({
-        success: false,
-        message: "Associated hiring not found",
-      });
+      res.status(404).json({ success: false, message: "Associated hiring not found" });
       return;
     }
-    const permission = appointment.permission
 
-    if(permission==="shared" || permission==="lawyer"){
-      if (req.user?.role ==="user"){
-        res.status(403).json({
-          success: false,
-          message: "You are not authorized to cancel this appointment",
-        });
-        return;
-      }
-      if(req.user?.id!=hiring.lawyer_id && req.user?.role!="admin"){
-        res.status(403).json({
-          success: false,
-          message: "You are not authorized to cancel this appointment",
-        });
-        return;
-      }
+    const { role, id: userId } = req.user!;
+    const permission = appointment.permission;
+
+    const isLawyer = userId === hiring.lawyer_id?.toString();
+    const isClient = userId === hiring.client_id?.toString();
+    const isAdmin = role === 'admin';
+
+    if ((permission === "shared" || permission === "lawyer") && !isAdmin && !isLawyer) {
+      res.status(403).json({ success: false, message: "You are not authorized to cancel this appointment" });
+      return;
     }
 
-    if(permission==="client"){
-      if (req.user?.role ==="lawyer"){
-        res.status(403).json({
-          success: false,
-          message: "You are not authorized to cancel this appointment",
-        });
-        return;
-      }
-      if(req.user?.id!=hiring.client_id && req.user?.role!="admin"){
-        res.status(403).json({
-          success: false,
-          message: "You are not authorized to cancel this appointment",
-        });
-        return;
-      }
+    if (permission === "client" && !isAdmin && !isClient) {
+      res.status(403).json({ success: false, message: "You are not authorized to cancel this appointment" });
+      return;
     }
 
     appointment.status = "cancelled";
     await appointment.save();
 
-    res.status(200).json({
-      success: true,
-      message: "Appointment cancelled successfully",
-    });
+    res.status(200).json({ success: true, message: "Appointment cancelled successfully" });
     return;
-  } catch (err:any) {
+  } catch (err: any) {
     console.error(err);
     res.status(500).json({
       success: false,
@@ -231,6 +178,8 @@ export const deleteAppointment = async (req:Request, res:Response ,next: NextFun
     return;
   }
 };
+
+
 
 export const getAppointments = async (req:Request, res:Response ,next: NextFunction) => {
   try {
