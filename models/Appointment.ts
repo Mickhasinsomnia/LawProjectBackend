@@ -8,7 +8,7 @@ export interface IAppointment extends Document {
   task: string;
   note?: string;
   location: string;
-  status?: "confirmed" | "cancelled" | "completed";
+  status?: "confirmed"  | "completed";
   permission?: "shared" | "lawyer" | "client";
 }
 
