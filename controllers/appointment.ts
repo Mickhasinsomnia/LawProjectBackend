@@ -7,11 +7,13 @@ export const createAppointment = async (req: Request, res: Response, next: NextF
     const hiring = await Hiring.findById(req.params.id);
 
     if (!hiring) {
-      return res.status(404).json({ success: false, message: "Hiring not found" });
+      res.status(404).json({ success: false, message: "Hiring not found" });
+      return;
     }
 
     if (hiring.status !== "active") {
-      return res.status(400).json({ success: false, message: "Hiring is not active or has been canceled" });
+      res.status(400).json({ success: false, message: "Hiring is not active or has been canceled" });
+      return;
     }
 
     const { permission } = req.body;
@@ -55,17 +57,19 @@ export const createAppointment = async (req: Request, res: Response, next: NextF
 
     const newAppointment = await Appointment.create(appointmentData);
 
-    return res.status(201).json({
+    res.status(201).json({
       success: true,
       data: newAppointment,
     });
+    return;
   } catch (err: any) {
     console.error(err);
-    return res.status(500).json({
+    res.status(500).json({
       success: false,
       message: "Failed to create appointment",
       error: err.message,
     });
+    return;
   }
 };
 

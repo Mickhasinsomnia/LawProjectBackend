@@ -8,6 +8,6 @@ router.post('/create/:id', protect, authorize('lawyer','user','admin'), createAp
 
 router.route('/:id').put(updateAppointment).delete(deleteAppointment);
 
-router.get('/user/:id', protect, authorize('lawyer', 'user', 'admin'), getAppointments);
+router.get('/', protect, authorize('lawyer', 'user', 'admin'), getAppointments);
 
 export default router;
