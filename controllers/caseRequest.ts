@@ -1,4 +1,5 @@
 import CaseRequest from "../models/CaseRequest.js";
+import Lawyer from "../models/Lawyer.js"
 import { Request, Response, NextFunction } from "express";
 import { generateFileName, uploadFile, getObjectSignedUrl, deleteFile } from "./s3.js";
 
@@ -391,6 +392,70 @@ export const getAllCaseRequest = async (req:Request, res:Response ,next: NextFun
     res.status(500).json({
       success: false,
       message: "Failed to retrieve case request",
+      error: err.message,
+    });
+    return;
+  }
+};
+
+export const addHiring = async (req: Request, res: Response, next:NextFunction) => {
+  try {
+    const lawyer = await Lawyer.exists({ _id: req.user?.id });
+    if (!lawyer) {
+      res.status(403).json({
+        success: false,
+        message: 'User must complete lawyer profile before creating a hiring',
+      });
+      return;
+    }
+
+    const acceptedCase = await CaseRequest.findById(req.params.id);
+    if (!acceptedCase) {
+      res.status(404).json({
+        success: false,
+        message: "Case request not found",
+      });
+      return;
+    }
+
+    const lawyer_id = req.user?.id;
+
+
+    if (acceptedCase.offered_Lawyers) {
+      const allowedIds = acceptedCase.offered_Lawyers.map(id => id.toString());
+
+      if (lawyer_id && !allowedIds.includes(lawyer_id)) {
+        res.status(403).json({
+          success: false,
+          message: "You are not authorized to access this case request",
+        });
+        return;
+      }
+    }
+
+    if (acceptedCase.consultation_status !== "pending") {
+      res.status(400).json({
+        success: false,
+        message: "Case is not available for hiring. Status must be 'pending'.",
+      });
+      return;
+    }
+
+    (acceptedCase as { lawyer_id: typeof lawyer_id }).lawyer_id = lawyer_id;
+    acceptedCase.consultation_status = 'active';
+
+    await acceptedCase.save();
+
+    res.status(201).json({
+      success: true,
+      data: acceptedCase,
+    });
+    return;
+  } catch (err: any) {
+    console.error(err);
+    res.status(400).json({
+      success: false,
+      message: "Failed to create hiring",
       error: err.message,
     });
     return;

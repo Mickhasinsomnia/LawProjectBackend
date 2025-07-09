@@ -6,7 +6,6 @@ import connectDB from "./config/db.js";
 import appointment from "./routes/appointment.js";
 import auth from "./routes/auth.js";
 import caseRequest from "./routes/caseRequest.js";
-import hiring from "./routes/hiring.js";
 import workingDay from "./routes/workingDay.js";
 import lawyer from "./routes/lawyer.js";
 import forum from "./routes/forum.js";
@@ -40,7 +39,6 @@ const otpLimiter = rateLimit({
 app.use('/api/v1/appointment', appointment);
 app.use('/api/v1/auth', auth);
 app.use('/api/v1/caseRequest', caseRequest);
-app.use('/api/v1/hiring', hiring);
 app.use('/api/v1/workingDay', workingDay);
 app.use('/api/v1/lawyer', lawyer);
 app.use('/api/v1/forum', forum);

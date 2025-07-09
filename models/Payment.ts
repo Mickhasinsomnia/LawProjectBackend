@@ -1,9 +1,9 @@
 import mongoose from 'mongoose';
 
 const PaymentSchema = new mongoose.Schema({
-  hiring_id: {
+  case_id: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Hiring',
+    ref: 'CaseRequest',
     required: true
   },
   status: {

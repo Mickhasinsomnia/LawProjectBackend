@@ -1,18 +1,18 @@
 import Appointment, { IAppointment } from "../models/Appointment.js";
-import Hiring from "../models/Hiring.js";
+import CaseRequest from "../models/CaseRequest.js";
 import { Request, Response, NextFunction } from 'express';
 
 export const createAppointment = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const hiring = await Hiring.findById(req.params.id);
+    const hiring = await CaseRequest.findById(req.params.id);
 
     if (!hiring) {
-      res.status(404).json({ success: false, message: "Hiring not found" });
+      res.status(404).json({ success: false, message: "Case not found" });
       return;
     }
 
-    if (hiring.status !== "active") {
-      res.status(400).json({ success: false, message: "Hiring is not active or has been canceled" });
+    if (hiring.consultation_status !== "active") {
+      res.status(400).json({ success: false, message: "Case is not active or has been canceled" });
       return;
     }
 
@@ -49,7 +49,7 @@ export const createAppointment = async (req: Request, res: Response, next: NextF
       note: req.body.note,
       location: req.body.location,
       timeStamp: req.body.timeStamp,
-      hiringId: hiring._id,
+      case_id: hiring._id,
       permission,
       client_id: hiring.client_id,
       lawyer_id: hiring.lawyer_id,
@@ -81,7 +81,7 @@ export const updateAppointment = async (req: Request, res: Response, next: NextF
       return;
     }
 
-    const hiring = await Hiring.findById(appointment.hiringId);
+    const hiring = await CaseRequest.findById(appointment.case_id);
     if (!hiring) {
       res.status(404).json({ success: false, message: "Associated hiring not found" });
       return;
@@ -144,7 +144,7 @@ export const deleteAppointment = async (req: Request, res: Response, next: NextF
       return;
     }
 
-    const hiring = await Hiring.findById(appointment.hiringId);
+    const hiring = await CaseRequest.findById(appointment.case_id);
     if (!hiring) {
       res.status(404).json({ success: false, message: "Associated hiring not found" });
       return;

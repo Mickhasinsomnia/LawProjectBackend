@@ -1,5 +1,5 @@
 import Payment from '../models/Payment.js';
-import Hiring from '../models/Hiring.js';
+import CaseRequest from '../models/CaseRequest.js';
 import Stripe from 'stripe'
 import { Request, Response, NextFunction } from 'express';
 import dotenv from 'dotenv';
@@ -7,9 +7,9 @@ dotenv.config({ path: "./config/config.env" });
 
 export const addPayment = async (req: Request, res: Response) => {
   try {
-    const hiring = await Hiring.findOne({ _id: req.params.id });
+    const hiring = await CaseRequest.findOne({ _id: req.params.id });
     if (!hiring) {
-       res.status(404).json({success: false,message: 'Hiring not found'
+       res.status(404).json({success: false,message: 'Case not found'
       });
       return;
     }
@@ -24,7 +24,7 @@ export const addPayment = async (req: Request, res: Response) => {
 
     const payment = await Payment.create({
       ...req.body,
-      hiring_id: req.params.id
+      case_id: req.params.id
     });
 
     res.status(201).json({ success: true, data: payment });
@@ -46,7 +46,7 @@ export const getPayment = async (req: Request, res: Response) => {
 
     const payment = await Payment.find()
       .populate({
-        path: "hiring_id",
+        path: "case_id",
         match:{
             $or: [
               { client_id: userId },
@@ -82,7 +82,7 @@ export const getPaymentById = async (req: Request, res: Response) => {
 
     const payment = await Payment.findById(paymentId)
       .populate({
-        path: "hiring_id",
+        path: "case_id",
         select: "client_id lawyer_id",
       }).lean();
 
@@ -94,7 +94,7 @@ export const getPaymentById = async (req: Request, res: Response) => {
       return;
     }
 
-    const hiring = payment.hiring_id;
+    const hiring = payment.case_id;
 
     if (
       req.user?.role !== 'admin' &&
