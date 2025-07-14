@@ -364,6 +364,42 @@ export const getCaseRequestsByLawyerId = async (req:Request, res:Response ,next:
   }
 };
 
+
+//@desc  Get all active case for a specific lawyer
+//@route GET /api/v1/caseRequest/lawyer/active
+//@access Private
+export const getActiveCase = async (req:Request, res:Response ,next: NextFunction) => {
+  try {
+    const lawyerId = req.user?.id;
+
+    const caseRequests = await CaseRequest.find({lawyer_id:lawyerId,consultation_status:'active'
+        }).sort({ createdAt: -1});
+
+    if (caseRequests.length === 0) {
+      res.status(404).json({
+        success: false,
+        message: "No case requests found for this lawyer",
+      });
+      return;
+    }
+
+    res.status(200).json({
+      success: true,
+      data: caseRequests,
+    });
+    return;
+  } catch (err:any) {
+    console.error(err);
+    res.status(500).json({
+      success: false,
+      message: "Failed to retrieve case requests",
+      error: err.message,
+    });
+    return;
+  }
+};
+
+
 //@desc  Get all case request
 //@route GET /api/v1/caseRequest
 //@access Private

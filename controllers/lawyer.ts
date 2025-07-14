@@ -3,7 +3,7 @@ import { getObjectSignedUrl } from "./s3.js";
 import { Request, Response ,NextFunction } from "express";
 
 // @desc    Create a new lawyer profile
-// @route   POST /api/v1/lawyers
+// @route   POST /api/v1/lawyer
 // @access  Private
 export const addLawyer = async (req: Request, res: Response, next:NextFunction) => {
   try {
@@ -37,7 +37,7 @@ export const addLawyer = async (req: Request, res: Response, next:NextFunction) 
 };
 
 // @desc    Get a lawyer profile by ID
-// @route   GET /api/v1/lawyers/:id
+// @route   GET /api/v1/lawyer/:id
 // @access  Public
 export const getLawyerById = async (req: Request, res: Response, next:NextFunction) => {
   try {
@@ -76,7 +76,7 @@ export const getLawyerById = async (req: Request, res: Response, next:NextFuncti
 };
 
 // @desc    Update a lawyer profile
-// @route   PUT /api/v1/lawyers/:id
+// @route   PUT /api/v1/lawyer/:id
 // @access  Private
 export const updateLawyer = async (req: Request, res: Response, next:NextFunction) => {
   try {
@@ -128,7 +128,7 @@ export const updateLawyer = async (req: Request, res: Response, next:NextFunctio
 };
 
 // @desc    Delete a lawyer profile
-// @route   DELETE /api/v1/lawyers/:id
+// @route   DELETE /api/v1/lawyer/:id
 // @access  Private/Admin or Owner
 export const deleteLawyer = async (req: Request, res: Response, next:NextFunction) => {
   try {
@@ -176,7 +176,7 @@ export const deleteLawyer = async (req: Request, res: Response, next:NextFunctio
 };
 
 // @desc    Get all lawyers
-// @route   GET /api/v1/lawyers
+// @route   GET /api/v1/lawyer
 // @access  Public
 export const getAllLawyers = async (req: Request, res: Response, next:NextFunction) => {
   try {
@@ -211,7 +211,7 @@ export const getAllLawyers = async (req: Request, res: Response, next:NextFuncti
 
 
 // @desc    Admin change verify status
-// @route   PUT /api/v1/lawyers/status/:id
+// @route   PUT /api/v1/lawyer/:id/status
 // @access  Private/Admin
 export const changeVerifyStatus = async (req: Request, res: Response, next:NextFunction)=>{
   const lawyer = await Lawyer.findById(req.params.id);
@@ -236,3 +236,50 @@ export const changeVerifyStatus = async (req: Request, res: Response, next:NextF
 
 
 }
+
+// @desc    Get lawyers by consultation rate range
+// @route   GET /api/v1/lawyer/price?min={min}&max={max}
+// @access  Public
+export const getLawyerByPrice = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const min = parseFloat(req.query.min as string);
+    const max = parseFloat(req.query.max as string);
+
+    if (isNaN(min) || isNaN(max)) {
+      res.status(400).json({
+        success: false,
+        message: "Invalid price range provided (min and max are required)",
+      });
+      return;
+    }
+
+    const lawyers = await Lawyer.find({
+      "consultationRate.min": { $lte: max },
+      "consultationRate.max": { $gte: min },
+    }).populate({
+      path: "_id",
+      select: "name tel location photo"
+    });
+
+    // Handle signed photo URLs
+    for (const lawyer of lawyers) {
+      const user = lawyer._id as { photo?: string };
+      if (user.photo && !user.photo.startsWith("http")) {
+        user.photo = await getObjectSignedUrl(user.photo);
+      }
+    }
+
+    res.status(200).json({
+      success: true,
+      count: lawyers.length,
+      data: lawyers,
+    });
+  } catch (err: any) {
+    console.error(err);
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch lawyers by price",
+      error: err.message,
+    });
+  }
+};

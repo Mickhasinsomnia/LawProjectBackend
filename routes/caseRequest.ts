@@ -1,5 +1,5 @@
 import express from 'express';
-import { addCaseRequest, cancelCaseRequest, updateCaseRequest, getCaseRequestById, getCaseRequestsByClientId, getCaseRequestsByLawyerId, getAllCaseRequest,deleteFileFromCase,addFileToCase,addHiring } from '../controllers/caseRequest.js';
+import { addCaseRequest, cancelCaseRequest, updateCaseRequest, getCaseRequestById, getCaseRequestsByClientId, getCaseRequestsByLawyerId, getAllCaseRequest,deleteFileFromCase,addFileToCase,addHiring,getActiveCase } from '../controllers/caseRequest.js';
 import { protect, authorize } from '../middleware/auth.js';
 import multer from 'multer';
 const storage = multer.memoryStorage();
@@ -8,6 +8,7 @@ const router = express.Router();
 
 router.get('/client', protect, authorize('user','admin'), getCaseRequestsByClientId);
 router.get('/lawyer', protect, authorize('lawyer','admin'), getCaseRequestsByLawyerId);
+router.get('/lawyer/active', protect, authorize('lawyer', 'admin'), getActiveCase);
 
 router.route('/').post(protect,authorize('user','admin'),upload.array('file', 5),addCaseRequest).get(protect,authorize('admin'),getAllCaseRequest);
 
