@@ -71,25 +71,27 @@ export const getAllChatUsers = async (req: Request, res: Response, next: NextFun
     const user = req.user?.id;
 
 
-    const chats = await Chat.find({
-      $or: [
-        { sender_id: user },
-        { receiver_id: user },
-      ],
-    }).sort({ createdAt: -1 });
+    const chats = await Chat.find(
+      {
+        $or: [
+          { sender_id: user },
+          { receiver_id: user },
+        ],
+      },
+      { sender_id: 1, receiver_id: 1, _id: 0 }
+    ).sort({ createdAt: -1 }).lean();
 
 
     const uniqueUserIds = [
-       ...new Set(
-         chats
-           .map(chat => chat.sender_id.toString())
-           .concat(chats.map(chat => chat.receiver_id.toString()))
-       ),
-     ];
+      ...new Set(
+        chats
+          .map(chat => chat.sender_id.toString())
+          .concat(chats.map(chat => chat.receiver_id.toString()))
+      ),
+    ];
 
-
-     const filteredUserIds = uniqueUserIds.filter(id => id !== user?.toString());
-
+    // Remove the logged-in user's own ID
+    const filteredUserIds = uniqueUserIds.filter(id => id !== user?.toString());
 
     res.status(200).json(filteredUserIds);
     return;
