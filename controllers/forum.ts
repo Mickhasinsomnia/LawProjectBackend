@@ -135,10 +135,11 @@ export const updateForum = async (req: Request, res: Response, next:NextFunction
     }
 
 
-    const { title, content } = req.body;
+    const { title, content,category } = req.body;
 
     if (title !== undefined) forum.title = title;
     if (content !== undefined) forum.content = content;
+    if (category !== undefined) forum.category = category;
 
     if (req.file) {
       const imageName = generateFileName();

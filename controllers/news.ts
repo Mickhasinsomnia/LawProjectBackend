@@ -110,10 +110,11 @@ export const updateNews = async (req: Request, res: Response, next:NextFunction)
     }
 
 
-    const { title, content } = req.body;
+    const { title, content, category } = req.body;
 
     if (title !== undefined) news.title = title;
     if (content !== undefined) news.content = content;
+    if (category !== undefined) news.category = category;
 
     if (req.file) {
       const imageName = generateFileName();

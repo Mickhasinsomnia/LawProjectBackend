@@ -129,10 +129,11 @@ export const updateArticle = async (req: Request, res: Response) => {
     }
 
 
-    const { title, content } = req.body;
+    const { title, content ,category} = req.body;
 
     if (title !== undefined) article.title = title;
     if (content !== undefined) article.content = content;
+    if (category !== undefined) article.category = category;
 
     if (req.file) {
       const imageName = generateFileName();

@@ -19,10 +19,7 @@ const ArticleSchema = new mongoose.Schema({
 
   },
   category: {
-      type: String,
-      enum: [
-
-      ],
+    type: String,
     required: true,
   },
   view_count :{
