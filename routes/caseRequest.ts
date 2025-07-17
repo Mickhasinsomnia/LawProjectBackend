@@ -10,7 +10,7 @@ router.get('/client', protect, authorize('user','admin'), getCaseRequestsByClien
 router.get('/lawyer', protect, authorize('lawyer','admin'), getCaseRequestsByLawyerId);
 router.get('/lawyer/active', protect, authorize('lawyer', 'admin'), getActiveCase);
 
-router.route('/').post(protect,authorize('user','admin'),upload.array('file', 5),addCaseRequest).get(protect,authorize('admin'),getAllCaseRequest);
+router.route('/').post(protect,authorize('user','admin'),upload.single('file'),addCaseRequest).get(protect,authorize('admin'),getAllCaseRequest);
 
 router.route('/:id').put(protect,authorize('user','admin'),updateCaseRequest).delete(protect,authorize('user','admin','lawyer'),cancelCaseRequest);
 

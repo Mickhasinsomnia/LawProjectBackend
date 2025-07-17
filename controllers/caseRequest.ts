@@ -10,20 +10,19 @@ import { generateFileName, uploadFile, getObjectSignedUrl, deleteFile } from "./
 export const addCaseRequest = async (req:Request, res:Response ,next: NextFunction) => {
   try {
 
-    const uploadedFileNames: string[] = [];
 
-    if (req.files && Array.isArray(req.files)) {
-          for (const file of req.files as Express.Multer.File[]) {
-            const fileName = generateFileName();
-            await uploadFile(file, fileName, file.mimetype);
-            uploadedFileNames.push(fileName);
-          }
-        }
+
+    if (req.file) {
+      const fileName = generateFileName();
+      console.log(fileName);
+      await uploadFile(req.file, fileName, req.file.mimetype);
+      req.body.summons = fileName;
+    }
+
 
     const newCaseRequest = await CaseRequest.create({
       ...req.body,
       client_id: req.user?.id,
-      files: uploadedFileNames,
     });
 
 
@@ -169,6 +168,10 @@ export const getCaseRequestById = async (req:Request, res:Response ,next: NextFu
     const user = caseRequest.lawyer_id as { photo?: string; };
     if (user && user.photo && !user.photo.startsWith("http")) {
       user.photo = await getObjectSignedUrl(user.photo);
+    }
+
+    if(caseRequest.summons && !caseRequest.summons.startsWith("http")){
+      caseRequest.summons = await getObjectSignedUrl(caseRequest.summons);
     }
 
 

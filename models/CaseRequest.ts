@@ -39,7 +39,11 @@ const CaseRequestSchema = new mongoose.Schema({
   files:{
     type: [String],
     default:[]
-  }
+  },
+  summons:{
+    type: String,
+    default:''
+}
 
 },{ timestamps: true });
 

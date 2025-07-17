@@ -64,3 +64,37 @@ export const addAiChat = async (req:Request, res:Response ,next: NextFunction) =
     return;
   }
 };
+
+
+export const getAllChatUsers = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const user = req.user?.id;
+
+
+    const chats = await Chat.find({
+      $or: [
+        { sender_id: user },
+        { receiver_id: user },
+      ],
+    }).sort({ createdAt: -1 });
+
+
+    const uniqueUserIds = [
+       ...new Set(
+         chats
+           .map(chat => chat.sender_id.toString())
+           .concat(chats.map(chat => chat.receiver_id.toString()))
+       ),
+     ];
+
+
+     const filteredUserIds = uniqueUserIds.filter(id => id !== user?.toString());
+
+
+    res.status(200).json(filteredUserIds);
+    return;
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+    return;
+  }
+};
