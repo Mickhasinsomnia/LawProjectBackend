@@ -16,6 +16,7 @@ import otpService from "./routes/otpService.js";
 import chat from "./routes/chat.js";
 import report from "./routes/report.js";
 import payment from "./routes/payment.js";
+import admin from "./routes/admin.js"
 import swaggerJsDoc from 'swagger-jsdoc';
 import swaggerUI from 'swagger-ui-express';
 
@@ -49,6 +50,7 @@ app.use('/api/v1',report)
 app.use('/api/v1/otpService', otpLimiter,otpService);
 app.use('/api/v1/chat', chat);
 app.use('/api/v1/payment',payment)
+app.use('/api/v1/admin',admin)
 
 const swaggerOptions = {
   swaggerDefinition: {

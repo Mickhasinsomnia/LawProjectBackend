@@ -299,11 +299,17 @@ export const addFileToCase = async (req:Request, res:Response ,next: NextFunctio
 //@desc  Get all case requests for a specific client
 //@route GET /api/v1/caseRequest/client
 //@access Private
-export const getCaseRequestsByClientId = async (req:Request, res:Response ,next: NextFunction) => {
+export const getCaseRequestsByClientId = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const clientId = req.user?.id;
 
-    const caseRequests = await CaseRequest.find({ client_id: clientId }).sort({ createdAt: -1});
+    const caseRequests = await CaseRequest.find({ client_id: clientId })
+      .sort({ createdAt: -1 })
+      .populate({
+        path: 'lawyer_id',
+        model: 'User',
+        select: 'name photo',
+      });
 
     if (caseRequests.length === 0) {
       res.status(404).json({
@@ -313,19 +319,24 @@ export const getCaseRequestsByClientId = async (req:Request, res:Response ,next:
       return;
     }
 
+    // Process each caseRequest's lawyer photo
+    for (const caseRequest of caseRequests) {
+      const lawyer = caseRequest.lawyer_id as { photo?: string };
+      if (lawyer && lawyer.photo && !lawyer.photo.startsWith("http")) {
+        lawyer.photo = await getObjectSignedUrl(lawyer.photo);
+      }
+    }
+
     res.status(200).json({
       success: true,
       data: caseRequests,
     });
-    return;
-  } catch (err:any) {
-    console.error(err);
+  } catch (err: any) {
     res.status(500).json({
       success: false,
       message: "Failed to retrieve case requests",
       error: err.message,
     });
-    return;
   }
 };
 
@@ -376,7 +387,11 @@ export const getActiveCase = async (req:Request, res:Response ,next: NextFunctio
     const lawyerId = req.user?.id;
 
     const caseRequests = await CaseRequest.find({lawyer_id:lawyerId,consultation_status:'active'
-        }).sort({ createdAt: -1});
+        }).sort({ createdAt: -1}).populate({
+          path: 'lawyer_id',
+          model: 'User',
+          select: 'name photo',
+        });
 
     if (caseRequests.length === 0) {
       res.status(404).json({
@@ -384,6 +399,13 @@ export const getActiveCase = async (req:Request, res:Response ,next: NextFunctio
         message: "No case requests found for this lawyer",
       });
       return;
+    }
+
+    for (const caseRequest of caseRequests) {
+      const lawyer = caseRequest.lawyer_id as { photo?: string };
+      if (lawyer && lawyer.photo && !lawyer.photo.startsWith("http")) {
+        lawyer.photo = await getObjectSignedUrl(lawyer.photo);
+      }
     }
 
     res.status(200).json({
