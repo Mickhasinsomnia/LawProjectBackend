@@ -69,10 +69,14 @@ export const addAiChat = async (req:Request, res:Response ,next: NextFunction) =
 export const getAllChatUsers = async (req: Request, res: Response) => {
   try {
     const userId = req.user?.id;
+    const botId = "6828a931e92578c60ee00ebd";
 
     const chats = await Chat.find({
-      $or: [{ sender_id: userId }, { receiver_id: userId }],
-    })
+          $or: [{ sender_id: userId }, { receiver_id: userId }],
+          // Exclude chats involving the bot:
+          sender_id: { $ne: botId },
+          receiver_id: { $ne: botId },
+        })
       .populate('sender_id', 'name photo')
       .populate('receiver_id', 'name photo')
       .sort({ createdAt: -1 })
