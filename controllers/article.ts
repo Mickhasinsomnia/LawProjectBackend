@@ -38,7 +38,7 @@ export const createArticle = async (req: Request, res: Response) => {
 //@access Public
 export const getArticles = async (req: Request, res: Response) => {
   try {
-    const articles = await Article.find().populate("poster_id", "name photo").lean();
+    const articles = await Article.find().populate("poster_id", "name photo").sort({ createdAt: -1 }).lean();
 
     const processedArticles = await Promise.all(
       articles.map(async (article) => {
@@ -79,7 +79,7 @@ export const getArticle = async (req: Request, res: Response) => {
   try {
 
     const article = await Article.findById(req.params.id)
-      .populate("poster_id", "name")
+      .populate("poster_id", "name photo")
       .lean();
 
     if (!article) {
@@ -91,6 +91,13 @@ export const getArticle = async (req: Request, res: Response) => {
 
     if (article.image && !article.image.startsWith("http")) {
       article.image = await getObjectSignedUrl(article.image);
+    }
+
+    const user = article.poster_id as {photo?:string}
+
+
+    if (user.photo && !user.photo.startsWith("http")) {
+      user.photo = await getObjectSignedUrl(user.photo);
     }
 
     const [likeCount] = await Promise.all([

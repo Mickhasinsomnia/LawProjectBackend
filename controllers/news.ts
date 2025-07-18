@@ -37,7 +37,7 @@ export const createNews = async (req: Request, res: Response, next:NextFunction)
 //@access Public
 export const getAllNews = async (req: Request, res: Response, next:NextFunction) => {
   try {
-    const newsList = await News.find().populate("poster_id", "name").lean();
+    const newsList = await News.find().populate("poster_id", "name").sort({ createdAt: -1 }).lean();
 
     const processedNews = await Promise.all(
       newsList.map(async (newsItem) => {

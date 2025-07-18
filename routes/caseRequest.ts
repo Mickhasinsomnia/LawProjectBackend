@@ -1,5 +1,5 @@
 import express from 'express';
-import { addCaseRequest, cancelCaseRequest, updateCaseRequest, getCaseRequestById, getCaseRequestsByClientId, getCaseRequestsByLawyerId, getAllCaseRequest,deleteFileFromCase,addFileToCase,addHiring,getActiveCase } from '../controllers/caseRequest.js';
+import { addCaseRequest, cancelCaseRequest, updateCaseRequest,deleteCaseRequest, getCaseRequestById, getCaseRequestsByClientId, getCaseRequestsByLawyerId, getAllCaseRequest,deleteFileFromCase,addFileToCase,addHiring,getActiveCase } from '../controllers/caseRequest.js';
 import { protect, authorize } from '../middleware/auth.js';
 import multer from 'multer';
 const storage = multer.memoryStorage();
@@ -12,6 +12,7 @@ router.get('/lawyer/active', protect, authorize('lawyer', 'admin'), getActiveCas
 
 router.route('/').post(protect,authorize('user','admin'),upload.single('file'),addCaseRequest).get(protect,authorize('admin'),getAllCaseRequest);
 
+router.route('/delete/:id').delete(protect,authorize('user','admin'),deleteCaseRequest);
 router.route('/:id').put(protect,authorize('user','admin'),updateCaseRequest).delete(protect,authorize('user','admin','lawyer'),cancelCaseRequest);
 
 router.route('/:id').get(protect, getCaseRequestById).post(protect,authorize('lawyer'),addHiring);

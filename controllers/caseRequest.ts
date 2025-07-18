@@ -56,6 +56,17 @@ export const cancelCaseRequest = async (req:Request, res:Response ,next: NextFun
       return;
     }
 
+    if (
+      req.user?.role !== "admin" &&
+      req.user?.id !== caseRequest.client_id?.toString()
+    ) {
+      res.status(403).json({
+        success: false,
+        message: `User is not authorized to update this case request`,
+      });
+      return;
+    }
+
     caseRequest.consultation_status = req.user?.role === "lawyer" ? "rejected" : "cancelled";
     await caseRequest.save();
 
@@ -125,6 +136,51 @@ export const updateCaseRequest = async (req:Request, res:Response ,next: NextFun
     res.status(500).json({
       success: false,
       message: "Failed to update case request",
+      error: err.message,
+    });
+    return;
+  }
+};
+
+
+//@desc     Delete a case request
+//@route    DELETE /api/v1/caseRequest/delete/:id
+//@access   Private
+export const deleteCaseRequest = async (req:Request, res:Response ,next: NextFunction) => {
+  try {
+    const caseRequest = await CaseRequest.findById(req.params.id);
+
+    if (!caseRequest) {
+      res.status(404).json({
+        success: false,
+        message: "Case request not found",
+      });
+      return;
+    }
+
+    if (
+      req.user?.role !== "admin" &&
+      req.user?.id !== caseRequest.client_id?.toString()
+    ) {
+      res.status(403).json({
+        success: false,
+        message: `User is not authorized to delete this case request`,
+      });
+      return;
+    }
+
+    await CaseRequest.deleteOne({ _id: req.params.id });
+
+    res.status(200).json({
+      success: true,
+      message: `Case request delete successfully`,
+    });
+    return;
+  } catch (err:any) {
+    console.error(err);
+    res.status(500).json({
+      success: false,
+      message: "Failed to update case request status",
       error: err.message,
     });
     return;
@@ -352,7 +408,11 @@ export const getCaseRequestsByLawyerId = async (req:Request, res:Response ,next:
             { lawyer_id: lawyerId },
             { offered_Lawyers: lawyerId }
           ]
-        }).sort({ createdAt: -1});
+        }).sort({ createdAt: -1}).populate({
+          path: 'client_id',
+          model: 'User',
+          select: 'name photo',
+        });
 
     if (caseRequests.length === 0) {
       res.status(404).json({
@@ -360,6 +420,13 @@ export const getCaseRequestsByLawyerId = async (req:Request, res:Response ,next:
         message: "No case requests found for this lawyer",
       });
       return;
+    }
+
+    for (const caseRequest of caseRequests) {
+      const lawyer = caseRequest.client_id as { photo?: string };
+      if (lawyer && lawyer.photo && !lawyer.photo.startsWith("http")) {
+        lawyer.photo = await getObjectSignedUrl(lawyer.photo);
+      }
     }
 
     res.status(200).json({

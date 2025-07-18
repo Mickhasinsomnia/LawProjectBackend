@@ -38,7 +38,7 @@ export const createForum = async (req: Request, res: Response, next:NextFunction
 //@access Public
 export const getForums = async (req: Request, res: Response, next:NextFunction) => {
   try {
-    const forums = await Forum.find().populate("poster_id", "name photo").lean();
+    const forums = await Forum.find().populate("poster_id", "name photo").sort({ createdAt: -1 }).lean();
 
     const processedForums = await Promise.all(
       forums.map(async (forum) => {
