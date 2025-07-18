@@ -1,6 +1,6 @@
 import Chat from "../models/Chat.js";
 import { Request, Response ,NextFunction} from "express";
-
+import { getObjectSignedUrl } from "./s3.js";
 //@desc  Add new chat message
 //POST /api/v1/chat
 //@access Private
@@ -66,37 +66,41 @@ export const addAiChat = async (req:Request, res:Response ,next: NextFunction) =
 };
 
 
-export const getAllChatUsers = async (req: Request, res: Response, next: NextFunction) => {
+export const getAllChatUsers = async (req: Request, res: Response) => {
   try {
-    const user = req.user?.id;
+    const userId = req.user?.id;
 
+    const chats = await Chat.find({
+      $or: [{ sender_id: userId }, { receiver_id: userId }],
+    })
+      .populate('sender_id', 'name photo')
+      .populate('receiver_id', 'name photo')
+      .sort({ createdAt: -1 })
+      .lean();
 
-    const chats = await Chat.find(
-      {
-        $or: [
-          { sender_id: user },
-          { receiver_id: user },
-        ],
-      },
-      { sender_id: 1, receiver_id: 1, _id: 0 }
-    ).sort({ createdAt: -1 }).lean();
+    const seen = new Set();
+    const users = [];
 
+    for (const chat of chats) {
+      const candidates = [chat.sender_id, chat.receiver_id];
 
-    const uniqueUserIds = [
-      ...new Set(
-        chats
-          .map(chat => chat.sender_id.toString())
-          .concat(chats.map(chat => chat.receiver_id.toString()))
-      ),
-    ];
+      for (const user of candidates) {
+        const id = user._id.toString();
+        if (id !== userId && !seen.has(id)) {
+          seen.add(id);
 
-    // Remove the logged-in user's own ID
-    const filteredUserIds = uniqueUserIds.filter(id => id !== user?.toString());
+          const objUser = user as { photo?: string };
+          if (objUser.photo && !objUser.photo.startsWith('http')) {
+            objUser.photo = await getObjectSignedUrl(objUser.photo);
+          }
 
-    res.status(200).json(filteredUserIds);
-    return;
+          users.push({ _id: user });
+        }
+      }
+    }
+
+    res.status(200).json(users);
   } catch (error: any) {
     res.status(500).json({ error: error.message });
-    return;
   }
 };
