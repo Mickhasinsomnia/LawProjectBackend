@@ -5,6 +5,10 @@ const CaseRequestSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
   },
+  title:{
+    type: String,
+    required: true
+  },
   lawyer_id: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Lawyer',

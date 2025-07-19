@@ -113,6 +113,7 @@ export const updateCaseRequest = async (req:Request, res:Response ,next: NextFun
       return;
     }
 
+    if (req.body.title) caseRequest.title = req.body.title
     if (req.body.description) caseRequest.description = req.body.description;
     if (req.body.note) caseRequest.note = req.body.note;
     if (req.body.lawyer_id) caseRequest.lawyer_id = req.body.lawyer_id
