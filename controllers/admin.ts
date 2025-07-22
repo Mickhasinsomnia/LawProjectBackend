@@ -5,7 +5,7 @@ import CaseRequest from "../models/CaseRequest.js"
 import Forum from "../models/Forum.js"
 import Article from "../models/Article.js"
 import type { Request, Response } from "express"
-import { getObjectSignedUrl } from "./s3.js"
+import { getObjectSignedUrl, deleteFile } from "./s3.js"
 
 export const getAllUser = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -48,6 +48,36 @@ export const getUserById = async (req: Request, res: Response): Promise<void> =>
     res.status(200).json({
       success: true,
       data: user,
+    })
+  } catch (err: any) {
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch user",
+      error: err.message,
+    })
+  }
+}
+
+export const deleteuser = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const user = await User.findById(req.params.id).lean()
+    if (!user) {
+      res.status(404).json({
+        success: false,
+        message: "User not found",
+      })
+      return
+    }
+    if (user.photo && !user.photo.startsWith("http")) {
+      await deleteFile(user.photo);
+    }
+
+    await User.deleteOne({ _id: req.params.id });
+
+
+    res.status(200).json({
+      success: true,
+      message: "User delete success",
     })
   } catch (err: any) {
     res.status(500).json({

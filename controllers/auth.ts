@@ -189,7 +189,7 @@ export const updateProfile = async (req: Request, res: Response, next: NextFunct
     const { thai_id } = req.body;
 
     const thaiIdRegex = /^\d-\d{4}-\d{5}-\d{2}-\d$/;
-    if (thai_id !== "" && !thaiIdRegex.test(thai_id)) {
+    if (typeof thai_id === 'string' && thai_id.trim() !== '' && !thaiIdRegex.test(thai_id)) {
       res.status(400).json({
         success: false,
         message: 'Invalid Thai ID format. Use format: X-XXXX-XXXXX-XX-X',
