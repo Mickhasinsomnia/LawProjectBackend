@@ -170,6 +170,19 @@ export const deleteCaseRequest = async (req:Request, res:Response ,next: NextFun
       return;
     }
 
+    if (caseRequest.files) {
+      for (const file of caseRequest.files) {
+        if (file) { // skips "", null, undefined, etc.
+          await deleteFile(file);
+        }
+      }
+    }
+
+    if (caseRequest.summons && caseRequest.summons !== "") {
+      await deleteFile(caseRequest.summons);
+    }
+
+
     await CaseRequest.deleteOne({ _id: req.params.id });
 
     res.status(200).json({
