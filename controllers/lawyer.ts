@@ -202,7 +202,7 @@ export const getAllLawyers = async (req: Request, res: Response, next:NextFuncti
     console.error(err);
     res.status(400).json({
       success: false,
-      message: "Failed to delete lawyer",
+      message: "Failed to get all lawyer",
       error: err.message,
     });
     return;

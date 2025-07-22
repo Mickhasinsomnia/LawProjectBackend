@@ -1,5 +1,6 @@
 import User from "../models/User.js"
 import News from "../models/News.js"
+import Lawyer from "../models/Lawyer.js"
 import CaseRequest from "../models/CaseRequest.js"
 import Forum from "../models/Forum.js"
 import Article from "../models/Article.js"
@@ -133,7 +134,7 @@ export const updateUser = async (req: Request, res: Response): Promise<void> => 
 export const getDashboardStats = async (req: Request, res: Response): Promise<void> => {
   try {
     const totalUsers = await User.countDocuments()
-    const registeredLawyers = await User.countDocuments({ role: "lawyer" })
+    const registeredLawyers = await Lawyer.countDocuments();
     const totalNews = await News.countDocuments()
     const totalCaseRequests = await CaseRequest.countDocuments()
     const totalForums = await Forum.countDocuments()
