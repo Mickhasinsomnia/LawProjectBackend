@@ -17,8 +17,10 @@ import chat from "./routes/chat.js";
 import report from "./routes/report.js";
 import payment from "./routes/payment.js";
 import admin from "./routes/admin.js"
+import notification from "./routes/notification.js";
 import swaggerJsDoc from 'swagger-jsdoc';
 import swaggerUI from 'swagger-ui-express';
+
 
 
 dotenv.config({ path: "./config/config.env" });
@@ -51,6 +53,7 @@ app.use('/api/v1/otpService', otpLimiter,otpService);
 app.use('/api/v1/chat', chat);
 app.use('/api/v1/payment',payment)
 app.use('/api/v1/admin',admin)
+app.use("/api/v1/notification", notification)
 
 const swaggerOptions = {
   swaggerDefinition: {
