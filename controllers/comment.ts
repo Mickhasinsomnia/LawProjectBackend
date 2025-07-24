@@ -1,12 +1,13 @@
 import Comment from '../models/Comment.js';
 import Forum from '../models/Forum.js';
+import Notification from '../models/Notification.js';
 import { getObjectSignedUrl } from "./s3.js";
 import { Request, Response, NextFunction } from "express";
 
 //@desc  Add new comment
 //POST /api/v1/forum/:forumId/comment
 //@access Private
-export const addComment = async (req: Request, res: Response , next:NextFunction) => {
+export const addComment = async (req: Request, res: Response , next: NextFunction) => {
   try {
     const forum_id = req.params.forumId;
 
@@ -15,8 +16,8 @@ export const addComment = async (req: Request, res: Response , next:NextFunction
       return;
     }
 
-    const exists = await Forum.exists({ _id: req.params.forumId });
-    if (!exists) {
+    const forum = await Forum.findById(forum_id);
+    if (!forum) {
       res.status(404).json({ success: false, message: "Forum not found" });
       return;
     }
@@ -24,13 +25,22 @@ export const addComment = async (req: Request, res: Response , next:NextFunction
     const comment = await Comment.create({
       ...req.body,
       user_id: req.user?.id,
-      forum_id: req.params.forumId
+      forum_id,
     });
+
+    const notification = await Notification.create({
+      user: forum.poster_id,  
+      type: "comment",
+      message: `มีคนแสดงความคิดเห็นในกระทู้ของคุณ: "${forum.title}"`,
+      link: `/forum/${forum_id}`,
+    });
+
+    console.log("Notification created:", notification);
+
     res.status(201).json({
       success: true,
       data: comment,
     });
-    return;
   } catch (err: any) {
     console.error(err);
     res.status(400).json({
@@ -38,7 +48,6 @@ export const addComment = async (req: Request, res: Response , next:NextFunction
       message: "Failed to add comment",
       error: err.message,
     });
-    return;
   }
 };
 
