@@ -1,5 +1,6 @@
 import CaseRequest from "../models/CaseRequest.js";
 import Lawyer from "../models/Lawyer.js"
+import Notification from "../models/Notification.js";
 import { Request, Response, NextFunction } from "express";
 import { generateFileName, uploadFile, getObjectSignedUrl, deleteFile } from "./s3.js";
 
@@ -25,6 +26,15 @@ export const addCaseRequest = async (req:Request, res:Response ,next: NextFuncti
       client_id: req.user?.id,
     });
 
+    if (Array.isArray(req.body.offered_Lawyers)) {
+      const notifications = req.body.offered_Lawyers.map((lawyerId: string) => ({
+        user: lawyerId,
+        type: "case_request",
+        message: "คุณได้รับคำร้องขอว่าจ้างใหม่จากลูกค้า",
+        link: `/case/${newCaseRequest._id}`, // adjust this route as needed
+      }))
+      await Notification.insertMany(notifications)
+    }
 
     res.status(201).json({
       success: true,

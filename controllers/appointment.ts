@@ -1,5 +1,6 @@
 import Appointment, { IAppointment } from "../models/Appointment.js";
 import CaseRequest from "../models/CaseRequest.js";
+import Notification from "../models/Notification.js";
 import { Request, Response, NextFunction } from 'express';
 
 export const createAppointment = async (req: Request, res: Response, next: NextFunction) => {
@@ -54,6 +55,17 @@ export const createAppointment = async (req: Request, res: Response, next: NextF
       client_id: hiring.client_id,
       lawyer_id: hiring.lawyer_id,
     };
+
+    if (hiring.client_id) {
+    const notification = await Notification.create({
+      user: hiring.client_id,
+      type: 'appointment',
+      message: `ทนายความได้กำหนดวันนัดหมายสำหรับคุณ: ${new Date(appointmentData.timeStamp).toLocaleString('th-TH')}`,
+      link: `/schedule`,
+    });
+
+    console.log("Notification created:", notification);
+  }
 
     const newAppointment = await Appointment.create(appointmentData);
 
