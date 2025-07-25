@@ -1,29 +1,50 @@
 import Chat from "../models/Chat.js";
 import { Request, Response ,NextFunction} from "express";
-import { getObjectSignedUrl } from "./s3.js";
+import { generateFileName, uploadFile, getObjectSignedUrl } from "./s3.js";
 //@desc  Add new chat message
 //POST /api/v1/chat
 //@access Private
-export const addChat = async (req:Request, res:Response ,next: NextFunction) => {
+export const addChat = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { receiver_id, text } = req.body;
-
     const sender_id = req.user?.id;
 
-    const newMessage = await Chat.create({ sender_id, receiver_id, text });
+    let fileKey: string | null = null;
+    let fileType: string | null = null;
 
-    res.status(201).json(newMessage);
-    return;
+    if (req.file) {
+      fileKey = generateFileName();
+      await uploadFile(req.file, fileKey, req.file.mimetype);
+      fileType = req.file.mimetype;
+    }
+
+    const newMessage = await Chat.create({
+      sender_id,
+      receiver_id,
+      text,
+      fileUrl: fileKey,
+      fileType,
+    });
+
+    // Add signed or public file URL
+    let fileUrl = null;
+    if (fileKey) {
+      fileUrl = await getObjectSignedUrl(fileKey); // or construct manually if public
+    }
+
+    res.status(201).json({
+      ...newMessage.toObject(),
+      fileUrl,
+    });
   } catch (error: any) {
     res.status(500).json({ error: error.message });
-    return;
   }
 };
 
 //@desc    Get chat messages between authenticated user and specified user
 //@route   GET /api/v1/chat/:id
 //@access  Private
-export const getChat = async (req:Request, res:Response ,next: NextFunction) => {
+export const getChat = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const sender_id = req.user?.id;
     const receiver_id = req.params.id;
@@ -38,12 +59,24 @@ export const getChat = async (req:Request, res:Response ,next: NextFunction) => 
         { sender_id, receiver_id },
         { sender_id: receiver_id, receiver_id: sender_id },
       ],
-    }).sort({ createdAt: 1});
-    res.status(200).json(chats);
-    return;
-  } catch (error:any) {
+    }).sort({ createdAt: 1 });
+
+    // Generate signed URL for each message if it has a file
+    const updatedChats = await Promise.all(
+      chats.map(async (chat) => {
+        const chatObj = chat.toObject();
+
+        if (chatObj.fileUrl) {
+          chatObj.fileUrl = await getObjectSignedUrl(chatObj.fileUrl);
+        }
+
+        return chatObj;
+      })
+    );
+
+    res.status(200).json(updatedChats);
+  } catch (error: any) {
     res.status(500).json({ error: error.message });
-    return;
   }
 };
 
