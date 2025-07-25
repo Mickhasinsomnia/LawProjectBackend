@@ -9,29 +9,30 @@ export const register = async (req: Request, res: Response, next: NextFunction) 
   try {
     const { name, email, password, tel, line_id, role, location, thai_id } = req.body;
 
-    const thaiIdRegex = /^\d-\d{4}-\d{5}-\d{2}-\d$/;
+    // Accept both dashed and plain Thai ID formats
+    const thaiIdRegex = /^(\d{1}-\d{4}-\d{5}-\d{2}-\d{1}|\d{13})$/;
+
     if (thai_id && !thaiIdRegex.test(thai_id)) {
-      res.status(400).json({
+      return res.status(400).json({
         success: false,
-        message: 'Invalid Thai ID format. Use format: X-XXXX-XXXXX-XX-X',
+        message: 'Invalid Thai ID format. Use format: X-XXXX-XXXXX-XX-X or 13 digits',
       });
-      return;
     }
-    // Create User
+
     const user = await User.create({
       name,
       email,
       password,
       tel,
-      line_id,
+      line_id : line_id|| undefined,
       role,
       location,
-      thai_id
+      thai_id: thai_id || undefined,
     });
 
-    sendTokenResponse(user, 200, res); // Create token
+    sendTokenResponse(user, 200, res);
   } catch (err: any) {
-    res.status(400).json({ success: false, message:err.message });
+    res.status(400).json({ success: false, message: err.message });
   }
 };
 

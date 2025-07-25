@@ -38,11 +38,11 @@ const UserSchema = new mongoose.Schema({
     validate: {
       validator: function (this: IUser, value: string) {
         if (this.provider === 'credentials') {
-          return /^(?:[A-Za-z][a-z]+ [A-Za-z][a-z]+|[ก-๙]{2,} [ก-๙]{2,})$/.test(value);
+          return /^(?:[A-Za-z]+\s[A-Za-z]+|[ก-๙]+(?:\s[ก-๙]+)+)$/.test(value);
         }
         return true; // allow any name for social login
       },
-      message: 'Please add a valid name in the format "Name Surname"',
+      message: 'กรุณากรอกชื่อ-นามสกุลให้ถูกต้อง เช่น สมชาย ณ อยุธยา หรือ John Smith',
     },
   },
   email: {

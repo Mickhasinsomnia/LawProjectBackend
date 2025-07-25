@@ -43,7 +43,8 @@ const LawyerSchema = new mongoose.Schema({
   },
   verificationDocs: {
     type: [String],
-    default: []
+    default: [],
+    required: true,
   }
 
 }, {
