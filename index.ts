@@ -18,8 +18,7 @@ import report from "./routes/report.js";
 import payment from "./routes/payment.js";
 import admin from "./routes/admin.js"
 import notification from "./routes/notification.js";
-import swaggerJsDoc from 'swagger-jsdoc';
-import swaggerUI from 'swagger-ui-express';
+import review from './routes/review.js'
 
 
 
@@ -54,24 +53,7 @@ app.use('/api/v1/chat', chat);
 app.use('/api/v1/payment',payment)
 app.use('/api/v1/admin',admin)
 app.use("/api/v1/notification", notification)
+app.use("/api/v1/review",review)
 
-const swaggerOptions = {
-  swaggerDefinition: {
-    openapi: '3.0.0',
-    info: {
-      title: 'Law API',
-      version: '1.0.0',
-      description: 'API documentation for the Law project'
-    },
-    servers: [
-      {
-        url: '/'
-      }
-    ],
-  },
-  apis: ['./swagger/swagger.yaml'],
-};
-const swaggerDocs=swaggerJsDoc(swaggerOptions);
-app.use('/api-docs',swaggerUI.serve, swaggerUI.setup(swaggerDocs));
 
 export default app;
