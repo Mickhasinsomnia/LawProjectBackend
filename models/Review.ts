@@ -1,12 +1,12 @@
 import mongoose from 'mongoose';
 
 const LawyerReviewSchema = new mongoose.Schema({
-  userId: {
+  user_id: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
     required: true,
   },
-  lawyerId: {
+  lawyer_id: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Lawyer',
     required: true,

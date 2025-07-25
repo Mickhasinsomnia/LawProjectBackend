@@ -45,6 +45,18 @@ const LawyerSchema = new mongoose.Schema({
     type: [String],
     default: [],
     required: true,
+  },
+  avgRating: {
+    type: Number,
+    default: 0,
+    min: 0,
+    max: 5,
+    set: (val:number) => Math.round(val * 100) / 100,
+  },
+  reviewCount: {
+    type: Number,
+    default: 0,
+    min: 0,
   }
 
 }, {
