@@ -290,3 +290,43 @@ export const likeCheck = async (req: Request, res: Response) => {
     });
   }
 };
+
+//@desc Get articles by specific lawyer
+//GET /api/v1/article/lawyer/:lawyerId
+//@access Public
+export const getArticleByLawyer = async (req: Request, res: Response) => {
+  try {
+    const { lawyerId } = req.params // Get lawyer ID from URL params instead of req.user.id
+
+    const articles = await Article.find({ poster_id: lawyerId })
+      .populate("poster_id", "name photo")
+      .sort({ createdAt: -1 })
+      .lean()
+
+    const processedArticles = await Promise.all(
+      articles.map(async (article) => {
+        if (article.image && !article.image.startsWith("http")) {
+          article.image = await getObjectSignedUrl(article.image)
+        }
+
+        const poster = article.poster_id as { photo?: string }
+        if (poster && poster.photo && !poster.photo.startsWith("http")) {
+          poster.photo = await getObjectSignedUrl(poster.photo)
+        }
+        ;(article as any).like_count = await ArticleLike.countDocuments({
+          article_id: article._id,
+        })
+
+        return article
+      }),
+    )
+
+    res.status(200).json({ success: true, data: processedArticles })
+  } catch (err: any) {
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch articles",
+      error: err.message,
+    })
+  }
+}

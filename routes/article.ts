@@ -1,5 +1,5 @@
 import express from 'express';
-import { createArticle, getArticles, getArticle, updateArticle, deleteArticle,likeArticle,unlikeArticle,likeCheck } from '../controllers/article.js';
+import { getArticleByLawyer, createArticle, getArticles, getArticle, updateArticle, deleteArticle,likeArticle,unlikeArticle,likeCheck,} from '../controllers/article.js';
 import { protect, authorize } from '../middleware/auth.js';
 import multer from 'multer';
 const storage = multer.memoryStorage()
@@ -7,6 +7,7 @@ const upload = multer({ storage: storage })
 const router = express.Router();
 
 router.get('/', getArticles);
+router.get('/lawyer/:lawyerId', getArticleByLawyer);
 router.get('/:id', getArticle);
 router.post('/', protect, authorize('admin','lawyer'), upload.single('image'),createArticle);
 router.put('/:id', protect, authorize('admin','lawyer'), upload.single('image'), updateArticle);
