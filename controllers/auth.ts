@@ -13,10 +13,11 @@ export const register = async (req: Request, res: Response, next: NextFunction) 
     const thaiIdRegex = /^(\d{1}-\d{4}-\d{5}-\d{2}-\d{1}|\d{13})$/;
 
     if (thai_id && !thaiIdRegex.test(thai_id)) {
-      return res.status(400).json({
+       res.status(400).json({
         success: false,
         message: 'Invalid Thai ID format. Use format: X-XXXX-XXXXX-XX-X or 13 digits',
       });
+       return;
     }
 
     const user = await User.create({
