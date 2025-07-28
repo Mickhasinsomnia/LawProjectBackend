@@ -20,6 +20,18 @@ export const register = async (req: Request, res: Response, next: NextFunction) 
        return;
     }
 
+    const allowedRoles = ['user', 'lawyer'];
+
+    if (!allowedRoles.includes(role)) {
+       res.status(403).json({
+        success: false,
+        message: 'Invalid role. Only "user" or "lawyer" are allowed.',
+      });
+      return;
+    }
+
+
+
     const user = await User.create({
       name,
       email,

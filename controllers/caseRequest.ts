@@ -613,3 +613,86 @@ export const addHiring = async (req: Request, res: Response, next:NextFunction) 
     return;
   }
 };
+
+
+// @desc     Clear offered_Lawyers array from case request
+// @route    PUT /api/v1/caseRequest/:id/clear-offered-lawyers
+// @access   Private (Admin or case owner or assigned lawyer)
+export const removeAssignedLawyer = async (req: Request, res: Response) => {
+  try {
+    const caseRequest = await CaseRequest.findById(req.params.id);
+
+    if (!caseRequest) {
+      res.status(404).json({ success: false, message: 'Case request not found' });
+      return;
+    }
+
+    const userId = req.user?.id;
+    const userRole = req.user?.role;
+
+    const isClient = caseRequest.client_id?.toString() === userId;
+    const isAssignedLawyer = caseRequest.lawyer_id?.toString() === userId;
+
+    if (userRole !== 'admin' && !isClient && !isAssignedLawyer) {
+      res.status(403).json({ success: false, message: 'Unauthorized' });
+      return;
+    }
+
+    // Use $unset to remove lawyer_id field
+    await CaseRequest.updateOne(
+      { _id: req.params.id },
+      { $unset: { lawyer_id: 1 } }
+    );
+
+    res.status(200).json({ success: true, message: 'Assigned lawyer removed successfully' });
+    return;
+  } catch (err: any) {
+    res.status(500).json({
+      success: false,
+      message: 'Failed to remove assigned lawyer',
+      error: err.message,
+    });
+    return;
+  }
+};
+
+// @desc     Clear offered_Lawyers array from case request
+// @route    PUT /api/v1/caseRequest/:id/clear-offered-lawyers
+// @access   Private (Admin or case owner or assigned lawyer)
+export const clearOfferedLawyers = async (req: Request, res: Response) => {
+  try {
+    const caseRequest = await CaseRequest.findById(req.params.id);
+
+    if (!caseRequest) {
+      res.status(404).json({ success: false, message: 'Case request not found' });
+      return;
+    }
+
+    const userId = req.user?.id;
+    const userRole = req.user?.role;
+
+    const isClient = caseRequest.client_id?.toString() === userId;
+    const isAssignedLawyer = caseRequest.lawyer_id?.toString() === userId;
+
+    if (userRole !== 'admin' && !isClient && !isAssignedLawyer) {
+      res.status(403).json({ success: false, message: 'Unauthorized' });
+      return;
+    }
+
+
+    await CaseRequest.updateOne(
+      { _id: req.params.id },
+      { $set: { offered_Lawyers: [] } }
+    );
+
+    res.status(200).json({ success: true, message: 'offered_Lawyers cleared successfully' });
+    return;
+  } catch (err: any) {
+    res.status(500).json({
+      success: false,
+      message: 'Failed to clear offered_Lawyers',
+      error: err.message,
+    });
+    return;
+  }
+};
