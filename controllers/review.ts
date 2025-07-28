@@ -1,6 +1,7 @@
 import Review from "../models/Review.js";
 import Lawyer from "../models/Lawyer.js";
 import { Request, Response, NextFunction } from "express";
+import { getObjectSignedUrl } from "./s3.js";
 
 
 // @desc Get review with given ID
@@ -31,24 +32,35 @@ export const getReview = async (req:Request, res:Response, next:NextFunction) =>
 // @desc Get all reviews of the camp with the given ID
 // @route   GET /api/v1/review/lawyer/:id
 // @access  Public
-export const getAllReview = async (req:Request, res:Response, next:NextFunction) => {
+export const getAllReview = async (req: Request, res: Response, next: NextFunction) => {
+  const lawyer_id = req.params.id;
+
+  if (!lawyer_id) {
+    res.status(400).json({ success: false, error: 'Lawyer ID is required' });
+    return;
+  }
+
   try {
-    const review = await Review.find({ lawyer_id: req.params.id });
-    if (review.length == 0 || !review) {
-      res.status(404).json({
-        message: "No reviews found for this lawyer",
-      });
+    const reviews = await Review.find({ lawyer_id }).populate("user_id", "name photo");
+
+    if (!reviews || reviews.length === 0) {
+      res.status(404).json({ success: false, error: 'No reviews found for this lawyer' });
       return;
     }
-    res.status(200).json({ success: true, data: review });
+
+    for (const review of reviews) {
+      const user = review.user_id as { photo?: string };
+      if (user && user.photo && !user.photo.startsWith("http")) {
+        user.photo = await getObjectSignedUrl(user.photo);
+      }
+    }
+
+    res.status(200).json({ success: true, data: reviews });
   } catch (err) {
     console.error(err);
-    res.status(500).json({
-      message: "Server error",
-    });
+    res.status(500).json({ success: false, error: "Server error" });
   }
 };
-
 // @desc Create a new review
 // @route   POST /api/v1/review
 // @access Private
