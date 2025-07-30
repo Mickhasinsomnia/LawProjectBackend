@@ -168,3 +168,54 @@ export const getAppointments = async (req:Request, res:Response ,next: NextFunct
     return;
   }
 };
+
+export const getAppointmentsByCaseId = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const user = req.user;
+    const { caseId } = req.params;
+
+    if (!caseId) {
+      res.status(400).json({
+        success: false,
+        message: "Case ID is required",
+      });
+      return;
+    }
+
+    let appointments: IAppointment[] = [];
+
+    if (user?.role === "user") {
+      appointments = await Appointment.find({
+        case_id: caseId,
+        client_id: user.id,
+        permission: { $in: ["shared", "client"] },
+      })
+        .populate("lawyer_id", "name email photo")
+        .populate("client_id", "name email photo")
+        .sort({ timeStamp: 1 });
+    }
+
+    if (user?.role === "lawyer") {
+      appointments = await Appointment.find({
+        case_id: caseId,
+        lawyer_id: user.id,
+        permission: { $in: ["shared", "lawyer"] },
+      })
+        .populate("lawyer_id", "name email photo")
+        .populate("client_id", "name email photo")
+        .sort({ timeStamp: 1 });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: appointments,
+    });
+  } catch (error: any) {
+    console.error(error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to get appointments for case",
+      error: error.message,
+    });
+  }
+};
