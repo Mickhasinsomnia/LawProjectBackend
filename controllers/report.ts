@@ -42,7 +42,14 @@ export const createReport = async (req: Request, res: Response) => {
 export const getReports = async (req: Request, res: Response) => {
   try {
     const reports = await ReportForum.find()
-      .populate('forum_id', 'title')
+      .populate({
+        path: 'forum_id',
+        select: 'title poster_id view_count createdAt',
+        populate: {
+          path: 'poster_id',
+          select: 'name'
+        }
+      })
       .populate('reporter_id', 'name')
       .lean();
 
@@ -86,17 +93,19 @@ export const createCommentReport = async (req: Request, res: Response) => {
       return;
     }
 
-    const exists = await Comment.exists({ _id: req.params.commentId });
+    const exists = await Comment.findById(req.params.commentId);
     if (!exists) {
       res.status(404).json({ success: false, message: "Comment not found" });
       return;
     }
+    const forum_id = exists.forum_id
 
     const report = await CommentReport.create({
       comment_id,
       reporter_id: req.user?.id,
       reason,
       details,
+      forum_id
     });
 
     res.status(201).json({ success: true, data: report });

@@ -29,7 +29,7 @@ export const getReview = async (req:Request, res:Response, next:NextFunction) =>
   }
 };
 
-// @desc Get all reviews of the camp with the given ID
+// @desc Get all reviews of the lawyer with the given ID
 // @route   GET /api/v1/review/lawyer/:id
 // @access  Public
 export const getAllReview = async (req: Request, res: Response, next: NextFunction) => {

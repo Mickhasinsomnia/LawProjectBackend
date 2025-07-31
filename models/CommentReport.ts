@@ -11,6 +11,11 @@ const CommentReportSchema = new mongoose.Schema({
     ref: "User",
     required: true,
   },
+  forum_id: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Forum",
+    required: true,
+  },
   reason: {
     type: String,
     required: true,

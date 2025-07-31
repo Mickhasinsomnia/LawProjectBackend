@@ -94,7 +94,7 @@ export const deleteNotification = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    const notification = await Notification.findByIdAndDelete(req.params.id);
+    const notification = await Notification.deleteOne({ _id: req.params.id });
 
     if (!notification) {
       res.status(404).json({ success: false, message: "Notification not found" });
