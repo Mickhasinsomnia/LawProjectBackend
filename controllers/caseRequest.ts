@@ -658,7 +658,7 @@ export const removeAssignedLawyer = async (req: Request, res: Response) => {
 
 // @desc     Clear offered_Lawyers array from case request
 // @route    PUT /api/v1/caseRequest/:id/clear-offered-lawyers
-// @access   Private (Admin or case owner or assigned lawyer)
+// @access   Private (Admin or case owner)
 export const clearOfferedLawyers = async (req: Request, res: Response) => {
   try {
     const caseRequest = await CaseRequest.findById(req.params.id);
@@ -672,9 +672,9 @@ export const clearOfferedLawyers = async (req: Request, res: Response) => {
     const userRole = req.user?.role;
 
     const isClient = caseRequest.client_id?.toString() === userId;
-    const isAssignedLawyer = caseRequest.lawyer_id?.toString() === userId;
 
-    if (userRole !== 'admin' && !isClient && !isAssignedLawyer) {
+
+    if (userRole !== 'admin' && !isClient ) {
       res.status(403).json({ success: false, message: 'Unauthorized' });
       return;
     }
@@ -694,5 +694,53 @@ export const clearOfferedLawyers = async (req: Request, res: Response) => {
       error: err.message,
     });
     return;
+  }
+};
+
+// @desc     Remove a specific lawyer from offered lawyers
+// @route    PUT /api/v1/caseRequest/:id/clear-offered-lawyers
+// @access   Private (Admin or case owner)
+export const removeOfferedLawyer = async (req: Request, res: Response) => {
+  try {
+    const caseRequest = await CaseRequest.findById(req.params.id);
+
+    if (!caseRequest) {
+      res.status(404).json({ success: false, message: 'Case request not found' });
+      return;
+    }
+
+    const userId = req.user?.id;
+    const userRole = req.user?.role;
+
+    const isClient = caseRequest.client_id?.toString() === userId;
+    const isAssignedLawyer = caseRequest.lawyer_id?.toString() === userId;
+
+    if (userRole !== 'admin' && !isClient && !isAssignedLawyer) {
+      res.status(403).json({ success: false, message: 'Unauthorized' });
+      return;
+    }
+
+    const { lawyerId: lawyerIdToRemove } = req.params;
+
+    if (!lawyerIdToRemove) {
+      res.status(400).json({ success: false, message: 'lawyerId is required in the URL' });
+      return;
+    }
+
+    await CaseRequest.updateOne(
+      { _id: req.params.id },
+      { $pull: { offered_Lawyers: lawyerIdToRemove } }
+    );
+
+    res.status(200).json({
+      success: true,
+      message: `Lawyer ${lawyerIdToRemove} removed from offered_Lawyers`,
+    });
+  } catch (err: any) {
+    res.status(500).json({
+      success: false,
+      message: 'Failed to remove lawyer from offered_Lawyers',
+      error: err.message,
+    });
   }
 };

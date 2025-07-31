@@ -59,14 +59,21 @@ export const getReports = async (req: Request, res: Response) => {
   }
 };
 
-//@desc  get all report
+//@desc  get report by specfic id
 //GET /api/v1/report/:reportId
 //@access Private
 export const getReport = async (req: Request, res: Response) => {
   try {
     const report = await ReportForum.findById(req.params.reportId)
-      .populate('forum_id', 'title content')
-      .populate('reporter_id', 'name email')
+      .populate({
+        path: 'forum_id',
+        select: 'title poster_id view_count createdAt',
+        populate: {
+          path: 'poster_id',
+          select: 'name'
+        }
+      })
+      .populate('reporter_id', 'name')
       .lean();
 
     if (!report) {
