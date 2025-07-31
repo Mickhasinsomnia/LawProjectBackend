@@ -5,128 +5,152 @@ import { Request, Response, NextFunction } from 'express';
 
 export const createAppointment = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const hiring = await CaseRequest.findById(req.params.id);
-
-    if (!hiring) {
-      res.status(404).json({ success: false, message: "Case not found" });
-      return;
-    }
-
-    if (hiring.consultation_status !== "active") {
-      res.status(400).json({ success: false, message: "Case is not active or has been canceled" });
-      return;
-    }
-
-    const { permission } = req.body;
-
+    const { task, note, location, timeStamp, permission, case_id } = req.body;
     const userId = req.user?.id;
     const userRole = req.user?.role;
 
+    let client_id: any = null;
+    let lawyer_id: any = null;
 
-    if (userRole === 'user') {
-      if (permission !== 'client') {
-        res.status(403).json({ success: false, message: "Users can only create client appointments." });
+    if (case_id) {
+      const hiring = await CaseRequest.findById(case_id);
+      if (!hiring) {
+        res.status(404).json({ success: false, message: "Case not found" });
         return;
       }
-      if (hiring.client_id && userId !== hiring.client_id.toString()) {
-        res.status(403).json({ success: false, message: "You are not the assigned client for this hiring." });
+
+      if (hiring.consultation_status !== "active") {
+        res.status(400).json({ success: false, message: "Case is not active or has been canceled" });
         return;
       }
+
+      client_id = hiring.client_id;
+      lawyer_id = hiring.lawyer_id;
+
+      // Ensure user is part of the case
+      if ((userRole === "user" && userId !== client_id.toString()) ||
+          (userRole === "lawyer" && userId !== lawyer_id.toString())) {
+        res.status(403).json({ success: false, message: "You are not authorized for this case" });
+        return;
+      }
+    } else {
+      // Personal event: assign current user only
+      if (userRole === 'user') client_id = userId;
+      else if (userRole === 'lawyer') lawyer_id = userId;
+      else {
+        res.status(403).json({ success: false, message: "Only users or lawyers can create appointments" });
+        return;
+      }
+        
     }
 
-    if (userRole === 'lawyer') {
-      if (permission === 'client') {
-        res.status(403).json({ success: false, message: "Lawyers cannot create client appointments." });
-        return;
-      }
-      if (hiring.lawyer_id && userId !== hiring.lawyer_id.toString()) {
-        res.status(403).json({ success: false, message: "You are not the assigned lawyer for this hiring." });
-        return;
-      }
-    }
-
-    const appointmentData = {
-      task: req.body.task,
-      note: req.body.note,
-      location: req.body.location,
-      timeStamp: req.body.timeStamp,
-      case_id: hiring._id,
+    const appointment = await Appointment.create({
+      task,
+      note,
+      location,
+      timeStamp,
+      case_id: case_id || null,
+      client_id,
+      lawyer_id,
       permission,
-      client_id: hiring.client_id,
-      lawyer_id: hiring.lawyer_id,
-    };
-
-    if (hiring.client_id) {
-    const notification = await Notification.create({
-      user: hiring.client_id,
-      type: 'appointment',
-      message: `ทนายความได้กำหนดวันนัดหมายสำหรับคุณ: ${new Date(appointmentData.timeStamp).toLocaleString('th-TH')}`,
-      link: `/schedule`,
     });
 
-    console.log("Notification created:", notification);
-  }
-
-    const newAppointment = await Appointment.create(appointmentData);
-
-    res.status(201).json({
-      success: true,
-      data: newAppointment,
-    });
+    res.status(201).json({ success: true, data: appointment });
     return;
   } catch (err: any) {
     console.error(err);
-    res.status(500).json({
-      success: false,
-      message: "Failed to create appointment",
-      error: err.message,
-    });
+    res.status(500).json({ success: false, message: "Failed to create appointment", error: err.message });
     return;
   }
 };
+
 
 
 export const deleteAppointment = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const appointment = await Appointment.findById(req.params.id);
     if (!appointment) {
-      res.status(404).json({ success: false, message: "No appointment found with the given id" });
-      return;
-    }
-
-    const hiring = await CaseRequest.findById(appointment.case_id);
-    if (!hiring) {
-      res.status(404).json({ success: false, message: "Associated hiring not found" });
+      res.status(404).json({
+        success: false,
+        message: "ไม่พบนัดหมายที่ต้องการลบ",
+      });
       return;
     }
 
     const { role, id: userId } = req.user!;
     const permission = appointment.permission;
 
-    const isLawyer = userId === hiring.lawyer_id?.toString();
-    const isClient = userId === hiring.client_id?.toString();
-    const isAdmin = role === 'admin';
+    // If appointment has no case_id => personal event, allow owner or admin to delete
+    if (!appointment.case_id) {
+      // For personal events, check if the user owns the appointment or is admin
+      const isOwner = appointment.client_id?.toString() === userId || appointment.lawyer_id?.toString() === userId;
+      const isAdmin = role === "admin";
 
-    if ((permission === "shared" || permission === "lawyer") && !isAdmin && !isLawyer) {
-      res.status(403).json({ success: false, message: "You are not authorized to cancel this appointment" });
+      if (!isOwner && !isAdmin) {
+        res.status(403).json({
+          success: false,
+          message: "คุณไม่มีสิทธิ์ลบนัดหมายนี้",
+        });
+        return;
+      }
+
+      await Appointment.deleteOne({ _id: appointment._id });
+
+      res.status(200).json({
+        success: true,
+        message: "ยกเลิกนัดหมายส่วนตัวเรียบร้อยแล้ว",
+      });
+      return;
+    }
+
+    // Otherwise, appointment is linked to a case — do normal permission checks
+    const hiring = await CaseRequest.findById(appointment.case_id);
+    if (!hiring) {
+      res.status(404).json({
+        success: false,
+        message: "ไม่พบคดีที่เกี่ยวข้องกับนัดหมายนี้",
+      });
+      return;
+    }
+
+    const isLawyer = hiring.lawyer_id?.toString() === userId;
+    const isClient = hiring.client_id?.toString() === userId;
+    const isAdmin = role === "admin";
+
+    if (
+      (permission === "shared" || permission === "lawyer") &&
+      !isAdmin &&
+      !isLawyer
+    ) {
+      res.status(403).json({
+        success: false,
+        message: "คุณไม่มีสิทธิ์ลบนัดหมายนี้",
+      });
       return;
     }
 
     if (permission === "client" && !isAdmin && !isClient) {
-      res.status(403).json({ success: false, message: "You are not authorized to cancel this appointment" });
+      res.status(403).json({
+        success: false,
+        message: "คุณไม่มีสิทธิ์ลบนัดหมายนี้",
+      });
       return;
     }
 
-    await Appointment.deleteOne({_id:appointment._id})
+    await Appointment.deleteOne({ _id: appointment._id });
 
-    res.status(200).json({ success: true, message: "Appointment cancelled successfully" });
+    res.status(200).json({
+      success: true,
+      message: "ยกเลิกนัดหมายเรียบร้อยแล้ว",
+    });
     return;
-  } catch (err: any) {
+
+  } catch (err: unknown) {
     console.error(err);
     res.status(500).json({
       success: false,
-      message: "Failed to cancel appointment",
-      error: err.message,
+      message: "ไม่สามารถยกเลิกนัดหมายได้",
+      error: err instanceof Error ? err.message : "Unknown error",
     });
     return;
   }

@@ -4,7 +4,7 @@ import { protect, authorize } from '../middleware/auth.js';
 
 const router = express.Router();
 
-router.post('/create/:id', protect, authorize('lawyer','user','admin'), createAppointment);
+router.post('/create', protect, authorize('lawyer','user','admin'), createAppointment);
 
 router.route('/:id').delete(protect,deleteAppointment);
 
