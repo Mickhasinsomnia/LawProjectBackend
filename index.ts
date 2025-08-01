@@ -2,13 +2,15 @@ import express from "express";
 import dotenv from "dotenv";
 import rateLimit from "express-rate-limit";
 import cors from "cors";
+import yaml from "yamljs";
+import path from "path";
+import { fileURLToPath } from "url";
+
+
 import connectDB from "./config/db.js";
-import swaggerJsDoc from "swagger-jsdoc";
-import swaggerUI from "swagger-ui-express";
 import appointment from "./routes/appointment.js";
 import auth from "./routes/auth.js";
 import caseRequest from "./routes/caseRequest.js";
-import workingDay from "./routes/workingDay.js";
 import lawyer from "./routes/lawyer.js";
 import forum from "./routes/forum.js";
 import news from "./routes/news.js";
@@ -22,51 +24,62 @@ import admin from "./routes/admin.js";
 import notification from "./routes/notification.js";
 import review from "./routes/review.js";
 
-
 dotenv.config({ path: "./config/config.env" });
 connectDB();
 
 const app = express();
-
 app.use(express.json());
-
 app.use(cors());
 
+// OTP rate limit
 const otpLimiter = rateLimit({
   windowMs: 1 * 60 * 1000,
   max: 4,
   message: "Too many OTP requests, please try again in 1 minute.",
 });
-const swaggerOptions = {
-  swaggerDefinition: {
-    openapi: "3.0.0",
 
-    info: {
-      title: "Law API",
 
-      version: "1.0.0",
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const swaggerDocument = yaml.load(path.join(__dirname, "./swagger/swagger.yaml"));
 
-      description: "API documentation for the Law project",
-    },
+app.get("/swagger.json", (req, res) => {
+  res.json(swaggerDocument);
+});
 
-    servers: [
-      {
-        url: "/",
-      },
-    ],
-  },
 
-  apis: ["./swagger/swagger.yaml"],
-};
+app.get("/api-docs", (req, res) => {
+  res.send(`
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <title>Swagger Docs</title>
+        <link rel="stylesheet" href="https://unpkg.com/swagger-ui-dist/swagger-ui.css">
+      </head>
+      <body>
+        <div id="swagger-ui"></div>
+        <script src="https://unpkg.com/swagger-ui-dist/swagger-ui-bundle.js"></script>
+        <script src="https://unpkg.com/swagger-ui-dist/swagger-ui-standalone-preset.js"></script>
+        <script>
+          SwaggerUIBundle({
+            url: '/swagger.json',
+            dom_id: '#swagger-ui',
+            presets: [
+              SwaggerUIBundle.presets.apis,
+              SwaggerUIStandalonePreset
+            ],
+            layout: "StandaloneLayout"
+          });
+        </script>
+      </body>
+    </html>
+  `);
+});
 
-const swaggerDocs = swaggerJsDoc(swaggerOptions);
-
-app.use("/api-docs", swaggerUI.serve, swaggerUI.setup(swaggerDocs));
-
+// Routes
 app.use("/api/v1/appointment", appointment);
 app.use("/api/v1/auth", auth);
 app.use("/api/v1/caseRequest", caseRequest);
-app.use("/api/v1/workingDay", workingDay);
 app.use("/api/v1/lawyer", lawyer);
 app.use("/api/v1/forum", forum);
 app.use("/api/v1/news", news);
