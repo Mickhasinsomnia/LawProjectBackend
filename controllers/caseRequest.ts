@@ -615,8 +615,8 @@ export const addHiring = async (req: Request, res: Response, next:NextFunction) 
 };
 
 
-// @desc     Clear offered_Lawyers array from case request
-// @route    PUT /api/v1/caseRequest/:id/clear-offered-lawyers
+// @desc     Remove lawyer from assign lawyer
+// @route    DELETE /api/v1/caseRequest/:id/assigned-lawyer
 // @access   Private (Admin or case owner or assigned lawyer)
 export const removeAssignedLawyer = async (req: Request, res: Response) => {
   try {
@@ -657,7 +657,7 @@ export const removeAssignedLawyer = async (req: Request, res: Response) => {
 };
 
 // @desc     Clear offered_Lawyers array from case request
-// @route    PUT /api/v1/caseRequest/:id/clear-offered-lawyers
+// @route    DELETE /api/v1/caseRequest/:id/offered-lawyers
 // @access   Private (Admin or case owner)
 export const clearOfferedLawyers = async (req: Request, res: Response) => {
   try {
@@ -697,8 +697,8 @@ export const clearOfferedLawyers = async (req: Request, res: Response) => {
   }
 };
 
-// @desc     Remove a specific lawyer from offered lawyers
-// @route    PUT /api/v1/caseRequest/:id/clear-offered-lawyers
+// @desc     Remove specfic offered lawyer from case request
+// @route    DELETE /api/v1/caseRequest/:id/offered-lawyers/:lawyerId
 // @access   Private (Admin or case owner)
 export const removeOfferedLawyer = async (req: Request, res: Response) => {
   try {
@@ -713,12 +713,24 @@ export const removeOfferedLawyer = async (req: Request, res: Response) => {
     const userRole = req.user?.role;
 
     const isClient = caseRequest.client_id?.toString() === userId;
-    const isAssignedLawyer = caseRequest.lawyer_id?.toString() === userId;
 
-    if (userRole !== 'admin' && !isClient && !isAssignedLawyer) {
+    if (caseRequest.offered_Lawyers) {
+      const allowedIds = caseRequest.offered_Lawyers.map(id => id.toString());
+
+      if (userId && !allowedIds.includes(userId)) {
+        res.status(403).json({
+          success: false,
+          message: "You are not authorized to remove offered lawyer",
+        });
+        return;
+      }
+    }
+
+    if (userRole !== 'admin' && !isClient) {
       res.status(403).json({ success: false, message: 'Unauthorized' });
       return;
     }
+
 
     const { lawyerId: lawyerIdToRemove } = req.params;
 
