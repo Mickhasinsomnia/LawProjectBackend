@@ -711,31 +711,30 @@ export const removeOfferedLawyer = async (req: Request, res: Response) => {
 
     const userId = req.user?.id;
     const userRole = req.user?.role;
-
-    const isClient = caseRequest.client_id?.toString() === userId;
-
-    if (caseRequest.offered_Lawyers) {
-      const allowedIds = caseRequest.offered_Lawyers.map(id => id.toString());
-
-      if (userId && !allowedIds.includes(userId)) {
-        res.status(403).json({
-          success: false,
-          message: "You are not authorized to remove offered lawyer",
-        });
-        return;
-      }
-    }
-
-    if (userRole !== 'admin' && !isClient) {
-      res.status(403).json({ success: false, message: 'Unauthorized' });
-      return;
-    }
-
-
     const { lawyerId: lawyerIdToRemove } = req.params;
 
     if (!lawyerIdToRemove) {
       res.status(400).json({ success: false, message: 'lawyerId is required in the URL' });
+      return;
+    }
+
+    // Convert offered_Lawyers to string array
+    const offeredLawyerIds = caseRequest.offered_Lawyers?.map(id => id.toString()) || [];
+
+    const isClient = caseRequest.client_id?.toString() === userId;
+    const isSelf = userId === lawyerIdToRemove;
+    const isOfferedLawyer = offeredLawyerIds.includes(lawyerIdToRemove);
+
+    // Authorization logic
+    if (
+      userRole !== 'admin' &&
+      !isClient &&
+      !(isSelf && isOfferedLawyer)
+    ) {
+      res.status(403).json({
+        success: false,
+        message: 'You are not authorized to remove this lawyer',
+      });
       return;
     }
 
