@@ -1,0 +1,2266 @@
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+openapi: 3.0.0
+security:
+  - bearerAuth: []
+
+paths:
+  # ============== FORUM ROUTES ==============
+  /api/v1/forum:
+    get:
+      summary: Get all forums
+      tags: [Forum]
+      responses:
+        200:
+          description: Success
+
+    post:
+      summary: Create a new forum
+      tags: [Forum]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                content:
+                  type: string
+                image:
+                  type: string
+                  format: binary
+                category:
+                  type: string
+                  description: Category of the forum
+      responses:
+        201:
+          description: Created
+
+  /api/v1/forum/{id}:
+    get:
+      summary: Get a specific forum
+      tags: [Forum]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Success
+
+    put:
+      summary: Update a forum
+      tags: [Forum]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                content:
+                  type: string
+                image:
+                  type: string
+                  format: binary
+                category:
+                  type: string
+                  description: Category of the forum
+      responses:
+        200:
+          description: Success
+
+    delete:
+      summary: Delete a forum
+      tags: [Forum]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Success
+
+  /api/v1/forum/{forumId}/like:
+    post:
+      summary: Like a forum
+      tags: [Forum]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: forumId
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Success
+
+    delete:
+      summary: Unlike a forum
+      tags: [Forum]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: forumId
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Success
+
+    get:
+      summary: Get users who liked a forum
+      tags: [Forum]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: forumId
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Success
+
+  # ============== NEWS ROUTES ==============
+  /api/v1/news:
+    get:
+      summary: Get all news
+      tags: [News]
+      responses:
+        200:
+          description: Success
+
+    post:
+      summary: Create a news article
+      tags: [News]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                content:
+                  type: string
+                image:
+                  type: string
+                  format: binary
+                category:
+                  type: string
+                  description: Category of the news
+      responses:
+        201:
+          description: Created
+
+  /api/v1/news/{id}:
+    get:
+      summary: Get a specific news article
+      tags: [News]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Success
+
+    put:
+      summary: Update a news article
+      tags: [News]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                content:
+                  type: string
+                image:
+                  type: string
+                  format: binary
+                category:
+                  type: string
+                  description: Category of the news
+      responses:
+        200:
+          description: Success
+
+    delete:
+      summary: Delete a news article
+      tags: [News]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Success
+
+  /api/v1/news/{newsId}/like:
+    post:
+      summary: Like a news article
+      tags: [News]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: newsId
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Success
+
+    delete:
+      summary: Unlike a news article
+      tags: [News]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: newsId
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+
+          description: Success
+
+    get:
+      summary: Get users who liked a news article
+      tags: [News]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: newsId
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Success
+
+  # ============== ARTICLE ROUTES ==============
+  /api/v1/article:
+    get:
+      summary: Get all articles
+      tags: [Article]
+      responses:
+        200:
+          description: Success
+
+    post:
+      summary: Create a new article
+      tags: [Article]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                content:
+                  type: string
+                image:
+                  type: string
+                  format: binary
+                category:
+                  type: string
+                  description: Category of the article
+      responses:
+        201:
+          description: Created
+
+  /api/v1/article/{id}:
+    get:
+      summary: Get a specific article
+      tags: [Article]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Success
+
+    put:
+      summary: Update an article
+      tags: [Article]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                content:
+                  type: string
+                image:
+                  type: string
+                  format: binary
+                category:
+                  type: string
+                  description: Category of the article
+      responses:
+        200:
+          description: Success
+
+    delete:
+      summary: Delete an article
+      tags: [Article]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Success
+
+  /api/v1/article/{articleId}/like:
+    post:
+      summary: Like an article
+      tags: [Article]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: articleId
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Success
+
+    delete:
+      summary: Unlike an article
+      tags: [Article]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: articleId
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Success
+
+    get:
+      summary: Get users who liked an article
+      tags: [Article]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: articleId
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Success
+
+  # ============== LAWYER ROUTES ==============
+  /api/v1/lawyer:
+    post:
+      summary: Create lawyer profile
+      tags: [Lawyer]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - slogan
+                - summary
+                - lawfirm_name
+                - consultationRate
+                - civilCase_specialized
+              properties:
+                slogan:
+                  type: string
+                  description: Lawyer's professional slogan
+                summary:
+                  type: string
+                  description: Professional summary
+                lawfirm_name:
+                  type: string
+                  description: Name of the law firm
+                consultationRate:
+                  type: object
+                  required:
+                    - min
+                    - max
+                  properties:
+                    min:
+                      type: number
+                      minimum: 0
+                    max:
+                      type: number
+                      minimum: 0
+                  description: Consultation rate range
+                documentDeliveryRate:
+                  type: object
+                  properties:
+                    min:
+                      type: number
+                      minimum: 0
+                    max:
+                      type: number
+                      minimum: 0
+                  description: Document delivery rate range
+                civilCase_specialized:
+                  type: array
+                  items:
+                    type: string
+                  description: Civil case specializations
+                criminalCase_specialized:
+                  type: array
+                  items:
+                    type: string
+                  description: Criminal case specializations
+                verificationDocs:
+                  type: array
+                  items:
+                    type: string
+                  description: Verification document IDs
+      responses:
+        201:
+          description: Created
+
+    get:
+      summary: Get all lawyers
+      tags: [Lawyer]
+      responses:
+        200:
+          description: Success
+
+  /api/v1/lawyer/{id}:
+    get:
+      summary: Get a specific lawyer
+      tags: [Lawyer]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Success
+
+    put:
+      summary: Update a lawyer profile
+      tags: [Lawyer]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                slogan:
+                  type: string
+                  description: Lawyer's professional slogan
+                summary:
+                  type: string
+                  description: Professional summary
+                lawfirm_name:
+                  type: string
+                  description: Name of the law firm
+                consultationRate:
+                  type: object
+                  properties:
+                    min:
+                      type: number
+                      minimum: 0
+                    max:
+                      type: number
+                      minimum: 0
+                  description: Consultation rate range
+                documentDeliveryRate:
+                  type: object
+                  properties:
+                    min:
+                      type: number
+                      minimum: 0
+                    max:
+                      type: number
+                      minimum: 0
+                  description: Document delivery rate range
+                civilCase_specialized:
+                  type: array
+                  items:
+                    type: string
+                  description: Civil case specializations
+                criminalCase_specialized:
+                  type: array
+                  items:
+                    type: string
+                  description: Criminal case specializations
+                verificationDocs:
+                  type: array
+                  items:
+                    type: string
+                  description: Verification document IDs
+      responses:
+        200:
+          description: Success
+
+    delete:
+      summary: Delete a lawyer profile
+      tags: [Lawyer]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Success
+
+  /api/v1/lawyer/{id}/status:
+    put:
+      summary: Update lawyer verification status
+      tags: [Lawyer]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                is_verified_by_council:
+                  type: boolean
+                  description: Is verified by law council
+                has_law_license:
+                  type: boolean
+                  description: Has law license
+      responses:
+        200:
+          description: Success
+
+  # ============== CASE REQUEST ROUTES ==============
+  /api/v1/caseRequest:
+    post:
+      summary: Create a case request
+      tags: [Case Request]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - category_type
+                - description
+                - consultation_date
+              properties:
+                category_type:
+                  type: string
+                  enum: [civil, criminal]
+                  description: Type of case
+                description:
+                  type: string
+                  description: Case description
+                consultation_date:
+                  type: string
+                  format: date-time
+                  description: Preferred consultation date
+                note:
+                  type: string
+                  description: Additional notes
+                files:
+                  type: array
+                  items:
+                    type: string
+                    format: binary
+                  description: Case documents
+                offered_Lawyers:
+                  type: array
+                  items:
+                    type: string
+                  description: IDs of lawyers to offer the case
+                lawyer_id:
+                  type: string
+                  description: ID of selected lawyer
+                status:
+                  type: string
+                  enum: [pending, accepted, rejected, completed]
+                  description: Status of the case request
+      responses:
+        201:
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                  message:
+                    type: string
+
+    get:
+      summary: Get all case requests
+      tags: [Case Request]
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: array
+                    items:
+                      type: object
+                  message:
+                    type: string
+
+  /api/v1/caseRequest/active:
+    get:
+      summary: Get active case requests
+      tags: [Case Request]
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: array
+                    items:
+                      type: object
+                  message:
+                    type: string
+
+  /api/v1/caseRequest/client/{id}:
+    get:
+      summary: Get case requests for a specific client
+      tags: [Case Request]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: array
+                    items:
+                      type: object
+                  message:
+                    type: string
+
+  /api/v1/caseRequest/lawyer/{id}:
+    get:
+      summary: Get case requests for a specific lawyer
+      tags: [Case Request]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: array
+                    items:
+                      type: object
+                  message:
+                    type: string
+
+  /api/v1/caseRequest/{id}:
+    get:
+      summary: Get a specific case request
+      tags: [Case Request]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                  message:
+                    type: string
+
+    put:
+      summary: Update a case request
+      tags: [Case Request]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                description:
+                  type: string
+                  description: Case description
+                note:
+                  type: string
+                  description: Additional notes
+                consultation_date:
+                  type: string
+                  format: date-time
+                  description: Preferred consultation date
+                offered_Lawyers:
+                  type: array
+                  items:
+                    type: string
+                  description: IDs of lawyers to offer the case
+                status:
+                  type: string
+                  enum: [pending, accepted, rejected, completed]
+                  description: Status of the case request
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                  message:
+                    type: string
+
+    delete:
+      summary: Delete a case request
+      tags: [Case Request]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+
+  /api/v1/caseRequest/{id}/file:
+    put:
+      summary: Update files for a case request
+      tags: [Case Request]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                files:
+                  type: array
+                  items:
+                    type: string
+                    format: binary
+                  description: Case documents
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                  message:
+                    type: string
+
+    delete:
+      summary: Delete a file from a case request
+      tags: [Case Request]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: fileIndex
+          required: true
+          schema:
+            type: integer
+            minimum: 0
+          description: Index of the file to delete
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                  message:
+                    type: string
+
+  /api/v1/caseRequest/{id}/assigned-lawyer:
+    delete:
+      summary: Remove assigned lawyer from a case request
+      tags: [Case Request]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+
+  /api/v1/caseRequest/{id}/offered-lawyers:
+    delete:
+      summary: Clear all offered lawyers from a case request
+      tags: [Case Request]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+
+  /api/v1/caseRequest/{id}/offered-lawyers/{lawyerId}:
+    delete:
+      summary: Remove a specific offered lawyer from a case request
+      tags: [Case Request]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: lawyerId
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+
+
+
+  # ============== APPOINTMENT ROUTES ==============
+  /api/v1/appointment/create/{id}:
+    post:
+      summary: Create an appointment for a hiring
+      tags: [Appointment]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - task
+                - timeStamp
+                - location
+                - permission
+              properties:
+                task:
+                  type: string
+                  description: Task for the appointment
+                timeStamp:
+                  type: string
+                  format: date-time
+                  description: Date and time of the appointment
+                location:
+                  type: string
+                  description: Location of the appointment
+                note:
+                  type: string
+                  description: Additional notes
+                permission:
+                  type: string
+                  enum: [client, lawyer, both]
+                  description: Who created the appointment
+      responses:
+        201:
+          description: Created
+
+  /api/v1/appointment/{id}:
+    get:
+      summary: Get a specific appointment
+      tags: [Appointment]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                  message:
+                    type: string
+
+    put:
+      summary: Update an appointment
+      tags: [Appointment]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                task:
+                  type: string
+                  description: Task for the appointment
+                timeStamp:
+                  type: string
+                  format: date-time
+                  description: Date and time of the appointment
+                location:
+                  type: string
+                  description: Location of the appointment
+                note:
+                  type: string
+                  description: Additional notes
+                permission:
+                  type: string
+                  enum: [client, lawyer, both]
+                  description: Who created the appointment
+                status:
+                  type: string
+                  enum: [pending, accepted, rejected, completed]
+                  description: Status of the appointment
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                  message:
+                    type: string
+
+    delete:
+      summary: Delete an appointment
+      tags: [Appointment]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+
+  /api/v1/appointment/user/{id}:
+    get:
+      summary: Get appointments for a specific user
+      tags: [Appointment]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Success
+
+  # ============== CHAT ROUTES ==============
+  /api/v1/chat:
+    post:
+      summary: Create a new message
+      tags: [Chat]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - receiver_id
+                - text
+              properties:
+                receiver_id:
+                  type: string
+                  description: ID of the recipient
+                text:
+                  type: string
+                  description: Message content
+      responses:
+        201:
+          description: Created
+
+  /api/v1/chat/{id}:
+    get:
+      summary: Get chat history with a specific user
+      tags: [Chat]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Success
+
+  /api/v1/chat/ai:
+    post:
+      summary: Chat with AI assistant
+      tags: [Chat]
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: Success
+
+  # ============== PAYMENT ROUTES ==============
+  /api/v1/payment/create/{id}:
+    post:
+      summary: Create a payment for a hiring
+      tags: [Payment]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: Hiring ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - amount
+              properties:
+                amount:
+                  type: number
+                  description: Payment amount
+                method:
+                  type: string
+                  description: Payment method
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: "#/components/schemas/Payment"
+                  message:
+                    type: string
+
+  /api/v1/payment:
+    get:
+      summary: Get all payments for the user
+      tags: [Payment]
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Payment"
+                  message:
+                    type: string
+
+  /api/v1/payment/{id}:
+    get:
+      summary: Get a specific payment
+      tags: [Payment]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: Payment ID
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: "#/components/schemas/Payment"
+                  message:
+                    type: string
+
+    post:
+      summary: Verify payment status
+      tags: [Payment]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: Payment ID
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+
+  /api/v1/payment/handle/{id}:
+    post:
+      summary: Handle payment callback
+      tags: [Payment]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: Payment ID
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                  message:
+                    type: string
+
+  # ============== COMMENT ROUTES ==============
+  /api/v1/forum/{forumId}/comment:
+    post:
+      summary: Create a comment on a forum
+      tags: [Comment]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: forumId
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                content:
+                  type: string
+      responses:
+        201:
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                  message:
+                    type: string
+
+    get:
+      summary: Get all comments for a forum
+      tags: [Comment]
+      parameters:
+        - in: path
+          name: forumId
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: array
+                    items:
+                      type: object
+                  message:
+                    type: string
+
+  /api/v1/forum/{forumId}/comment/{commentId}:
+    put:
+      summary: Update a comment
+      tags: [Comment]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: forumId
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: commentId
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                content:
+                  type: string
+      responses:
+        200:
+          description: Success
+
+    delete:
+      summary: Delete a comment
+      tags: [Comment]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: forumId
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: commentId
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Success
+
+  # ============== REPORT ROUTES ==============
+  /api/v1/report/forum:
+    get:
+      summary: Get all forum reports
+      tags: [Report]
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: Success
+
+  /api/v1/report/forum/{reportId}:
+    get:
+      summary: Get a specific forum report
+      tags: [Report]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: reportId
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Success
+
+  /api/v1/forum/{forumId}/report:
+    post:
+      summary: Report a forum
+      tags: [Report]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: forumId
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                reason:
+                  type: string
+      responses:
+        201:
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  token:
+                    type: string
+
+  /api/v1/comment/{commentId}/report:
+    post:
+      summary: Report a comment
+      tags: [Report]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: commentId
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                reason:
+                  type: string
+      responses:
+        201:
+          description: Created
+
+  /api/v1/report/comment:
+    get:
+      summary: Get all comment reports
+      tags: [Report]
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  token:
+                    type: string
+                  user:
+                    type: object
+
+  /api/v1/report/comment/{commentId}:
+    get:
+      summary: Get a specific comment report
+      tags: [Report]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: commentId
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+
+  # ============== ADMIN ROUTES ==============
+  /api/v1/admin/user:
+    get:
+      summary: Get all users
+      tags: [Admin]
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: array
+                    items:
+                      type: object
+                  message:
+                    type: string
+
+  /api/v1/admin/user/{id}:
+    get:
+      summary: Get a specific user
+      tags: [Admin]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                  message:
+                    type: string
+
+    put:
+      summary: Update a user
+      tags: [Admin]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                email:
+                  type: string
+                  format: email
+                phone:
+                  type: string
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                  message:
+                    type: string
+
+    delete:
+      summary: Delete a user
+      tags: [Admin]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+
+  /api/v1/admin/user/{id}/role:
+    put:
+      summary: Update user role
+      tags: [Admin]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                role:
+                  type: string
+                  enum: [admin, user, lawyer]
+      responses:
+        200:
+          description: Success
+
+  /api/v1/admin/dashboard/stats:
+    get:
+      summary: Get dashboard statistics
+      tags: [Admin]
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                    properties:
+                      totalUsers:
+                        type: number
+                      registeredLawyers:
+                        type: number
+                      totalNews:
+                        type: number
+                      totalCaseRequests:
+                        type: number
+                      totalForums:
+                        type: number
+                      totalArticles:
+                        type: number
+                  message:
+                    type: string
+
+  # ============== AUTH ROUTES ==============
+  /api/v1/auth/register:
+    post:
+      summary: Register a new user
+      tags: [Auth]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - email
+                - password
+              properties:
+                name:
+                  type: string
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+                  format: password
+                phone:
+                  type: string
+      responses:
+        201:
+          description: Created
+
+  /api/v1/auth/login:
+    post:
+      summary: Login user
+      tags: [Auth]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+                  format: password
+      responses:
+        200:
+          description: Success
+
+  /api/v1/auth/oauthLogin:
+    post:
+      summary: Login with OAuth
+      tags: [Auth]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - name
+              properties:
+                email:
+                  type: string
+                  format: email
+                name:
+                  type: string
+                photo:
+                  type: string
+      responses:
+        200:
+          description: Success
+
+  /api/v1/auth/logout:
+    get:
+      summary: Logout user
+      tags: [Auth]
+      responses:
+        200:
+          description: Success
+
+  /api/v1/auth/getMe:
+    get:
+      summary: Get current user profile
+      tags: [Auth]
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: Success
+
+  /api/v1/auth/updateProfile:
+    put:
+      summary: Update user profile
+      tags: [Auth]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                email:
+                  type: string
+                  format: email
+                phone:
+                  type: string
+      responses:
+        200:
+          description: Success
+
+  /api/v1/auth/updatePhoto:
+    put:
+      summary: Update user profile photo
+      tags: [Auth]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                image:
+                  type: string
+                  format: binary
+      responses:
+        200:
+          description: Success
+
+  /api/v1/auth/deletePhoto:
+    delete:
+      summary: Delete user profile photo
+      tags: [Auth]
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: Success
+
+  /api/v1/auth/resetPassword:
+    put:
+      summary: Reset user password
+      tags: [Auth]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+                - code
+              properties:
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+                  format: password
+                code:
+                  type: string
+      responses:
+        200:
+          description: Success
+
+  # ============== NOTIFICATION ROUTES ==============
+  /api/v1/notification:
+    get:
+      summary: Get all notifications for current user
+      tags: [Notification]
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: Success
+
+    post:
+      summary: Create a notification
+      tags: [Notification]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - title
+                - message
+                - recipient
+              properties:
+                title:
+                  type: string
+                message:
+                  type: string
+                recipient:
+                  type: string
+                link:
+                  type: string
+      responses:
+        201:
+          description: Created
+
+  /api/v1/notification/{id}/read:
+    put:
+      summary: Mark notification as read
+      tags: [Notification]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Success
+
+  /api/v1/notification/{id}:
+    delete:
+      summary: Delete a notification
+      tags: [Notification]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Success
+
+  # ============== OTP SERVICE ROUTES ==============
+  /api/v1/otpService/send:
+    post:
+      summary: Send OTP to user
+      tags: [OTP Service]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - phone
+              properties:
+                phone:
+                  type: string
+      responses:
+        200:
+          description: Success
+
+  /api/v1/otpService/verify:
+    post:
+      summary: Verify OTP
+      tags: [OTP Service]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - phone
+                - code
+              properties:
+                phone:
+                  type: string
+                code:
+                  type: string
+      responses:
+        200:
+          description: Success
+
+  /api/v1/otpService/resetPassword:
+    post:
+      summary: Send password reset OTP via email
+      tags: [OTP Service]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+              properties:
+                email:
+                  type: string
+                  format: email
+      responses:
+        200:
+          description: Success
+
+  # ============== REVIEW ROUTES ==============
+  /api/v1/review:
+    post:
+      summary: Create a review
+      tags: [Review]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - lawyer_id
+                - rating
+                - comment
+              properties:
+                lawyer_id:
+                  type: string
+                rating:
+                  type: number
+                  minimum: 1
+                  maximum: 5
+                comment:
+                  type: string
+      responses:
+        201:
+          description: Created
+
+  /api/v1/review/lawyer/{id}:
+    get:
+      summary: Get all reviews for a lawyer
+      tags: [Review]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Success
+
+  /api/v1/review/{id}:
+    get:
+      summary: Get a specific review
+      tags: [Review]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Success
+
+    put:
+      summary: Update a review
+      tags: [Review]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+
+              type: object
+              properties:
+                rating:
+                  type: number
+                  minimum: 1
+                  maximum: 5
+                comment:
+                  type: string
+      responses:
+        200:
+          description: Success
+
+    delete:
+      summary: Delete a review
+      tags: [Review]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Success
