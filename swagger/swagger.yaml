@@ -6,6 +6,10 @@ components:
       bearerFormat: JWT
 
 openapi: 3.0.0
+info:
+  title: Lawyer matching system
+  version: 1.0.0
+  description: API doccument for lawyer matching system
 security:
   - bearerAuth: []
 
@@ -1320,7 +1324,7 @@ paths:
                   success:
                     type: boolean
                   data:
-                    $ref: "#/components/schemas/Payment"
+                    type: object
                   message:
                     type: string
 
@@ -1343,7 +1347,7 @@ paths:
                   data:
                     type: array
                     items:
-                      $ref: "#/components/schemas/Payment"
+                      type: object
                   message:
                     type: string
 
@@ -1371,7 +1375,7 @@ paths:
                   success:
                     type: boolean
                   data:
-                    $ref: "#/components/schemas/Payment"
+                    type: object
                   message:
                     type: string
 
